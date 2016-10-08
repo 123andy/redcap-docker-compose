@@ -10,13 +10,14 @@
     </head>
     <body>
         <h1>Hello REDCapper</h1>
+        <hr>
 <?php
 
 $redcap_ready = file_exists("redcap/install.php");
 if ($redcap_ready) {
-    print "<div>Looks like you've got redcap where it should be - <a href='redcap/install.php'>launch the installer</a> and continue...</div>
+    print "<p>Looks like you've got redcap where it should be - <a href='redcap/install.php'>start the installer</a> and continue...</p>
     
-        <div>To access mysql on your docker instance, check out the directions here: 
+        <p>To access mysql on your docker instance, check out the directions here: <a href='https://github.com/123andy/redcap-docker-compose#connecting-to-the-database' target='_blank'>mysql launch in docker</a></p>
     
     ";
 } else {
@@ -33,6 +34,9 @@ if ($redcap_ready) {
 
 // END PAGE
 ?>
+        <br>
+        <p>Good luck!</p>
+        <p> -Andy</p>
         <h6>This page will refresh every 3 seconds...</h6>
     </body>
 </html>
