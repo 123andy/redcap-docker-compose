@@ -7,9 +7,9 @@ services:
       - "80:80"
       - "3306:3306"
     volumes:
-      - ./www:/redcap_webroot
-      - ./mysql:/var/lib/mysql
-      - ./logs:/var/log/export"
+      - "./www:/redcap_webroot"
+      - "./mysql:/var/lib/mysql"
+      - "./logs:/var/log/export"
     links:
       - "mailhog:mailhog"
     depends_on:
