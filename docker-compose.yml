@@ -1,15 +1,15 @@
-version: '2'
+version: '3'
 services:
   redcap:
     container_name: redcap
     image: andy123/redcap-docker
     ports:
-      - "80:80"
-      - "3306:3306"
+      - "20080:80"
+      - "23306:3306"
     volumes:
-      - "./www:/redcap_webroot"
-      - "./mysql:/var/lib/mysql"
-      - "./logs:/var/log/export"
+      - ${WEBROOT_DIR}:/redcap_webroot"
+      - ${MYSQL_DIR}:/var/lib/mysql"
+      - ${LOGS_DIR}:/var/log/export"
     links:
       - "mailhog:mailhog"
     depends_on:
@@ -20,3 +20,7 @@ services:
     ports:
       - "1026:1025"
       - "81:8025"
+volumes:
+  webroot:
+  mysql:
+  logs:
