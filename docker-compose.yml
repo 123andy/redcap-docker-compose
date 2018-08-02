@@ -1,25 +1,80 @@
 version: '3'
 services:
-  redcap:
-    container_name: redcap
-    image: andy123/redcap-docker
+#  web:
+#    build: docker-redcap
+#    env_file: .env
+#    ports:
+#      - "20080:80"
+#      - "23306:3306"
+#    volumes:
+#      - ${WEBROOT_DIR}:/redcap_webroot"
+#      - ${MYSQL_DIR}:/var/lib/mysql"
+#      - ${LOGS_DIR}:/var/log/export"
+#    links:
+#      - "mailhog:mailhog"
+#    depends_on:
+#      - mailhog
+
+  web:
+    build: docker-php-apache
+    env_file: .env
     ports:
       - "20080:80"
-      - "23306:3306"
     volumes:
-      - ${WEBROOT_DIR}:/redcap_webroot"
-      - ${MYSQL_DIR}:/var/lib/mysql"
-      - ${LOGS_DIR}:/var/log/export"
-    links:
-      - "mailhog:mailhog"
-    depends_on:
-      - mailhog
+      - ./override-php-apache:/etc/container-config-override
+      - ${WEBROOT_DIR}:/var/www/html
+      - ${LOGS_DIR}:/var/log/apache2
+
+
+  #  db:
+#    image: mysql:5.7
+#    volumes:
+#    - db-data:/var/lib/mysql
+#    restart: always
+#    ports:
+#    - "23306:3306"
+#    environment:
+#      MYSQL_ROOT_PASSWORD: redcap
+#      MYSQL_DATABASE: redcap
+#      MYSQL_USER: redcap
+#      MYSQL_PASSWORD: redcap
+
+  cron:
+    build: docker-cron
+    env_file: .env
+    command: ['crond', '-f', '/var/spool/cron/crontabs']
+    volumes:
+      - ${CRONTAB_DIR}:/var/spool/cron/crontabs
+
+
+
+
+#  redcap:
+#    container_name: redcap
+#    image: andy123/redcap-docker
+#    ports:
+#      - "20080:80"
+#      - "23306:3306"
+#    volumes:
+#      - ${WEBROOT_DIR}:/redcap_webroot"
+#      - ${MYSQL_DIR}:/var/lib/mysql"
+#      - ${LOGS_DIR}:/var/log/export"
+#    links:
+#      - "mailhog:mailhog"
+#    depends_on:
+#      - mailhog
   mailhog:
     container_name: mailhog
     image: mailhog/mailhog:latest
-    ports:
-      - "1026:1025"
-      - "81:8025"
+#    ports:
+#      - "1026:1025"
+#      - "81:8025"
+    environment:
+      # https://github.com/mailhog/MailHog/blob/master/docs/CONFIG.md
+      - MH_UI_WEB_PATH=mailhog
+
+
+
 volumes:
   webroot:
   mysql:
