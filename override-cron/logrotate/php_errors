@@ -1,0 +1,7 @@
+/logs-dir/php_errors.log {
+    rotate 4
+	hourly
+	nocompress
+	missingok
+	notifempty
+}

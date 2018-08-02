@@ -1,81 +1,75 @@
 version: '3'
 services:
-#  web:
-#    build: docker-redcap
-#    env_file: .env
-#    ports:
-#      - "20080:80"
-#      - "23306:3306"
-#    volumes:
-#      - ${WEBROOT_DIR}:/redcap_webroot"
-#      - ${MYSQL_DIR}:/var/lib/mysql"
-#      - ${LOGS_DIR}:/var/log/export"
-#    links:
-#      - "mailhog:mailhog"
-#    depends_on:
-#      - mailhog
 
   web:
     build: docker-php-apache
     env_file: .env
+    depends_on:
+      - db
     ports:
-      - "20080:80"
+      - "${WEB_PORT}:80"
     volumes:
       - ./override-php-apache:/etc/container-config-override
       - ${WEBROOT_DIR}:/var/www/html
       - ${LOGS_DIR}:/var/log/apache2
 
 
-  #  db:
-#    image: mysql:5.7
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - web
+      - db
+    env_file: .env
+    restart: always
+    ports:
+      - 8080:80
 #    volumes:
-#    - db-data:/var/lib/mysql
-#    restart: always
-#    ports:
-#    - "23306:3306"
+#      - /sessions
+
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    env_file: .env
+    volumes:
+      - ${MYSQL_DIR}:/var/lib/mysql
+      - ${LOGS_DIR}:/var/log/mysql
+      - ./override-mysql:/etc/mysql/mysql.conf.d
+    restart: always
+    ports:
+     - "${MYSQL_PORT}:3306"
 #    environment:
-#      MYSQL_ROOT_PASSWORD: redcap
+#      MYSQL_ROOT_PASSWORD: root
 #      MYSQL_DATABASE: redcap
 #      MYSQL_USER: redcap
-#      MYSQL_PASSWORD: redcap
+#      MYSQL_PASSWORD: redcap123
+
 
   cron:
     build: docker-cron
     env_file: .env
     command: ['crond', '-f', '/var/spool/cron/crontabs']
+    depends_on:
+      - web
+      - db
     volumes:
       - ${CRONTAB_DIR}:/var/spool/cron/crontabs
+      - ./override-cron/logrotate:/etc/logrotate.d
+      - ${LOGS_DIR}:/logs-dir
 
-
-
-
-#  redcap:
-#    container_name: redcap
-#    image: andy123/redcap-docker
-#    ports:
-#      - "20080:80"
-#      - "23306:3306"
-#    volumes:
-#      - ${WEBROOT_DIR}:/redcap_webroot"
-#      - ${MYSQL_DIR}:/var/lib/mysql"
-#      - ${LOGS_DIR}:/var/log/export"
-#    links:
-#      - "mailhog:mailhog"
-#    depends_on:
-#      - mailhog
   mailhog:
     container_name: mailhog
     image: mailhog/mailhog:latest
-#    ports:
-#      - "1026:1025"
-#      - "81:8025"
+    depends_on:
+      - web
+    ports:
+      - "1025:1025"
+      - "8025:8025"
     environment:
       # https://github.com/mailhog/MailHog/blob/master/docs/CONFIG.md
       - MH_UI_WEB_PATH=mailhog
 
-
-
 volumes:
-  webroot:
-  mysql:
-  logs:
+  mysql-volume:
+  logs-volume:

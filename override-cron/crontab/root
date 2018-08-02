@@ -1,3 +1,3 @@
 #root crontabs go here
-* * * * * wget -O /dev/null web/cron.php
-#* * * * * touch /edocs/minute_cron
+*   * * * *   wget -O /dev/null web/cron.php
+*/5 * * * *   /usr/sbin/logrotate /etc/logrotate.conf
