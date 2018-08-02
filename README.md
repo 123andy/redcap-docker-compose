@@ -1,11 +1,16 @@
 # redcap-docker-compose
 
-A docker-compose script for building REDCap with Mailhog.  This is the easiest way to create a local development instance of REDCap on your computer.
+A docker-compose script builds a working php-mysql environment designed for REDCap.
+  This is one of the easiest ways to create a local development instance of REDCap on your computer.
 
 ## Configuration Steps
-1. Install docker on your machine.  https://docs.docker.com/#components
-2. Clone this repository or simply download the docker-compose.yml file.
-3. Open your command shell or terminal and run `docker-compose up` from the directory with the docker-compose.yml file.  The first time you run this it make take a few minutes as all of the image files will be pulled down and cached on your computer.
+1. Install docker on your machine.  https://store.docker.com/search?type=edition&offering=community
+2. Clone or download this repository to your computer.
+3. Open the .env file in the root folder where you downloaded this repo.  It contains many parameters you may want to adjust
+   1. asdfasf
+   2. asdfasf
+   
+3. Open your command shell or terminal and run `docker-compose up` from the root of this directory with the docker-compose.yml file.  The first time you run this it make take a few minutes as all of the image files will be pulled down and cached on your computer.
 ```
 $ ls -latr
 -rw-r--r--   1 andy123  staff   436 Oct  8 08:14 docker-compose.yml

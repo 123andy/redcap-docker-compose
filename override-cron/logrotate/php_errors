@@ -1,6 +1,6 @@
 /logs-dir/php_errors.log {
     rotate 4
-	hourly
+	weekly
 	nocompress
 	missingok
 	notifempty

@@ -2,31 +2,16 @@ version: '3'
 services:
 
   web:
-    build: docker-php-apache
+    build: docker-web
     env_file: .env
     depends_on:
       - db
     ports:
       - "${WEB_PORT}:80"
     volumes:
-      - ./override-php-apache:/etc/container-config-override
+      - ./override-web:/etc/container-config-override
       - ${WEBROOT_DIR}:/var/www/html
       - ${LOGS_DIR}:/var/log/apache2
-
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    depends_on:
-      - web
-      - db
-    env_file: .env
-    restart: always
-    ports:
-      - 8080:80
-#    volumes:
-#      - /sessions
-
 
   db:
     image: mysql:5.7
@@ -44,6 +29,20 @@ services:
 #      MYSQL_DATABASE: redcap
 #      MYSQL_USER: redcap
 #      MYSQL_PASSWORD: redcap123
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+    - web
+    - db
+    env_file: .env
+    restart: always
+    ports:
+    - 8080:80
+  #    volumes:
+  #      - /sessions
 
 
   cron:

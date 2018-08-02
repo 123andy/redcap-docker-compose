@@ -5,7 +5,6 @@
         DocumentRoot ${APACHE_DOCUMENT_ROOT}
 
         #setEnv REMOTE_USER ${REMOTE_USER}
-        setEnv vhost redcap.conf
 
         # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
         # error, crit, alert, emerg.
