@@ -8,6 +8,11 @@ else
   echo "$TZ IS NOT DEFINED"
 fi
 
+# ENABLE A FEW PHP EXTENSIONS
+# HERE IS AN EXAMPLE OF
+#docker-php-ext-install mysqli
+#docker-php-ext-enable mysqli
+
 
 #
 ## UPDATE PHP TIMEZONE IF SPECIFIED IN ENV FILE

@@ -6,16 +6,22 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq && \
     apt-get -yq --no-install-recommends install \
-#    libapache2-mod-shib2 \
+    libapache2-mod-shib2 \
     ssmtp \
     vim \
     emacs \
     git \
     ssh \
     wget \
+    links \
+    libpng-dev \
     ### cleanup \
     && rm -r /var/lib/apt/lists/*
 
+# ADD PHP EXTENSIONS
+RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+RUN docker-php-ext-install gd && docker-php-ext-enable mysqli
+RUN docker-php-ext-install zip && docker-php-ext-enable zip
 
 # MOUNT A VOLUME WITH OUR DEFAULT CONTAINER CONFIG
 # THIS CAN BE OVERWRITTEN BY MOUNTING TO THE /etc/container-config-overwrite FOLDER
@@ -23,20 +29,21 @@ COPY ./container-config /etc/container-config
 
 ENV SERVER_NAME localhost
 ENV SERVER_ADMIN root
-
-ENV SSMTP_MAILHUB ""
-
+ENV SERVER_ALIAS localhost
 ENV APACHE_RUN_HOME /var/www
 ENV APACHE_DOCUMENT_ROOT /var/www/html
 ENV APACHE_ERROR_LOG /dev/stdout
 ENV APACHE_ACCESS_LOG /dev/stdout
+
+# If you are overriding this container, you might want to remove the default vhost
+ENV REMOVE_DEFAULT_VHOST false
 
 # Copy main startup script
 COPY container_start /etc/container_start
 RUN chmod +x /etc/container_start
 CMD ["/etc/container_start"]
 
-COPY ./default-webroot/index.php /var/www/html/index.php
+#COPY ./default-webroot/index.php /var/www/html/index.php
 
 ## Custom Webroot
 #COPY default-webroot/ /var/www/html/

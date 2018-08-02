@@ -1,0 +1,1 @@
+You can add configuration info to the default virtualhost by using the default.virtualhost file.  Otherwise all .conf files in the sites-enabled directory will be loaded.
