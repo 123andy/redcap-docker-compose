@@ -3,6 +3,7 @@ services:
 
   web:
     build: docker-web
+    container_name: redcap-web
     env_file: .env
     depends_on:
       - db
@@ -12,10 +13,18 @@ services:
       - ./override-web:/etc/container-config-override
       - ${WEBROOT_DIR}:/var/www/html
       - ${LOGS_DIR}:/var/log/apache2
+# YOU CAN BLOCK OUTGOING TRAFFIC FROM WEB BY ADDING THESE LINES
+#    extra_hosts:
+#      - "api.twilio.com:127.0.0.1"
+#      - "www.twilio.com:127.0.0.1"
+#      - "taskrouter.twilio.com:127.0.0.1"
+#      - "lookups.twilio.com:127.0.0.1"
+#      - "event-bridge.twilio.com:127.0.0.1"
+
 
   db:
     image: mysql:5.7
-    container_name: db
+    container_name: redcap-db
     env_file: .env
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
@@ -24,29 +33,23 @@ services:
     restart: always
     ports:
      - "${MYSQL_PORT}:3306"
-#    environment:
-#      MYSQL_ROOT_PASSWORD: root
-#      MYSQL_DATABASE: redcap
-#      MYSQL_USER: redcap
-#      MYSQL_PASSWORD: redcap123
 
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
+    container_name: redcap-phpmyadmin
+    env_file: .env
     depends_on:
     - web
     - db
-    env_file: .env
     restart: always
     ports:
-    - 8080:80
-  #    volumes:
-  #      - /sessions
+    - "8080:80"
 
 
   cron:
     build: docker-cron
+    container_name: redcap-cron
     env_file: .env
     command: ['crond', '-f', '/var/spool/cron/crontabs']
     depends_on:
@@ -57,18 +60,28 @@ services:
       - ./override-cron/logrotate:/etc/logrotate.d
       - ${LOGS_DIR}:/logs-dir
 
+
   mailhog:
-    container_name: mailhog
+    container_name: redcap-mailhog
     image: mailhog/mailhog:latest
+    env_file: .env
     depends_on:
       - web
     ports:
       - "1025:1025"
       - "8025:8025"
+    volumes:
+      - mailhog-volume:/mail-volume
+      - ./override-mailhog:/override
     environment:
-      # https://github.com/mailhog/MailHog/blob/master/docs/CONFIG.md
-      - MH_UI_WEB_PATH=mailhog
+      - MH_STORAGE:maildir
+      - MH_MAILDIR_PATH:/mail-volume
+      - MH_OUTGOING_SMTP:/override/outgoing_smtp.json
+#      - MH_HOSTNAME:mailhog
+#      - MH_OUTGOING_SMTP:{"server name":{"name":"Stanford MedMail","host":"medmail.stanford.edu","port":"587"}
+
 
 volumes:
   mysql-volume:
   logs-volume:
+  mailhog-volume:

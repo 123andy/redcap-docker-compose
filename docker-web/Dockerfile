@@ -11,15 +11,14 @@ RUN apt-get update -qq && \
     git \
     ssh \
     wget \
-    links \
     libpng-dev \
     libzip-dev \
     zip \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install gd \
-    && docker-php-ext-enable mysqli
+    && docker-php-ext-configure zip --with-libzip \
+    && docker-php-ext-install gd zip mysqli \
+#    && docker-php-ext-enable mysqli \
     ### cleanup \
-    && rm -r /var/lib/apt/lists/* \
+    && rm -r /var/lib/apt/lists/*
 
 # MOUNT A VOLUME WITH OUR DEFAULT CONTAINER CONFIG
 # THIS CAN BE OVERWRITTEN BY MOUNTING TO THE /etc/container-config-overwrite FOLDER

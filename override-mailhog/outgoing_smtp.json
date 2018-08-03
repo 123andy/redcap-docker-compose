@@ -1,0 +1,7 @@
+{
+  "server name": {
+    "name": "Stanford MedMail",
+    "host": "medmail.stanford.edu",
+    "port": "587"
+  }
+}

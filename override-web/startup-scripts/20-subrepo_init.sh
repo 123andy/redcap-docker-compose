@@ -63,38 +63,41 @@ git clone https://github.com/ingydotnet/git-subrepo.git /usr/bin/git-subrepo && 
 echo -e "\nsource /usr/bin/git-subrepo/.rc\n" >> $HOME_DIR/.bash_profile
 
 
-## Setup webroot repo
-##   - dont pull code down if a .git folder exists
-#if [ ! -d "$WEBROOT_DIR/.git" ]; then
-# echo "NO GIT in $WEBROOT_DIR"
-# # Pull down code from git for our site!
-# if [ ! -z "$WEBROOT_REPO_SSH_URL" ]; then
-#   # Remove the test index file
-#   cd $WEBROOT_DIR
-#   rm -f index.*
-#   if [ ! -z "$WEBROOT_REPO_BRANCH" ]; then
-#     /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone -b $WEBROOT_REPO_BRANCH $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
-#   else
-#    echo "git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR/"
-#    /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
-#   fi
-# fi
-#fi
-#
-#
-## Set up web repo folders for each env variable
-#cd $HOME_DIR;
-#IFS=','
-#for i in $WEBROOT_REPO_FOLDERS; do
-#    echo $i
-#    mkdir -p $i
-#    chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $i
-#done
-#
-## In case additional volumes are mounted to the HOME_DIR (var/www), let's double-check permissions
-#for f in */; do
-#    if [[ -d $f ]]; then
-#        echo "$f"
-#        chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $f
-#    fi
-#done
+
+# Setup webroot repo
+if [ ! -z "$WEBROOT_REPO_SSH_URL" ]; then
+ # dont pull code down if a .git folder exists
+ if [ ! -d "$WEBROOT_DIR/.git" ]; then
+   echo "NO GIT in $WEBROOT_DIR"
+   # Pull down code from git for our site!
+   # Remove the test index file
+   cd $WEBROOT_DIR
+   rm -f index.*
+   if [ ! -z "$WEBROOT_REPO_BRANCH" ]; then
+     /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone -b $WEBROOT_REPO_BRANCH $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
+   else
+    echo "git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR/"
+    /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
+   fi
+ fi
+fi
+
+
+# Set up web repo folders for each env variable
+if [ ! -z "$WEBROOT_REPO_FOLDERS" ]; then
+    cd $HOME_DIR;
+    IFS=','
+    for i in $WEBROOT_REPO_FOLDERS; do
+        echo $i
+        mkdir -p $i
+        chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $i
+    done
+
+    # In case additional volumes are mounted to the HOME_DIR (var/www), let's double-check permissions
+    for f in */; do
+        if [[ -d $f ]]; then
+            echo "$f"
+            chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $f
+        fi
+    done
+fi
