@@ -25,9 +25,12 @@ few files in the directory - details to be added.
 1. Install docker on your machine.
    * [Docker Community Edition](https://store.docker.com/search?type=edition&offering=community)
         * Optionally, you can also download a docker GUI such as [Kitematic](https://kitematic.com/)
-1. Clone or download [this repository](https://github.com/123andy/redcap-docker-compose) to your computer.
+1. Clone or download [this repository](https://github.com/123andy/redcap-docker-compose) to your computer.  
+   Unzip the archive to a folder
    * [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
-1. Download the full install version of REDCap from the community consortium
+1. Download the full install version of REDCap from the community consortium.  If you want this script to help you
+   install REDCap, you can place the `redcapx.y.z.zip` file in the `REDCAP-DOWNLOADS` folder and it will be auto-extracted
+   and installed to your webroot.
    * [REDCap Community Download Page](https://community.projectredcap.org/page/download.html) - requires authentication.
    * Talk to your site's REDCap administrator if you need help getting the source code or if you need 
    to [apply for community access](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
@@ -60,7 +63,6 @@ a gui tool.  Other logs are mapped through to a volume.
 
  
 ## Installing REDCap
-
 Once your container is up and running, you should be able to connect by opening [http://localhost](http://localhost)
 
 You will likely have a phpinfo page if all has gone well.  The next step is to add and configure your REDCap webapp
@@ -88,21 +90,30 @@ and your REDCap database.
 ```
 
 
-  
+## Usage
+* You can access your webroot at [http://localhost](http://localhost/)
+* You can access your mailhog at [http://localhost/mailhog/](http://localhost/mailhog/)
+   * (don't forget the trailing slash)
+* You can access your phpMyAdmin at [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
+   * (don't forget the trailing slash)
+
+## TODO
+* Talk about GIT/SSH integration for auto-pulling content from remote repo
+
   
 ## Other Misc Notes
 
 ### Connecting to the database
-
-I haven't finished getting the php-my-admin configured so for now you will have to connect to the database using an outside sql tool (mySql Workbench) or you could run mysql as follows from the bash shell:
-Open a terminal or command-line shell on your computer and run:
+You can also access the database directly from your terminal with the following command:
 ```
-$ docker exec -it redcap mysql -u admin -predcap
+$ docker-compose exec db mysql -u redcap -predcap123
+redcap-docker-compose$ docker-compose exec db mysql -u redcap -predcap123
+mysql: [Warning] Using a password on the command line interface can be insecure.
 Welcome to the MySQL monitor.  Commands end with ; or \g.
-Your MySQL connection id is 2
-Server version: 5.5.52-0ubuntu0.14.04.1 (Ubuntu)
+Your MySQL connection id is 19
+Server version: 5.7.23-log MySQL Community Server (GPL)
 
-Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
 
 Oracle is a registered trademark of Oracle Corporation and/or its
 affiliates. Other names may be trademarks of their respective

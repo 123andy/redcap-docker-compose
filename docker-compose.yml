@@ -79,7 +79,15 @@ services:
       MH_OUTGOING_SMTP: /outgoing_smtp.json
       MH_UI_WEB_PATH: mailhog
 
-
+  setup:
+    build: docker-setup
+    env_file: .env
+    volumes:
+      - ${REDCAP_DOWNLOAD_DIR}:/redcap_download
+      - ${WEBROOT_DIR}:/webroot
+    environment:
+      - RUN_IF_EMPTY=true
+      - FORCE_RUN=false
 
 volumes:
   mysql-volume:
