@@ -9,6 +9,11 @@ if [ ! -z "$MH_MAILDIR_PATH" ]; then
   chown -R 1000 $MH_MAILDIR_PATH
 fi
 
+if [ ! -z "$MH_OUTGOING_SMTP" ]; then
+  echo "Verifying permissions of outgoing smtp config at $MH_OUTGOING_SMTP"
+  chown 1000 $MH_OUTGOING_SMTP
+fi
+
 # RUN MAILHOG AS A NON-PRIV USER
 su - mailhog
 exec "MailHog"

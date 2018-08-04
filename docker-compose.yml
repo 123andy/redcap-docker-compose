@@ -72,11 +72,11 @@ services:
       - "8025:8025"
     volumes:
       - mailhog-volume:/maildir
-      - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing-smtp.json
+      - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
     environment:
       MH_STORAGE: maildir
       MH_MAILDIR_PATH: /maildir
-      MH_OUTGOING_SMTP: /outgoing-smtp.json
+      MH_OUTGOING_SMTP: /outgoing_smtp.json
       MH_UI_WEB_PATH: mailhog
 
 
