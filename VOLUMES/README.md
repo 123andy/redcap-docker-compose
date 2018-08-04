@@ -1,0 +1,1 @@
+This is the default location of webroot and logs.  You can move them by editing the .env file
