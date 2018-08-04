@@ -65,6 +65,7 @@ a gui tool.  Other logs are mapped through to a volume.
 ## Installing REDCap
 Once your container is up and running, you should be able to connect by opening [http://localhost](http://localhost)
 
+If you placed 
 You will likely have a phpinfo page if all has gone well.  The next step is to add and configure your REDCap webapp
 and your REDCap database.
 
