@@ -1,0 +1,6 @@
+.idea*
+.env*
+.DS_Store
+VOLUMES/*
+REDCAP-DOWNLOAD/*
+!VOLUMES/README.md

@@ -1,22 +1,97 @@
-version: '2'
+version: '3'
 services:
-  redcap:
-    container_name: redcap
-    image: andy123/redcap-docker
-    ports:
-      - "80:80"
-      - "3306:3306"
-    volumes:
-      - "./www:/redcap_webroot"
-      - "./mysql:/var/lib/mysql"
-      - "./logs:/var/log/export"
-    links:
-      - "mailhog:mailhog"
+
+  web:
+    build: docker-web
+#    container_name: redcap-web
+    env_file:
+      - .env
+      - .env-git-ssh
+    restart: always
     depends_on:
-      - mailhog
-  mailhog:
-    container_name: mailhog
-    image: mailhog/mailhog:latest
+      - db
     ports:
-      - "1026:1025"
-      - "81:8025"
+      - "${WEB_PORT}:80"
+    volumes:
+      - ${WEB_OVERRIDES}:/etc/container-config-override
+      - ${WEBROOT_DIR}:/var/www/html
+      - ${LOGS_DIR}:/var/log/apache2
+# You can prevent your REDCap from accessing certain sites (like twilio) using these settings
+#    extra_hosts:
+#      - "api.twilio.com:127.0.0.1"
+#      - "www.twilio.com:127.0.0.1"
+#      - "taskrouter.twilio.com:127.0.0.1"
+#      - "lookups.twilio.com:127.0.0.1"
+#      - "event-bridge.twilio.com:127.0.0.1"
+
+
+  db:
+    image: mysql:5.7
+#    container_name: redcap-db
+    env_file: .env
+    restart: always
+    volumes:
+      - ${MYSQL_DIR}:/var/lib/mysql
+      - ${LOGS_DIR}:/var/log/mysql
+      - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
+    ports:
+     - "${MYSQL_PORT}:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+#    container_name: redcap-phpmyadmin
+    env_file: .env
+    depends_on:
+      - web
+      - db
+    restart: always
+    ports:
+      - "8080:80"
+
+  cron:
+    build: docker-cron
+#    container_name: redcap-cron
+    restart: always
+    env_file: .env
+    command: ['crond', '-f', '/var/spool/cron/crontabs']
+    depends_on:
+      - web
+      - db
+    volumes:
+      - ${CRONTAB_FILE}:/var/spool/cron/crontabs/root
+      - ${CRON_LOGROTATE_DIR}:/etc/logrotate.d
+      - ${LOGS_DIR}:/logs-dir
+
+  mailhog:
+    build: docker-mailhog
+#    container_name: redcap-mailhog
+    restart: always
+    env_file: .env
+    depends_on:
+      - web
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - mailhog-volume:/maildir
+      - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
+    environment:
+      MH_STORAGE: maildir
+      MH_MAILDIR_PATH: /maildir
+      MH_OUTGOING_SMTP: /outgoing_smtp.json
+      MH_UI_WEB_PATH: mailhog
+
+  setup:
+    build: docker-setup
+    env_file: .env
+    volumes:
+      - ${REDCAP_DOWNLOAD_DIR}:/redcap_download
+      - ${WEBROOT_DIR}:/webroot
+    environment:
+      - PARSE_ZIP_INSTALLER=true
+      - FORCE_RUN=false
+
+volumes:
+  mysql-volume:
+  logs-volume:
+  mailhog-volume:
