@@ -1,26 +1,5 @@
 # redcap-docker-compose
 
-This docker-compose script builds a working php-mysql environment designed for REDCap.
-  This is one of the easiest ways to create a local development instance of REDCap on your computer or test server
-
-### Updates
-
-* 2018-08-04  Added support for auto-install from `redcapx.y.z.zip`
-* 2018-08-01  Major refactoring into docker-compose 3
-
-## About
-This docker-compose will build multiple servers as part of a docker group to host REDCap on your local computer/server.
-It consists of:
- * The official PHP-Apache docker image (Currently version 7.2)
- * The official MySql docker image (currently version 5.7)
- * The official PhpMyAdmin web-based mysql tool for managing the database.
- * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
- * A basic alpine-based MailHop image (for capturing outbound emails from REDCap for your review)
- * A basic alpine-based setup image to create your first REDCap webroot and database.php
-
-The advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how
-these changes might affect your projects or custom code
-
 ## Configuration
 The services are mainly configured through a `.env` environment file.  Additional customization can be done my modifying
 the files in the `override-*` directories.  Detailed examples should be added to this documentation - please help with
@@ -82,7 +61,7 @@ redcap-docker-compose$ docker-compose up
 ```
 1. Watch the logs, if all went well, you should be able to get a phpinfo() page at [http://localhost](http://localhost)
 1. Next, open your installer zip (or take your existing development folder) and place it into the `WEBROOT_DIR` folder
-as configured in your `.env` file.  Be sure to read the [note on the `/redcap/`](what-should-i-do-with-the-redcap-folder) folder after this section.
+as configured in your `.env` file.  Be sure to read the note on the `/redcap/` folder after this section.
 1. Next, we need to edit the `database.php` file in the webroot to match your *MYSQL_XXX* database parameters from the
  .env file.  Using your text editor, open `database.php` and insert something like:
    ```php
@@ -96,7 +75,7 @@ as configured in your `.env` file.  Be sure to read the [note on the `/redcap/`]
      $salt      = '12345678';
    ```
 
-> ##### What should I do with the `/redcap/` folder?
+> #### What should I do with the `/redcap/` folder?
 >
 >When you place your redcap files in your `WEBROOT_DIR` you can either include the `/redcap/` folder or leave it out.
 I prefer to leave off so the REDCap homepage will be [http://localhost](http://localhost).
@@ -107,6 +86,51 @@ I prefer to leave off so the REDCap homepage will be [http://localhost](http://l
  your cron container with `docker-compose up -d --no-deps --build cron`
 >
 >Note that if you use the *startup assistant* it leaves off the /redcap/ folder.
+
+
+## Configure REDCap
+At this point, we assume that you have a running set of containers.  If you should now setup your database.
+
+1. Open the installer at [http://localhost/install.php](http://localhost/install.php)
+    * You can *IGNORE* the part about creating a new database user - you already have one as defined in the MYSQL_XXX
+variables in the `.env` file.
+1. Copy the SQL to generate your redcap database and then execute it!  See [Connecting to the database](#connecting-to-the-database)
+
+
+### Connecting to the database
+There are at least three ways to connect to your database:
+1. You can connect to the database from your client using any database tool (dataGrip, phpWorkbench, etc).  The default
+ port is 3306 but you can change this in the `.env` file.
+1. You have phpMyAdmin running inside this service - simply visit [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
+1. You can connect to the database from the command line as illustrated in the example below:
+```
+$ docker-compose exec db mysql -u redcap -predcap123
+redcap-docker-compose$ docker-compose exec db mysql -u redcap -predcap123
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Server version: 5.7.23-log MySQL Community Server (GPL)
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+```
+
+
+## Logging
+* Some logs (like apache access and cron) are passed through to the docker runtime and can be viewed by calling 
+`docker-compose logs` or can be viewed using a gui tool.  
+* Other log files (like mysql slow queries and php_errors.log) are mapped through to a log volume on your computer for
+easy monitoring using tools like notepad++ (pc), console (mac), or just `tail -f *` from the terminal.
+* Custom application logs should be written to `/var/log/redcap` inside the web image that maps to the `$LOG_DIR` 
+as configured in the `.env` file.
+* Log rotation can be configured so your log files don't grow too large - see `override-cron/logrotate` for an example. 
+
+
+## Usage
+* You can access your webroot at [http://localhost](http://localhost/)
+* You can access your mailhog at [http://localhost/mailhog/](http://localhost/mailhog/)
+   * (don't forget the trailing slash)
+* You can access your phpMyAdmin at [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
+   * (don't forget the trailing slash)
 
 
 ## Useful Docker-compose Commands
@@ -132,51 +156,6 @@ located (unless you specify additional parameters).
    * `docker ps -a` - shows you all running *and stopped* containers.
    
 
-## Configure REDCap
-At this point, we assume that you have a running set of containers.  If you should now setup your database.
-
-1. Open the installer at [http://localhost/install.php](http://localhost/install.php)
-    * You can *IGNORE* the part about creating a new database user - you already have one as defined in the MYSQL_XXX
-variables in the `.env` file.
-1. Copy the SQL to generate your redcap database and then execute it!  See [Connecting to the database](#connecting-to-the-database)
-
-
-## Logging
-* Some logs (like apache access and cron) are passed through to the docker runtime and can be viewed by calling 
-`docker-compose logs` or can be viewed using a gui tool.  
-* Other log files (like mysql slow queries and php_errors.log) are mapped through to a log volume on your computer for
-easy monitoring using tools like notepad++ (pc), console (mac), or just `tail -f *` from the terminal.
-* Custom application logs should be written to `/var/log/redcap` inside the web image that maps to the `$LOG_DIR` 
-as configured in the `.env` file.
-* Log rotation can be configured so your log files don't grow too large - see `override-cron/logrotate` for an example. 
-
-
-## Usage
-* You can access your webroot at [http://localhost](http://localhost/)
-* You can access your mailhog at [http://localhost/mailhog/](http://localhost/mailhog/)
-   * (don't forget the trailing slash)
-* You can access your phpMyAdmin at [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
-   * (don't forget the trailing slash)
-
-
-### Connecting to the database
-There are at least three ways to connect to your database:
-1. You can connect to the database from your client using any database tool (dataGrip, phpWorkbench, etc).  The default
- port is 3306 but you can change this in the `.env` file.
-1. You have phpMyAdmin running inside this service - simply visit [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
-1. You can connect to the database from the command line as illustrated in the example below:
-```
-$ docker-compose exec db mysql -u redcap -predcap123
-redcap-docker-compose$ docker-compose exec db mysql -u redcap -predcap123
-Welcome to the MySQL monitor.  Commands end with ; or \g.
-Server version: 5.7.23-log MySQL Community Server (GPL)
-
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
-
-mysql> 
-```
-
-
 ## GIT/SSH Integration
 There is an additional `.env-git-ssh` file that allows you to enable your web container to run git commands with
 external git repos.  For example, you can have your container automatically download its web content from a
@@ -184,7 +163,6 @@ git repo when it is created.  You could also add a hook to your app that causes 
 commit changes to your code.  This is great for building a continuous integration server for test purposes.
 
 More detailed documentation is required.
-
 
 ### Other Misc Notes
 
