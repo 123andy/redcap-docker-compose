@@ -3,10 +3,11 @@ services:
 
   web:
     build: docker-web
-    container_name: redcap-web
+#    container_name: redcap-web
     env_file:
       - .env
       - .env-git-ssh
+    restart: always
     depends_on:
       - db
     ports:
@@ -26,19 +27,19 @@ services:
 
   db:
     image: mysql:5.7
-    container_name: redcap-db
+#    container_name: redcap-db
     env_file: .env
+    restart: always
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
       - ${LOGS_DIR}:/var/log/mysql
       - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
-    restart: always
     ports:
      - "${MYSQL_PORT}:3306"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: redcap-phpmyadmin
+#    container_name: redcap-phpmyadmin
     env_file: .env
     depends_on:
       - web
@@ -49,7 +50,8 @@ services:
 
   cron:
     build: docker-cron
-    container_name: redcap-cron
+#    container_name: redcap-cron
+    restart: always
     env_file: .env
     command: ['crond', '-f', '/var/spool/cron/crontabs']
     depends_on:
@@ -61,8 +63,8 @@ services:
       - ${LOGS_DIR}:/logs-dir
 
   mailhog:
-    container_name: redcap-mailhog
     build: docker-mailhog
+#    container_name: redcap-mailhog
     restart: always
     env_file: .env
     depends_on:
@@ -86,7 +88,7 @@ services:
       - ${REDCAP_DOWNLOAD_DIR}:/redcap_download
       - ${WEBROOT_DIR}:/webroot
     environment:
-      - RUN_IF_EMPTY=true
+      - PARSE_ZIP_INSTALLER=true
       - FORCE_RUN=false
 
 volumes:
