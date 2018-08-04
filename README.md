@@ -3,87 +3,90 @@
 A docker-compose script builds a working php-mysql environment designed for REDCap.
   This is one of the easiest ways to create a local development instance of REDCap on your computer.
 
-## Configuration Steps
-1. Install docker on your machine.  https://store.docker.com/search?type=edition&offering=community
-2. Clone or download this repository to your computer.
-3. Open the .env file in the root folder where you downloaded this repo.  It contains many parameters you may want to adjust
-   1. asdfasf
-   2. asdfasf
+## Updates
+
+2018-08-03  Major refactoring into docker-compose 3
+
+## About
+This docker-compose will build multiple servers as part of a docker group to host REDCap on your local computer/server.
+It consists of:
+ * The official PHP-Apache docker image (Currently version 7.2)
+ * The official MySql docker image (currently version 5.7)
+ * The official PhpMyAdmin web-based mysql tool for managing the database.
+ * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
+ * A basic alpine-based MailHop image (for capturing outbound emails from REDCap for your review)
+
+## Configuration
+The image is mainly configured through a .env environment file.  Additional customization can be done my modifying a
+few files in the directory - details to be added.
+
+
+## Getting Started
+1. Install docker on your machine.
+   * [Docker Community Edition](https://store.docker.com/search?type=edition&offering=community)
+        * Optionally, you can also download a docker GUI such as [Kitematic](https://kitematic.com/)
+1. Clone or download [this repository](https://github.com/123andy/redcap-docker-compose) to your computer.
+   * [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
+1. Download the full install version of REDCap from the community consortium
+   * [REDCap Community Download Page](https://community.projectredcap.org/page/download.html) - requires authentication.
+   * Talk to your site's REDCap administrator if you need help getting the source code or if you need 
+   to [apply for community access](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
+1. Open the `.env` file in the root folder where you downloaded this repo with your text editor or development tool.
+   * Review the settings and see what you can easily customize 
+     * You will want to select where your webroot folder will reside on your computer.  This is where your redcap source code will go.
+     You migth want this in your Documents or Desktop folder for easy access.
+     * You will want to understand where the log files will be located.
+1. Lastly, you will start-up the containers.  This can be done from the terminal/command line by navigating to the folder
+   containing the `docker-compose.yml` file and running the following commands:
+   * `docker-compose up -d` - this will run and detach form the containers leaving them to run in the background.  
+   This is the most common way I run these containers.  You can view the status and logs from other `docker-compose`
+   commands or from the GUI of docker-compose tools like [Kitematic](https://kitematic.com/)
+   * `docker-compose up` - this will run the containers in the current window.  If you close your window the containers
+    will be stopped.
+   * `docker-compose up -d --force-recreate` - This should be run if you modify the .env file or other custom override
+    files and need those changes to be incorporated into the containers -- otherwise your changes will not appear in the
+    running images.
+   * `docker-compose stop` - this will stop the docker process (which would be good to do if you want to save battery)
+   * `docker-compose down` - this will stop and remove the containers - meaning the next time you call up they will be 
+   recreated (this is similar to the --force-recreate tag)
+   * `docker-compose down -v` - this will stop and remove the containers *along with their internal volumes*.  For
+   example, if you call this any saved email messages from mailhub would be removed.
    
-3. Open your command shell or terminal and run `docker-compose up` from the root of this directory with the docker-compose.yml file.  The first time you run this it make take a few minutes as all of the image files will be pulled down and cached on your computer.
-```
-$ ls -latr
--rw-r--r--   1 andy123  staff   436 Oct  8 08:14 docker-compose.yml
-drwxr-xr-x   3 andy123  staff   102 Oct  8 08:29 www
--rw-r--r--   1 andy123  staff  1381 Oct  8 08:32 README.md
--rw-r--r--   1 andy123  staff  1068 Oct  8 08:14 LICENSE
+   Please note that **all commands** must be run from the root directory where the `docker-compose.yaml` file is located.  
 
-$ docker-compose up
-Creating network "redcapdockercompose_default" with the default driver
-Pulling mailhog (mailhog/mailhog:latest)...
-latest: Pulling from mailhog/mailhog
-4d06f2521e4f: Pull complete
-...
-Pulling redcap (andy123/redcap-docker:latest)...
-latest: Pulling from andy123/redcap-docker
-862a3e9af0ae: Pull complete
-...
-```
-Next, compose will run the containers:
-```
-Creating mailhog
-Creating redcap
-Attaching to mailhog, redcap
-mailhog    | 2016/10/08 15:37:50 Using in-memory storage
-mailhog    | 2016/10/08 15:37:50 [SMTP] Binding to address: 0.0.0.0:1025
-mailhog    | 2016/10/08 15:37:50 Serving under http://0.0.0.0:8025/
-redcap     | => An empty or uninitialized MySQL volume is detected in /var/lib/mysql
-redcap     | => Installing MySQL ...
-mailhog    | [HTTP] Binding to address: 0.0.0.0:8025
-mailhog    | Creating API v1 with WebPath: 
-mailhog    | Creating API v2 with WebPath: 
-redcap     | => Done!
-redcap     | => Waiting for confirmation of MySQL service startup
-redcap     | => Creating MySQL admin user with preset password
-redcap     | => Done!
-redcap     | ========================================================================
-redcap     | You can now connect to this MySQL Server using:
-redcap     | 
-redcap     |     mysql -uadmin -predcap -h<host> -P<port>
-redcap     | 
-redcap     | Please remember to change the above password as soon as possible!
-redcap     | MySQL user 'root' has no password but only allows local connections
-redcap     | ========================================================================
-redcap     | => Setting timezone
-redcap     | => Setting max_input_vars
-redcap     | => Setting php sendmail to ssmtp
-redcap     | => Setting ssmtp link to mailhog
-redcap     | => Configuring CRON
-redcap     | no crontab for root
-redcap     | => Starting Supervisor
-```
-4. Open another terminal window or your finder/windows explorer and you should see a few new folders have been created:
-```
-docker-redcap-compose
-  - docker-compose.yml
-  - www                 // Contains your web-root directory
-  - mysql               // Contains your database
-  - logs                // Contains log files (useful for debugging)
-```
-5. Open your web browser and goto http://localhost
-  * you should see the contents of the index file in your www directory. 
-6. Open http://localhost:81
-  * You should see the web interface for MailHog.
-  * Click 'OK' to allow notifications - they will come in handy when you get an email
+## Logging
+Some logs are passed through to the docker runtime and appear by calling `docker-compose logs` or can be viewed using
+a gui tool.  Other logs are mapped through to a volume.
 
-  
+ 
 ## Installing REDCap
 
-Now that you have a local LAMP server, you need to complete the installation of REDCap.  This means:
+Once your container is up and running, you should be able to connect by opening [http://localhost](http://localhost)
 
-1. Goto the Consortium website and download the latest version
-2. Unpack and move the contents of the redcapx.xx.x.zip folder into the `www` folder
-3. Open your browser and goto http://localhost/redcap/install.php and follow the directions.
+You will likely have a phpinfo page if all has gone well.  The next step is to add and configure your REDCap webapp
+and your REDCap database.
+
+1. Unzip the `redcapx.y.z` folder.  Inside is a folder called just `redcap`.  
+1. You want to take the **CONTENTS** of the redcap folder and place them inside your webroot 
+   (as defined with the `WEBROOT_DIR` in the .env file)
+   * If you configure redcap this way, `http://localhost` will by your homepage.
+   * If, on the other hand, you prefer to have `http://localhost/redcap/` be your homepage, you would copy not only 
+   the contents but the entire redcap folder to your webroot.  
+     * Please note that if you do this, you need to update the crontab root file and change 
+   `wget -O /dev/null web/cron.php` to `wget -O /dev/null web/redcap/cron.php` and force a rebuild of your containers.
+1. Next, we need to edit the `database.php` file in the webroot to match your database parameters from the .env file.
+   Using your text editor, open `database.php` and insert something like:
+```php
+<?php
+  global $log_all_errors;
+  $log_all_errors = FALSE;
+  $hostname  = 'db';        // Note this is the 'internal' name (as seen by a docker-container)
+  $db        = 'redcap';
+  $username  = 'redcap';
+  $password  = 'redcap123';
+  $salt      = '12345678';
+```
+
 
   
   
