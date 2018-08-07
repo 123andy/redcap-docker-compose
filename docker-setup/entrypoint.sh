@@ -71,13 +71,13 @@ if [[ "$PARSE_ZIP_INSTALLER" = true ]] || [[ "$FORCE_RUN" = true ]]; then
                                 mv -f $dbFile $dbBackupFile
 
                                 echo "<?php"                                     > $dbFile
-                                echo "\\tglobal \$log_all_errors;"              >> $dbFile
-                                echo "\\t\$log_all_errors = FALSE;"             >> $dbFile
-                                echo "\\t\$hostname  = 'db';"                   >> $dbFile
-                                echo "\\t\$db  = '${MYSQL_DATABASE}';"          >> $dbFile
-                                echo "\\t\$username  = '${MYSQL_USER}';"        >> $dbFile
-                                echo "\\t\$password  = '${MYSQL_PASSWORD}';"    >> $dbFile
-                                echo "\\t\$salt  = '12345678';"                 >> $dbFile
+                                echo "  global \$log_all_errors;"              >> $dbFile
+                                echo "  \$log_all_errors = FALSE;"             >> $dbFile
+                                echo "  \$hostname  = 'db';"                   >> $dbFile
+                                echo "  \$db  = '${MYSQL_DATABASE}';"          >> $dbFile
+                                echo "  \$username  = '${MYSQL_USER}';"        >> $dbFile
+                                echo "  \$password  = '${MYSQL_PASSWORD}';"    >> $dbFile
+                                echo "  \$salt  = '12345678';"                 >> $dbFile
 
                                 echo "${extWEBROOT}/database.php generated"
 
