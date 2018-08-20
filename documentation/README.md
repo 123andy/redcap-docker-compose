@@ -29,6 +29,8 @@ a pull request if you do something interesting.
        source code will go. You might want this in your Documents or Desktop folder for easy access.  The default will
        be inside the `VOLUMES/www` folder.
      * You will want to understand where the log files will be located.  Default is `VOLUMES/logs`
+     * If you are on a MAC, you should set the `APACHE_RUN_USER_ID` setting to your current mac users' UID.  This can
+       be found by opening your terminal and typing `id`.  Typically it is 501 for the first user on a mac.
 1. Lastly, you will start-up the containers.  This can be done from the terminal/command line by navigating to the folder
    containing the `docker-compose.yml` file and running a docker-compose up command.
 
