@@ -96,6 +96,7 @@ At this point, we assume that you have a running set of containers.  If you shou
 1. Open the installer at [http://localhost/install.php](http://localhost/install.php)
     * You can *IGNORE* the part about creating a new database user - you already have one as defined in the MYSQL_XXX
 variables in the `.env` file.
+    * IF YOU JUST GOTO h`ttp://localhost` you will likely see an error about 'wrong version' - you have to goto the `/install.php` first!
 1. Copy the SQL to generate your redcap database and then execute it!  See [Connecting to the database](#connecting-to-the-database)
 
 
