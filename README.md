@@ -14,7 +14,7 @@ It consists of:
  * The official PhpMyAdmin web-based mysql tool for managing the database.
  * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
  * A basic alpine-based MailHop image (for capturing outbound emails from REDCap for your review)
- * A basic alpine-based setup image to create your first REDCap webroot, database.php, and populate the REDCap tables.
+ * A basic alpine-based setup image to create your first REDCap webroot, database.php, populate the REDCap tables and configure REDCap.
 
 The advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how
 these changes might affect your projects or custom code.

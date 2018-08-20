@@ -43,6 +43,21 @@ create_redcap_tables() {
     echo "REDCap tables created"
 }
 
+set_redcap_config() {
+    DATABASE_HOSTNAME=$1
+    DATABASE_NAME=$2
+    DATABASE_USER=$3
+    DATABASE_PASSWORD=$4
+    info_text=$5
+    field_name=$6
+    value=$7
+    echo "set_redcap_config: $info_text"
+
+    CONNECTION="-h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME"
+    mysql $CONNECTION -e "UPDATE $DATABASE_NAME.redcap_config SET value = '$value' WHERE field_name = '$field_name';"
+}
+
+
 
 if [[ "$PARSE_ZIP_INSTALLER" = true ]] || [[ "$FORCE_RUN" = true ]]; then
 
@@ -122,6 +137,9 @@ if [[ "$PARSE_ZIP_INSTALLER" = true ]] || [[ "$FORCE_RUN" = true ]]; then
                             fi
                             # populate database
                             create_redcap_tables ${MYSQL_DATABASE} ${MYSQL_USER} ${MYSQL_PASSWORD} ${WEBROOT} ${version} db
+                            # configure REDCAP
+                            MYSQL_HOSTNAME=db
+                            set_redcap_config ${MYSQL_HOSTNAME} ${MYSQL_DATABASE} ${MYSQL_USER} ${MYSQL_PASSWORD} "Setting redcap_base_url..." redcap_base_url "http://localhost/"
                         fi
 
                         echo "Cleaning up ${dir}"

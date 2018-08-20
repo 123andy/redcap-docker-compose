@@ -43,7 +43,7 @@ There are two ways to get your new docker-compose REDCap environment running - I
 
 ### A) Setup Assistant
 There is an optional *setup assistant* that can help extract your first REDCap install, configure your database.php
-file, and populate your database tables.
+file, populate your database tables and configure REDCap.
 1. Before you start up the containers the first time, download the `redcapx.x.x.zip` file from the Consortium website into the
  `REDCAP-DOWNLOADS` directory.
 1. Then go to the root of this repository and run:
