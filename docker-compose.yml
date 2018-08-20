@@ -6,7 +6,6 @@ services:
 #    container_name: redcap-web
     env_file:
       - .env
-      - .env-git-ssh
     restart: always
     depends_on:
       - db

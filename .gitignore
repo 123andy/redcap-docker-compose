@@ -1,5 +1,4 @@
 .idea*
-.env*
 .DS_Store
 VOLUMES/*
 !VOLUMES/README.md
