@@ -26,6 +26,7 @@ the files in the `override-*` directories.
 See the [documentaton](documentation/README.md) for more information on getting started!
 
 ## Updates
+* 2018-08-19  Added .env file and added UID override for MAC users to maintain file ownership (see .env)
 * 2018-08-04  Added support for auto-install from `redcapx.y.z.zip`
 * 2018-08-01  Major refactoring into docker-compose 3
 
