@@ -34,24 +34,27 @@ a pull request if you do something interesting.
 1. Lastly, you will start-up the containers.  This can be done from the terminal/command line by navigating to the folder
    containing the `docker-compose.yml` file and running a docker-compose up command.
 
- 
+
 ## Installing REDCap
 
 There are two ways to get your new docker-compose REDCap environment running - I recommend using the startup assistant,
  but you can also choose the manual method if you want to learn more or have an existing environment you are porting
  over.
 
-### A) Startup Assistant
-There is an optional *startup assistant* that can help extract your first redcap install and configure your database.php
-file.
-1. Before you start up the containers the first time, download the `redcapx.x.x.zip` file from consortium into the
+### A) Setup Assistant
+There is an optional *setup assistant* that can help extract your first REDCap install, configure your database.php
+file, and populate your database tables.
+1. Before you start up the containers the first time, download the `redcapx.x.x.zip` file from the Consortium website into the
  `REDCAP-DOWNLOADS` directory.
-1. Then goto the terminal where this file is located and run:
+1. Then go to the root of this repository and run:
 ```bash
 redcap-docker-compose$ docker-compose up
 ```
 The first startup might take a while, so be patient.  Keep an eye on your `WEBROOT_DIR` and review the logs.  If all
-goes well, you should be able to skip to the [Configure REDCap](#configure-redcap) section.
+goes well, you should have a running REDCap.  To access this REDCap, direct your web browser to [http://localhost/]( http://localhost/).
+
+If you _don't_ see a running REDCap, review the manual steps below to figure out what step failed.
+
 
 ### B) Manual setup WEBROOT_DIR
 Alternately, you can manually add the contents of a redcap installer into your `WEBROOT_DIR` folder and then setup the
@@ -96,7 +99,7 @@ At this point, we assume that you have a running set of containers.  If you shou
 1. Open the installer at [http://localhost/install.php](http://localhost/install.php)
     * You can *IGNORE* the part about creating a new database user - you already have one as defined in the MYSQL_XXX
 variables in the `.env` file.
-    * IF YOU JUST GOTO h`ttp://localhost` you will likely see an error about 'wrong version' - you have to goto the `/install.php` first!
+    * IF YOU JUST GOTO `http://localhost` you will likely see an error about 'wrong version' - you have to goto the `/install.php` first!
 1. Copy the SQL to generate your redcap database and then execute it!  See [Connecting to the database](#connecting-to-the-database)
 
 
