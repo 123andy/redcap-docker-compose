@@ -7,6 +7,43 @@ TEMP="/tmp"
 WEBROOT="/webroot"
 extWEBROOT="${WEBROOT_DIR}"
 
+create_redcap_tables() {
+    REQUIRED_PARAMETER_COUNT=6
+    if [ $# != $REQUIRED_PARAMETER_COUNT ]; then
+        echo "${FUNCNAME[0]} Creates a MySQL database, a DB user with access to the DB, and sets user's password."
+        echo "${FUNCNAME[0]} requires these $REQUIRED_PARAMETER_COUNT parameters in this order:"
+        echo "DATABASE_NAME        Name of the database to create"
+        echo "DATABASE_USER        Database user who will have access to DATABASE_NAME"
+        echo "DATABASE_PASSWORD    Password of DATABASE_USER"
+        echo "DEPLOY_DIR           The directory where the app is deployed"
+        echo "VERSION              The version of the schema files to be loaded"
+        echo "DATABASE_HOSTNAME    Database host that houses the redcap DB"
+        return 1
+    else
+        DATABASE_NAME=$1
+        DATABASE_USER=$2
+        DATABASE_PASSWORD=$3
+        DEPLOY_DIR=$4
+        VERSION=$5
+        DATABASE_HOSTNAME=$6
+    fi
+
+
+    echo "Creating REDCap tables..."
+    SQL_DIR=$DEPLOY_DIR/redcap_v$VERSION/Resources/sql
+    mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME < $SQL_DIR/install.sql
+    mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME < $SQL_DIR/install_data.sql
+    mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME -e "UPDATE $DATABASE_NAME.redcap_config SET value = '$VERSION' WHERE field_name = 'redcap_version' "
+
+    files=$(ls -v $SQL_DIR/create_demo_db*.sql)
+    for i in $files; do
+        echo "Executing sql file $i"
+        mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME < $i
+    done
+    echo "REDCap tables created"
+}
+
+
 if [[ "$PARSE_ZIP_INSTALLER" = true ]] || [[ "$FORCE_RUN" = true ]]; then
 
     if [ -z "$(ls -A ${PREFIX})" ]; then
@@ -83,6 +120,8 @@ if [[ "$PARSE_ZIP_INSTALLER" = true ]] || [[ "$FORCE_RUN" = true ]]; then
 
                                 echo "REDCap v${version} installed to ${extWEBROOT} and database.php file generated" > $file.log
                             fi
+                            # populate database
+                            create_redcap_tables ${MYSQL_DATABASE} ${MYSQL_USER} ${MYSQL_PASSWORD} ${WEBROOT} ${version} db
                         fi
 
                         echo "Cleaning up ${dir}"
