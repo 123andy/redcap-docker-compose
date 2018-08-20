@@ -7,56 +7,57 @@ TEMP="/tmp"
 WEBROOT="/webroot"
 extWEBROOT="${WEBROOT_DIR}"
 
-create_redcap_tables() {
-    REQUIRED_PARAMETER_COUNT=6
-    if [ $# != $REQUIRED_PARAMETER_COUNT ]; then
-        echo "${FUNCNAME[0]} Creates a MySQL database, a DB user with access to the DB, and sets user's password."
-        echo "${FUNCNAME[0]} requires these $REQUIRED_PARAMETER_COUNT parameters in this order:"
-        echo "DATABASE_NAME        Name of the database to create"
-        echo "DATABASE_USER        Database user who will have access to DATABASE_NAME"
-        echo "DATABASE_PASSWORD    Password of DATABASE_USER"
-        echo "DEPLOY_DIR           The directory where the app is deployed"
-        echo "VERSION              The version of the schema files to be loaded"
-        echo "DATABASE_HOSTNAME    Database host that houses the redcap DB"
-        return 1
-    else
-        DATABASE_NAME=$1
-        DATABASE_USER=$2
-        DATABASE_PASSWORD=$3
-        DEPLOY_DIR=$4
-        VERSION=$5
-        DATABASE_HOSTNAME=$6
-    fi
-
-
-    echo "Creating REDCap tables..."
-    SQL_DIR=$DEPLOY_DIR/redcap_v$VERSION/Resources/sql
-    mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME < $SQL_DIR/install.sql
-    mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME < $SQL_DIR/install_data.sql
-    mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME -e "UPDATE $DATABASE_NAME.redcap_config SET value = '$VERSION' WHERE field_name = 'redcap_version' "
-
-    files=$(ls -v $SQL_DIR/create_demo_db*.sql)
-    for i in $files; do
-        echo "Executing sql file $i"
-        mysql -h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME < $i
-    done
-    echo "REDCap tables created"
-}
-
 set_redcap_config() {
     DATABASE_HOSTNAME=$1
-    DATABASE_NAME=$2
-    DATABASE_USER=$3
-    DATABASE_PASSWORD=$4
+    DATABASE_USER=$2
+    DATABASE_PASSWORD=$3
+    DATABASE_NAME=$4
     info_text=$5
     field_name=$6
     value=$7
     echo "set_redcap_config: $info_text"
 
-    CONNECTION="-h$DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME"
+    CONNECTION="-h $DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME"
     mysql $CONNECTION -e "UPDATE $DATABASE_NAME.redcap_config SET value = '$value' WHERE field_name = '$field_name';"
 }
 
+create_redcap_tables() {
+    REQUIRED_PARAMETER_COUNT=6
+    if [ $# != $REQUIRED_PARAMETER_COUNT ]; then
+        echo "${FUNCNAME[0]} Creates a MySQL database, a DB user with access to the DB, and sets user's password."
+        echo "${FUNCNAME[0]} requires these $REQUIRED_PARAMETER_COUNT parameters in this order:"
+        echo "DATABASE_HOSTNAME    Database host that houses the redcap DB"
+        echo "DATABASE_USER        Database user who will have access to DATABASE_NAME"
+        echo "DATABASE_PASSWORD    Password of DATABASE_USER"
+        echo "DATABASE_NAME        Name of the database to create"
+        echo "DEPLOY_DIR           The directory where the app is deployed"
+        echo "VERSION              The version of the schema files to be loaded"
+        return 1
+    else
+        DATABASE_HOSTNAME=$1
+        DATABASE_USER=$2
+        DATABASE_PASSWORD=$3
+        DATABASE_NAME=$4
+        DEPLOY_DIR=$5
+        VERSION=$6
+    fi
+
+
+    echo "Creating REDCap tables..."
+    SQL_DIR=$DEPLOY_DIR/redcap_v$VERSION/Resources/sql
+    CONNECTION_PARMS="-h $DATABASE_HOSTNAME -u$DATABASE_USER -p$DATABASE_PASSWORD $DATABASE_NAME"
+    mysql $CONNECTION_PARMS < $SQL_DIR/install.sql
+    mysql $CONNECTION_PARMS < $SQL_DIR/install_data.sql
+    CONNECTION_VARS="$DATABASE_HOSTNAME $DATABASE_USER $DATABASE_PASSWORD $DATABASE_NAME"
+    set_redcap_config $CONNECTION_VARS "Setting redcap_version..." redcap_version $VERSION
+
+    files=$(ls -v $SQL_DIR/create_demo_db*.sql)
+    for i in $files; do
+        echo "Executing sql file $i"
+        mysql $CONNECTION_PARMS < $i
+    done
+    echo "REDCap tables created"
+}
 
 
 if [[ "$PARSE_ZIP_INSTALLER" = true ]] || [[ "$FORCE_RUN" = true ]]; then
@@ -136,10 +137,11 @@ if [[ "$PARSE_ZIP_INSTALLER" = true ]] || [[ "$FORCE_RUN" = true ]]; then
                                 echo "REDCap v${version} installed to ${extWEBROOT} and database.php file generated" > $file.log
                             fi
                             # populate database
-                            create_redcap_tables ${MYSQL_DATABASE} ${MYSQL_USER} ${MYSQL_PASSWORD} ${WEBROOT} ${version} db
-                            # configure REDCAP
                             MYSQL_HOSTNAME=db
-                            set_redcap_config ${MYSQL_HOSTNAME} ${MYSQL_DATABASE} ${MYSQL_USER} ${MYSQL_PASSWORD} "Setting redcap_base_url..." redcap_base_url "http://localhost/"
+                            MYSQL_CONNECTION_PARMS="${MYSQL_HOSTNAME} ${MYSQL_USER} ${MYSQL_PASSWORD} ${MYSQL_DATABASE}"
+                            create_redcap_tables ${MYSQL_CONNECTION_PARMS} ${WEBROOT} ${version}
+                            # configure REDCAP
+                            set_redcap_config ${MYSQL_CONNECTION_PARMS} "Setting redcap_base_url..." redcap_base_url "http://localhost/"
                         fi
 
                         echo "Cleaning up ${dir}"
