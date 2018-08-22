@@ -1,0 +1,2 @@
+# Make sure bash scripts do not get windows linefeeds
+*.sh text eol=lf
