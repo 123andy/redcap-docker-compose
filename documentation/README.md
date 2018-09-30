@@ -1,9 +1,13 @@
 # redcap-docker-compose
 
 ## Configuration
-The services are mainly configured through a `.env` environment file.  Additional customization can be done my modifying
-the files in the `override-*` directories.  Detailed examples should be added to this documentation - please help with
-a pull request if you do something interesting.  
+
+The services are mainly configured through a `.env` environment file on
+Windows hosts or through the shell environment on Mac OSX and Linux.
+Additional customization can be done my modifying the files in the
+`override-*` directories.  Detailed examples should be added to this
+documentation - please help with a pull request if you do something
+interesting.
 
 > Anytime you make a change, you must 'rebuild' the docker container(s)
  -- *stopping and restarting isn't sufficient*.  See the commands below for examples
@@ -23,6 +27,9 @@ a pull request if you do something interesting.
    * If you want the *setup assistant* to help you install REDCap, place the `redcapx.y.z.zip` file in the
    `REDCAP-DOWNLOADS` folder from the previous step and it will be auto-extracted
    and installed to your webroot.
+
+## Configuration on Windows Docker hosts
+
 1. Open the `.env` file in the redcap-docker-compose folder with a text editor or IDE.
    * Review the settings and see what you can easily customize 
      * You will want to select where your `WEBROOT_DIR` folder will reside on your computer.  This is where your redcap
@@ -33,6 +40,34 @@ a pull request if you do something interesting.
        be found by opening your terminal and typing `id`.  Typically it is 501 for the first user on a mac.
 1. Lastly, you will start-up the containers.  This can be done from the terminal/command line by navigating to the folder
    containing the `docker-compose.yml` file and running a docker-compose up command.
+
+## Configuration on Mac OS X and Linux Docker hosts
+
+Mac and Linux users have the option of creating their own file of environment variables. Using this file simplifies upgrades and development by not modifying `.env`.
+
+1. Create your own environment file by copying `myenv-example.txt`. i.e.,
+
+    cp myenv-example.txt myenv.txt
+
+1. Review the settings in `.env` file in the redcap-docker-compose folder. For
+any setting in .env you want to change, copy the setting from .env to
+`myenv.txt`, prefix it with the command `export` and change the value to the
+value you need in your environment. A typical `myenv.txt` might look like
+this:
+
+    ### myenv-example.txt ###
+    # Customize your environment by exporting environment
+    # variables with values suitable to your environment.
+    # Copy any variable from .env here, prefix it with
+    # the word command 'export', and set the value you need.
+
+    export TZ=America/New_York
+    export MYSQL_PORT=3386
+    export MYSQL_PASSWORD=password
+
+1. Source the `myenv.txt` before running any Docker commands
+
+    source myenv.txt
 
 
 ## Installing REDCap
