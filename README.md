@@ -20,10 +20,11 @@ The advantage of this docker-based method is you can easily upgrade database ver
 these changes might affect your projects or custom code.
 
 ## Configuration
-The services are mainly configured through a `.env` environment file.  Additional customization can be done my modifying
-the files in the `override-*` directories.
+The services are mainly configured through a `.env` environment file or shell
+environment variables.  Additional customization can be done by modifying the
+files in the `override-*` directories.
 
-See the [documentaton](documentation/README.md) for more information on getting started!
+See the [documentation](documentation/README.md) for more information on getting started!
 
 ## Updates
 * 2018-08-19  Added .env file and added UID override for MAC users to maintain file ownership (see .env)
