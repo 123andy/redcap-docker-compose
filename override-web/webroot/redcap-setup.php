@@ -73,6 +73,15 @@ public function __construct() {
                     // SUCCESS
                     $this->successes[] = "REDCap successfully unzipped to $this->install_path";
 
+                    // TODO - what should happen here is to refresh this page and include the redcap_connect so we can
+                    // just use all the redcap logic to complete the setup....  Saving that for another day...
+
+                    // TODO - Add users automatically to this dev instance since setting up table-based users is such a PITA.
+
+                    // CREATE DATABASE.PHP
+                    $dest_path = $this->install_path . "database.php";
+                    $this->buildDatabaseDotPhp($dest_path);
+
                     // SETUP DATABASE
                     if (! $this->initializeDatabase()) throw new RuntimeException("Unable to initialize Database.  Proceed with manual database setup.");
 
@@ -91,7 +100,7 @@ public function __construct() {
                     if (mysqli_multi_query($this->db_conn, $sql)) do {
 				        // Nothing needed here
                         $commands++;
-			        } while (mysqli_next_result($this->db_conn));
+			        } while (mysqli_more_results($this->db_conn) && mysqli_next_result($this->db_conn));
                     $this->successes[] = "Install SQL Script Completed $commands queries";
 
                     // TEST IF WE NOW HAVE TABLES
@@ -106,7 +115,7 @@ public function __construct() {
             }
         }
     } catch (RuntimeException $e) {
-        $this->errors[] = $e->getMessage() . " in " . __FUNCTION__;
+        $this->errors[] = $e->getMessage();
         return false;
     }
 }
@@ -122,10 +131,11 @@ public function createUser($username, $email, $first_name, $last_name, $password
 
 
 /**
- * Build a database.php file
- * @return bool|string
+ * Build a database.php file to the dest_path
+ * @param  string $dest_path
+ * @return bool
  */
-public function buildDatabaseDotPhp() {
+public function buildDatabaseDotPhp($dest_path) {
     try {
 
         if (empty($this->hostname)) throw new RuntimeException("Missing required hostname");
@@ -143,7 +153,9 @@ public function buildDatabaseDotPhp() {
         $contents[] = '$username = "' . $this->username . '";';
         $contents[] = '$password = "' . $this->password . '";';
         $contents[] = '$salt     = "' . $this->salt     . '";';
-        return implode("\n\t",$contents);
+
+        file_put_contents($dest_path, implode("\n\t",$contents));
+        return true;
     } catch (RuntimeException $e) {
         $this->errors[] = $e->getMessage() . " in " . __FUNCTION__;
         return false;
@@ -192,45 +204,8 @@ public function getInstallerVersions(){
 
 
 public function db_query($sql) {
-
     $q = mysqli_query($this->db_conn, $sql);
     return $q;
-
-    // If the MySQl upgrades user/password exists, then use it instead of default db connection
-    //$updatesCxnSuccessful = false;
-    //if ($sql != '' && db_multi_query($sql)) {
-    //    do {
-    //        // Nothing needed here
-    //    } while (db_next_result());
-    //
-    //    // Set the db connection back to the default again
-    //    if ($updatesCxnSuccessful) db_connect();
-    //    return "1";
-    //}
-    // Error
-
-    // BUILD A DATABASE.PHP FILE
-    //$contents = $this->buildDatabaseDotPhp();
-    //$dest = __DIR__ . DIRECTORY_SEPARATOR . ($install_folder == "base" ? "" : $install_folder . DIRECTORY_SEPARATOR) . "database.php";
-    //
-    //if (!file_exists($dest)) {
-    //    $this->successes[] = "Created a new database.php at $dest";
-    //    file_put_contents($dest, $contents);
-    //}
-    //
-    //$this->debug['install_path'] = $this->install_path;
-    //
-    //// TEST DATABASE
-    //$result = $this->testDatabase();
-    //if (!$result) throw new RuntimeException("Unable to connect to database " . $this->db);
-    //
-    //// SEE IF DATABASE ALREADY EXISTS
-    ////$result = $this->runQuery
-    //
-    //
-    //
-    //$this->debug['db_valid'] = $result ? "TRUE":false;
-
 }
 
 
@@ -245,8 +220,9 @@ public function initializeDatabase() {
         $this->db_conn = new mysqli($this->hostname, $this->username, $this->password, $this->db);
 
         if ($this->db_conn->connect_errno) {
-            throw new RuntimeException("Username ($this->username) / password (XXXXXX) could not connect to $db at $this->hostname.  Check your database.php file");
+            throw new RuntimeException("Username ($this->username) / password (XXXXXX) could not connect to $this->db at $this->hostname.  Check your database.php file");
         }
+
         $result = true;
     } catch (RuntimeException $e) {
         $this->errors[] = $e->getMessage() . " in " . __FUNCTION__;
@@ -553,14 +529,12 @@ public function displayPageHeader() {
 }
 
 
-}
+} // End of class
 
 
 
 $RI = new REDCapInstaller();
-
 $RI->displayPageHeader();
-
 
 ?>
     <div id="main-navbar" class="navbar navbar-dark bg-dark navbar-fixed-top">
@@ -678,106 +652,8 @@ if ($RI->step == 1) {
     </form>
     <?php
 } elseif ($RI->step == 2) {
-    // DATABASE SETUP
+    // DATABASE SETUP TBD
     ?>
-
-    <div class="mt-2 card install">
-        <div class="card-header bg-cardinal text-light">
-            <h3><i class="fas fa-dice-two"></i> REDCap Database Configuration</h3>
-        </div>
-        <div class="card-body">
-            <div>
-                <h5>
-                    Your database zip is ready.  Now it is time to initialize the REDCap database.
-                </h5>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="radio" value="consortium" class="form-check-input" name="dl-option">Use your
-                        <a target="_blank" href="https://community.projectredcap.org">Community Consortium</a> login
-                        to download the latest version automatically
-                    </label>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="radio" value="upload" class="form-check-input" name="dl-option">Upload a full
-                        .zip installer (perhaps provided by your consortium representative)
-                    </label>
-                </div>
-            </div>
-
-            <div class="install-option option-consortium mt-2 p-2 border border-secondary rounded">
-                <h5>Enter REDCap Consortium Credentials:</h5>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" name="username"
-                           placeholder="Consortium username (e.g. andy.martin)">
-                    <small id="username-help" class="form-text text-muted">Look above your profile image for your
-                        username, typically it is firstname.lastname
-                    </small>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" name="password" placeholder="Password">
-                </div>
-                <div class="form-group">
-                    <label for="password"><h6>Select REDCap Version</h6></label>
-                    <div>
-                        <select name="version"><?php echo $RI->getInstallerVersions() ?></select>
-                    </div>
-                    <small class="form-text text-muted">Select the version of REDCap to install</small>
-                </div>
-            </div>
-
-            <div class="install-option option-upload mt-2 p-2 border border-secondary rounded">
-                <h5>Upload redcap_vx.y.z.zip Installer:</h5>
-                <div class="input-group mb-3">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="installer-upload" name="installer-upload">
-                        <label class="custom-file-label" for="installer-upload">Choose file</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="install-option option-folder mt-2 p-2 border border-secondary rounded">
-                <h5>Select how to install REDCap on your webserver:</h5>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="radio" value="redcap" class="form-check-input" name="install-folder"
-                               checked="checked">
-                        By default, REDCap will be installed in the redcap folder, so your web url will be <a
-                                target="_blank" href="http://localhost/redcap">http://localhost/redcap</a>
-                    </label>
-                    <small class="form-text text-muted">This configuration can be useful if you wish to install
-                        other services on this web server (such as multiple REDCap versions)
-                    </small>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="radio" value="base" class="form-check-input" name="install-folder">You can also
-                        installed into the 'root' of your web folder, so your web url will be
-                        <a target="_blank" href="http://localhost">http://localhost</a>
-                    </label>
-                    <small class="form-text text-muted">This most likely resembles your production deployment and
-                        some find it 'prettier' than the subfolder default
-                    </small>
-                </div>
-            </div>
-
-        </div>
-        <div class="card-footer">
-            <input type="hidden" name="install-option"/>
-            <button type="submit"
-                    class="input-group btn btn-lg btn-success initiate-installation text-center d-block">INSTALL
-                REDCAP
-            </button>
-            <small class="form-text text-muted">Any existing files will be overwritten. This make time some time to
-                download and extract... Be patient!
-            </small>
-        </div>
-    </div>
-
-
-
     <?php
     }
 
@@ -802,7 +678,6 @@ if ($RI->step == 1) {
 </div>
 
 <script>
-
 
     $(document).ready(function(){
 
@@ -852,18 +727,16 @@ if ($RI->step == 1) {
 
     });
 
-
-
 </script>
+
 
 
 <pre>
     <?php
+        // DEBUGGING INFO
         foreach ($RI->debug as $k => $v) {
             echo "\n\n" . $k ."\n". print_r($v,true);
         }
-    //echo "\n\nPOST:" . print_r($_POST,true);
-    //echo "\n\nENV:" . print_r($_ENV,true);
     ?>
 </pre>
 
