@@ -14,13 +14,12 @@ set_time_limit ( 600 ); // 10 Minute Execution Time
  */
 class REDCapInstaller {
 
-// Database
+// Database Config
 private $hostname,
     $db,
     $username,
     $password,
     $salt;
-
 
 public $errors = array();       // Place to record error alerts
 public $successes = array();    // Place to record success alerts
@@ -39,13 +38,20 @@ public $step = 1;               // Install Step (1 = zip file, 2 = database setu
 public function __construct() {
     try {
 
+        if (file_exists("redcap_connect.php")) {
+            include_once "redcap_connect.php";
+        } elseif (file_exists("redcap/redcap_connect.php")) {
+            include_once "redcap/redcap_connect.php";
+        }
+
+
+
         // INITIALIZE DB FROM ENV PARAMS
         $this->hostname = 'db';
         $this->db = empty($_ENV['MYSQL_DATABASE']) ? FALSE : $_ENV['MYSQL_DATABASE'];
         $this->username = empty($_ENV['MYSQL_USER']) ? FALSE : $_ENV['MYSQL_USER'];
         $this->password = empty($_ENV['MYSQL_PASSWORD']) ? FALSE : $_ENV['MYSQL_PASSWORD'];
         $this->salt = empty($_ENV['REDCAP_SALT']) ? '12345678' : $_ENV['REDCAP_SALT'];
-
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -387,8 +393,8 @@ public function unzipFile($path, $strip_redcap_folder = FALSE) {
                 $count = 0;
 
                 // Loop through archive
-                for ($i = 0; $i < 3; $i++) {
-                //for ($i = 0; $i < $zip->numFiles; $i++) {
+                //for ($i = 0; $i < 3; $i++) {
+                for ($i = 0; $i < $zip->numFiles; $i++) {
                     $filename = $zip->getNameIndex($i);
 
                     // $count will only be 1 if zip file starts with $subfolder_to_extract
@@ -622,7 +628,7 @@ if ($RI->step == 1) {
                                     target="_blank" href="http://localhost/redcap">http://localhost/redcap</a>
                         </label>
                         <small class="form-text text-muted">This configuration can be useful if you wish to install
-                            other services on this web server (such as multiple REDCap versions)
+                            other services on this web server (such as multiple REDCap versions).
                         </small>
                     </div>
                     <div class="form-check">
