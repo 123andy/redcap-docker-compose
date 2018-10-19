@@ -52,6 +52,7 @@ services:
 #    container_name: redcap-cron
     restart: always
     env_file: .env
+    # command: ['crond', '-f', '/var/spool/cron/crontabs']
     depends_on:
       - web
       - db
