@@ -1,2 +1,3 @@
-# Make sure bash scripts do not get windows linefeeds
+* text=auto
 *.sh text eol=lf
+*.bat text eol=lf
