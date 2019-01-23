@@ -2,11 +2,10 @@
 
 /**
  * This is the REDCap Installer Page
- *
  * It helps you upload and install REDCap on a clean web server
  */
 
-set_time_limit ( 600 ); // 10 Minute Execution Time
+set_time_limit ( 1200 ); // 20 Minute Execution Time
 
 
 /**
@@ -25,6 +24,8 @@ public $errors = array();       // Place to record error alerts
 public $successes = array();    // Place to record success alerts
 public $debug = array();        // place to dump debug output
 
+public $redcap_webroot_path;    // This is the path relative to the web root where REDCap will be run (default is '/').
+
 public $install_path;           // The path where REDCap is being installed
 
 public $db_conn;                // DB Connection
@@ -38,13 +39,11 @@ public $step = 1;               // Install Step (1 = zip file, 2 = database setu
 public function __construct() {
     try {
 
-        if (file_exists("redcap_connect.php")) {
-            include_once "redcap_connect.php";
-        } elseif (file_exists("redcap/redcap_connect.php")) {
-            include_once "redcap/redcap_connect.php";
-        }
-
-
+//        if (file_exists("redcap_connect.php")) {
+//            include_once "redcap_connect.php";
+//        } elseif (file_exists("redcap/redcap_connect.php")) {
+//            include_once "redcap/redcap_connect.php";
+//        }
 
         // INITIALIZE DB FROM ENV PARAMS
         $this->hostname = 'db';
@@ -53,11 +52,21 @@ public function __construct() {
         $this->password = empty($_ENV['MYSQL_PASSWORD']) ? FALSE : $_ENV['MYSQL_PASSWORD'];
         $this->salt = empty($_ENV['REDCAP_SALT']) ? '12345678' : $_ENV['REDCAP_SALT'];
 
+        // GET THE INSTALL PATH FROM THE .ENV
+        $this->redcap_webroot_path = (empty($_ENV['REDCAP_WEBROOT_PATH'])) ? '/' : $_ENV['REDCAP_WEBROOT_PATH'];
+
+        // INCLUDE REDCAP CONNECT!
+        if (file_exists("." . $this->redcap_webroot_path . "redcap_connect.php")) {
+            include_once "." . $this->redcap_webroot_path . "redcap_connect.php";
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+            $this->install_path = __DIR__ . $this->redcap_webroot_path;
             $install_option = empty($_POST['install-option']) ? false : $_POST['install-option'];
-            $install_folder = empty($_POST['install-folder']) ? "redcap" : $_POST['install-folder'];
-            $this->install_path = __DIR__ . DIRECTORY_SEPARATOR . ($install_folder == "base" ? "" : $install_folder . DIRECTORY_SEPARATOR);
+
+//            $install_folder = empty($_POST['install-folder']) ? "redcap" : $_POST['install-folder'];
+//            $this->install_path = __DIR__ . DIRECTORY_SEPARATOR . ($install_folder == "base" ? "" : $install_folder . DIRECTORY_SEPARATOR);
 
             switch ($install_option) {
                 case "upload":
@@ -73,11 +82,14 @@ public function __construct() {
             if ($zip_path !== false && empty($this->errors)) {
 
                 // Continue unzipping
-                $result = $this->unzipFile($zip_path, $install_folder == "base");
+                $result = $this->unzipFile($zip_path);
 
-                if ($result == true && empty($this->errors)) {
+                if ($result !== false && empty($this->errors)) {
                     // SUCCESS
-                    $this->successes[] = "REDCap successfully unzipped to $this->install_path";
+                    $this->successes[] = "REDCap successfully unzipped to $result";
+
+                    // MOVE UNZIPPED FILES TO WEBROOT
+                    shell_exec("mv " . $result . "/redcap/* " . $this->install_path);
 
                     // TODO - what should happen here is to refresh this page and include the redcap_connect so we can
                     // just use all the redcap logic to complete the setup....  Saving that for another day...
@@ -97,7 +109,7 @@ public function __construct() {
                     if ($redcap_tables > 0) throw new RuntimeException("There are $redcap_tables redcap* tables in the " . $this->db . " database.  Please update manually.");
 
                     // GET THE INSTALL SQL
-                    $install_url = "http://localhost/" . ($install_folder == "base" ? "" : $install_folder . "/") . "install.php";
+                    $install_url = "http://localhost" . $this->redcap_webroot_path . "install.php";
                     $sql = file_get_contents($install_url . "?sql=1");
                     if (empty($sql)) throw new RuntimeException("Unable to obtain installation SQL from $install_url");
 
@@ -209,6 +221,11 @@ public function getInstallerVersions(){
 
 
 
+/**
+ * Wrapper for running a query
+ * @param $sql
+ * @return bool|mysqli_result
+ */
 public function db_query($sql) {
     $q = mysqli_query($this->db_conn, $sql);
     return $q;
@@ -236,6 +253,7 @@ public function initializeDatabase() {
     }
     return $result;
 }
+
 
 /**
  * Download installer from consortium as authenticated user
@@ -300,7 +318,6 @@ public function downloadInstallerFromConsortium() {
     }
     return $result;
 }
-
 
 
 /**
@@ -375,62 +392,66 @@ public function handleUpload($field_name, $strip_redcap_folder = TRUE) {
 /**
  * UNZIP THE ARCHIVE
  *
- * @param      $path
+ * @param      $source_path
  * @param bool $strip_redcap_folder
- * @return bool
+ * @return mixed    FALSE if failure, otherwise PATH to unzipped contents
  */
-public function unzipFile($path, $strip_redcap_folder = FALSE) {
+
+public function unzipFile($source_path) {
     try {
         // UNZIP IT
         $zip = new ZipArchive;
-        $res = $zip->open($path);
+        $res = $zip->open($source_path);
 
         if ($res === TRUE) {
+            $dest_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "redcap-installer";
+            $zip->extractTo($dest_path);
             //echo "<br>Opened Zip file at $path";
-            if ($strip_redcap_folder) {
-                // REMOVE THE /redcap FOLDER FROM THE ARCHIVE
-                $subfolder_to_extract = 'redcap';
-                $count = 0;
-
-                // Loop through archive
-                //for ($i = 0; $i < 3; $i++) {
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    $filename = $zip->getNameIndex($i);
-
-                    // $count will only be 1 if zip file starts with $subfolder_to_extract
-                    $filename2 = preg_replace('/^' . $subfolder_to_extract . '\//', "", $filename, 1, $count);
-                    if ($count == 1) {
-                        $isDir = (substr($filename2, -1, 1) == '/');
-                        $dest_file = $this->install_path . $filename2;
-
-                        // If source item in zip is a directory, check if it exists
-                        // filename2 is empty for the 'base' directory after $subfolder_to_extract is removed
-                        if ($isDir || empty($filename2)) {
-                            if (!is_dir($dest_file)) {
-                                mkdir($dest_file, 0777, true);
-                            }
-                        } else {
-                            // Zip item is a file
-                            // Make sure required destination directory exists
-                            $dest_path = pathinfo($dest_file);
-                            if (!file_exists($dest_path['dirname'])) {
-                                mkdir($dest_path['dirname'], 0777, true);
-                            }
-
-                            // Extract file
-                            copy("zip://" . $path . "#" . $filename, $dest_file);
-                        }
-                    }
-                }
-            } else {
-                // Simply unzip to the directory root
-                $zip->extractTo(__DIR__);
-            }
+//            if ($strip_redcap_folder) {
+//                // REMOVE THE /redcap FOLDER FROM THE ARCHIVE
+//                $subfolder_to_extract = 'redcap';
+//                $count = 0;
+//
+//                // Loop through archive
+//                //for ($i = 0; $i < 3; $i++) {
+//                for ($i = 0; $i < $zip->numFiles; $i++) {
+//                    $filename = $zip->getNameIndex($i);
+//
+//                    // $count will only be 1 if zip file starts with $subfolder_to_extract
+//                    $filename2 = preg_replace('/^' . $subfolder_to_extract . '\//', "", $filename, 1, $count);
+//                    if ($count == 1) {
+//                        $isDir = (substr($filename2, -1, 1) == '/');
+//                        $dest_file = $this->install_path . $filename2;
+//
+//                        // If source item in zip is a directory, check if it exists
+//                        // filename2 is empty for the 'base' directory after $subfolder_to_extract is removed
+//                        if ($isDir || empty($filename2)) {
+//                            if (!is_dir($dest_file)) {
+//                                mkdir($dest_file, 0777, true);
+//                            }
+//                        } else {
+//                            // Zip item is a file
+//                            // Make sure required destination directory exists
+//                            $dest_path = pathinfo($dest_file);
+//                            if (!file_exists($dest_path['dirname'])) {
+//                                mkdir($dest_path['dirname'], 0777, true);
+//                            }
+//
+//                            // Extract file
+//                            copy("zip://" . $source_path . "#" . $filename, $dest_file);
+//                        }
+//                    }
+//                }
+//            } else {
+//                // Simply unzip to the directory root
+//                $zip->extractTo(__DIR__);
+//            }
             $zip->close();
         } else {
-            throw new RuntimeException('Failed to unzip file');
+            throw new RuntimeException('Failed to unzip source file:' + $source_path);
         }
-        return true;
+
+        return $dest_path;
     } catch (RuntimeException $e) {
         $this->errors[] = $e->getMessage() . " in " . __FUNCTION__;
         return false;
@@ -619,27 +640,13 @@ if ($RI->step == 1) {
                 </div>
 
                 <div class="install-option option-folder mt-2 p-2 border border-secondary rounded">
-                    <h5>Select how to install REDCap on your webserver:</h5>
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="radio" value="redcap" class="form-check-input" name="install-folder"
-                                   checked="checked">
-                            By default, REDCap will be installed in the redcap folder, so your web url will be <a
-                                    target="_blank" href="http://localhost/redcap">http://localhost/redcap</a>
-                        </label>
-                        <small class="form-text text-muted">This configuration can be useful if you wish to install
-                            other services on this web server (such as multiple REDCap versions).
-                        </small>
-                    </div>
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="radio" value="base" class="form-check-input" name="install-folder">You can also
-                            installed into the 'root' of your web folder, so your web url will be
-                            <a target="_blank" href="http://localhost">http://localhost</a>
-                        </label>
-                        <small class="form-text text-muted">This most likely resembles your production deployment and
-                            some find it 'prettier' than the subfolder default
-                        </small>
+                    <h5>REDCap Webroot Path</h5>
+                    <div>
+                        Based on your configuration, REDCap will be located at:
+                        <a target="_blank" href="http://localhost<?php echo $RI->redcap_webroot_path ?>">
+                            http://localhost<?php echo $RI->redcap_webroot_path ?>
+                        </a>
+                        <small class="form-text text-muted">This configuration can be changed by modifying the REDCAP_WEBROOT_PATH option in the <code>.env</code> file.</small>
                     </div>
                 </div>
 
@@ -696,7 +703,7 @@ if ($RI->step == 1) {
 
             // Show parameters
             $('div.install-option').hide();
-            $('div.install-option.option-folder').fadeIn();
+            // $('div.install-option.option-folder').fadeIn();
             $('div.option-' + option).fadeIn();
         });
 

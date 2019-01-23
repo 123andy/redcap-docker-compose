@@ -1,0 +1,4 @@
+#root crontabs go here
+#*   * * * *   wget web/cron.php --spider >/dev/null 2>&1
+*   * * * *   wget web{REDCAP_WEBROOT_PATH}cron.php --spider >/dev/null 2>&1
+*/5 * * * *   /usr/sbin/logrotate /etc/logrotate.conf

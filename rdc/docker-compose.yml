@@ -49,7 +49,6 @@ services:
 
   cron:
     build: docker-cron
-#    container_name: redcap-cron
     restart: always
     env_file: .env
     # command: ['crond', '-f', '/var/spool/cron/crontabs']
@@ -63,7 +62,6 @@ services:
 
   mailhog:
     build: docker-mailhog
-#    container_name: redcap-mailhog
     restart: always
     env_file: .env
     depends_on:
