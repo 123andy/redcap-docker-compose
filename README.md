@@ -3,13 +3,23 @@
 ![Docker Compose][docker-compose-logo]
 ![REDCap][redcap-logo]
 
-This repo is designed to build a local development instance of REDCap on your laptop.  It also includes some aids to try and facilitate a rapid setup of REDCap using either your consortium credentials or a complete installer you receive from a teammate at your institution.
+## About
+This repo is designed to build a local development instance of REDCap on your laptop.  It also includes some aids 
+to try and facilitate a rapid setup of REDCap using either your consortium credentials or a complete installer you 
+receive from a teammate at your institution.
 
-This is intended to be one of the fastest and easiest ways to create a local development instance of REDCap on your computer or test server.
+This is intended to be one of the fastest and easiest ways to create a local development instance of REDCap on your 
+computer or test server.
 
 This is not intended to be used as a production server, although we do run something pretty similar here at Stanford.
 
-## About
+## Quick-Start
+ * Download this repository and unzip it to your computer
+ * Have Docker installed (see [documentation](rdc/documentation/README.md) for more details)
+ * Open a terminal, goto the `rdc` folder and type `docker-compose up -d`
+ * Open your web browser and goto `http://localhost` and follow directions
+ 
+## Details
 This docker-compose will build multiple servers as part of a docker group to host REDCap on your local computer/server.
 It consists of:
  * The official PHP-Apache docker image (Currently version 7.2)
