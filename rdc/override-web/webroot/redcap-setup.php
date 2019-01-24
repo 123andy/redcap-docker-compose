@@ -25,6 +25,7 @@ public $successes = array();    // Place to record success alerts
 public $debug = array();        // place to dump debug output
 
 public $redcap_webroot_path;    // This is the path relative to the web root where REDCap will be run (default is '/').
+public $redcap_webroot_url;     // The url to the webroot
 
 public $install_path;           // The full file path where REDCap is being installed
 
@@ -48,6 +49,10 @@ public function __construct() {
 
         // GET THE INSTALL PATH FROM THE .ENV
         $this->redcap_webroot_path = (empty($_ENV['REDCAP_WEBROOT_PATH'])) ? '/' : $_ENV['REDCAP_WEBROOT_PATH'];
+
+        $this->redcap_webroot_url = 'http://localhost' .
+            (($ENV['WEB_PORT'] == "80") ? "" : ":" . $ENV['WEB_PORT']) .
+            $this->redcap_webroot_path;
 
         // INCLUDE REDCAP CONNECT!
         if (file_exists("." . $this->redcap_webroot_path . "redcap_connect.php")) {
@@ -119,7 +124,7 @@ public function __construct() {
                         " XXX</code> where XXX is the name of the volume <i>e.g. rdc_mysql-volume</i>");
 
                     // GET THE INSTALL SQL
-                    $install_url = "http://localhost" . $this->redcap_webroot_path . "install.php";
+                    $install_url = $this->redcap_webroot_url . "install.php";
                     $sql = file_get_contents($install_url . "?sql=1");
                     if (empty($sql)) throw new RuntimeException("Unable to obtain installation SQL from $install_url");
 
@@ -625,8 +630,8 @@ if ($RI->step == 1) {
                 <div class="option-folder mt-2 p-2 border border-secondary rounded">
                     <div>
                         Based on your configuration, REDCap will be accessible at:
-                        <a target="_blank" href="http://localhost<?php echo $RI->redcap_webroot_path ?>">
-                            http://localhost<?php echo $RI->redcap_webroot_path ?>
+                        <a target="_blank" href="<?php echo $RI->redcap_webroot_url ?>">
+                            <?php echo $RI->redcap_webroot_url ?>
                         </a> once complete.
                         <small class="form-text text-muted">This configuration can be changed by modifying the <strong>REDCAP_WEBROOT_PATH</strong> option in the <code>.env</code> file.</small>
                     </div>
