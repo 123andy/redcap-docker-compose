@@ -13,7 +13,7 @@ This is not intended to be used as a production server, although we do run somet
 This docker-compose will build multiple servers as part of a docker group to host REDCap on your local computer/server.
 It consists of:
  * The official PHP-Apache docker image (Currently version 7.2)
- * The official MySql docker image (currently version 5.7)
+ * The official cd MySql docker image (currently version 5.7)
  * A basic alpine-based MailHop image (for capturing outbound emails from REDCap for your review)
 
 (optional)

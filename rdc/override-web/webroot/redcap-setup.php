@@ -26,7 +26,7 @@ public $debug = array();        // place to dump debug output
 
 public $redcap_webroot_path;    // This is the path relative to the web root where REDCap will be run (default is '/').
 
-public $install_path;           // The path where REDCap is being installed
+public $install_path;           // The full file path where REDCap is being installed
 
 public $db_conn;                // DB Connection
 
@@ -38,12 +38,6 @@ public $step = 1;               // Install Step (1 = zip file, 2 = database setu
  */
 public function __construct() {
     try {
-
-//        if (file_exists("redcap_connect.php")) {
-//            include_once "redcap_connect.php";
-//        } elseif (file_exists("redcap/redcap_connect.php")) {
-//            include_once "redcap/redcap_connect.php";
-//        }
 
         // INITIALIZE DB FROM ENV PARAMS
         $this->hostname = 'db';
@@ -549,6 +543,7 @@ public function displayPageHeader() {
         }
         .bg-cardinal {background-color: #8c1515}
         .install-option {display:none;}
+        .initiate-installation {display:none;}
     </style>
 </head>
 <body>
@@ -584,30 +579,39 @@ if ($RI->step == 1) {
     <form id="form-upload" enctype="multipart/form-data" class="form" method="POST">
         <div class="mt-2 card install">
             <div class="card-header bg-cardinal text-light">
-                <h3><i class="fas fa-dice-one"></i> The REDCap Installer ZIP</h3>
+                <h3><i class="fas arrow-alt-circle-up"></i> REDCap Installation Options</h3>
             </div>
             <div class="card-body">
                 <div>
                     <h5>
-                        You can install REDCap on this docker server using either of two methods:
+                        To install REDCap, we need the full zip installer.  There are two ways to get this installer
+                        file to this script:
                     </h5>
                     <div class="form-check">
                         <label class="form-check-label">
                             <input type="radio" value="consortium" class="form-check-input" name="dl-option">Use your
                             <a target="_blank" href="https://community.projectredcap.org">Community Consortium</a> login
-                            to download the latest version automatically
+                            to download your favorite REDCap version automatically
                         </label>
                     </div>
                     <div class="form-check">
                         <label class="form-check-label">
-                            <input type="radio" value="upload" class="form-check-input" name="dl-option">Upload a full
-                            .zip installer (perhaps provided by your consortium representative)
+                            <input type="radio" value="upload" class="form-check-input" name="dl-option">Use a local copy
+                            of the full zip installer, perhaps provided by a colleague or
+                            consortium representative <i>(typically named redcapx.y.z.zip)</i>
                         </label>
+                    </div>
+                    <div class="mt-4">
+                        <small class="text-center">
+                            If you don't have either of these, then you need to reach out to your institution's REDCap
+                            Consortium representatives for assistance.  This can be found at our
+                            <a target="_blank" href="https://project-redcap.org/partners/">Consortium Site</a>
+                        </small>
                     </div>
                 </div>
 
                 <div class="install-option option-consortium mt-2 p-2 border border-secondary rounded">
-                    <h5>Enter REDCap Consortium Credentials:</h5>
+                    <h5>Enter your REDCap Consortium Credentials:</h5>
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" class="form-control" name="username"
@@ -639,29 +643,34 @@ if ($RI->step == 1) {
                     </div>
                 </div>
 
-                <div class="install-option option-folder mt-2 p-2 border border-secondary rounded">
-                    <h5>REDCap Webroot Path</h5>
+                <div class="option-folder mt-2 p-2 border border-secondary rounded">
                     <div>
-                        Based on your configuration, REDCap will be located at:
+                        Based on your configuration, REDCap will be accessible at:
                         <a target="_blank" href="http://localhost<?php echo $RI->redcap_webroot_path ?>">
                             http://localhost<?php echo $RI->redcap_webroot_path ?>
-                        </a>
+                        </a> once complete.
                         <small class="form-text text-muted">This configuration can be changed by modifying the REDCAP_WEBROOT_PATH option in the <code>.env</code> file.</small>
                     </div>
                 </div>
 
             </div>
+
             <div class="card-footer">
                 <input type="hidden" name="install-option"/>
                 <button type="submit"
                         class="input-group btn btn-lg btn-success initiate-installation text-center d-block">INSTALL
                     REDCAP
                 </button>
-                <small class="form-text text-muted">Any existing files will be overwritten. This make time some time to
+                <small class="form-text text-muted text-center">Any existing files will be overwritten. This make time some time to
                     download and extract... Be patient!
                 </small>
             </div>
         </div>
+
+        <div class="text-center mt-4">
+            This installer was created by Andy Martin with assistance from Rob Taylor and Philip Chase
+        </div>
+
     </form>
     <?php
 } elseif ($RI->step == 2) {
@@ -705,6 +714,9 @@ if ($RI->step == 1) {
             $('div.install-option').hide();
             // $('div.install-option.option-folder').fadeIn();
             $('div.option-' + option).fadeIn();
+
+            // Show the installation option
+            $('button.initiate-installation').fadeIn();
         });
 
 

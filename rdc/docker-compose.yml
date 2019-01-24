@@ -51,12 +51,10 @@ services:
     build: docker-cron
     restart: always
     env_file: .env
-    # command: ['crond', '-f', '/var/spool/cron/crontabs']
     depends_on:
       - web
       - db
     volumes:
-      - ${CRONTAB_FILE}:/var/spool/cron/crontabs/root
       - ${CRON_LOGROTATE_DIR}:/etc/logrotate.d
       - ${LOGS_DIR}:/logs-dir
 
@@ -70,7 +68,7 @@ services:
       - "1025:1025"
       - "8025:8025"
     volumes:
-      - mailhog-volume:/maildir
+      - ${MAILHOG_DIR}:/maildir
       - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
     environment:
       MH_STORAGE: maildir

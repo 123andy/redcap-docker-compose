@@ -12,9 +12,11 @@ if [ ! -z "$APACHE_RUN_USER_ID" ]; then
     fi
 fi
 
-# Replace REDCAP_WEBROOT_PATH for mounted crontab
-sed -i "s/REDCAP_WEBROOT_PATH/${REDCAP_WEBROOT_PATH}/g" /var/spool/cron/crontabs/root
+# ADD REDCap CRON ENTRIES
+echo "*   * * * *   wget web${REDCAP_WEBROOT_PATH}cron.php --spider >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
 
+# Add logrotate scripts
+echo "*/5 * * * *   /usr/sbin/logrotate /etc/logrotate.conf"    >> /var/spool/cron/crontabs/root
 # Log Rotate throws an error if this file doesn't exist
 touch /var/log/messages
 

@@ -1,7 +1,4 @@
 .idea*
 .DS_Store
-VOLUMES/*
-!VOLUMES/README.md
-REDCAP-DOWNLOAD/*
-!REDCAP-DOWNLOAD/README.md
-myenv.txt
+www/*
+logs/*
