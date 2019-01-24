@@ -76,23 +76,32 @@ public function __construct() {
             if ($zip_path !== false && empty($this->errors)) {
 
                 // Continue unzipping
-                $result = $this->unzipFile($zip_path);
+                $dest_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "redcap-installer";
+                $result = $this->unzipFile($zip_path, $dest_path);
 
-                if ($result !== false && empty($this->errors)) {
+//                $this->successes[] = "Zip Path: " . $zip_path;
+//                $this->successes[] = "Dest Path: " . $dest_path;
+//                $this->successes[] = "Install Path: " . $this->install_path;
+
+                if (! is_dir($this->install_path)) shell_exec("mkdir -p " . $this->install_path);
+
+                if ($result == true && empty($this->errors)) {
                     // SUCCESS
-                    $this->successes[] = "REDCap successfully unzipped to $result";
+                    $this->successes[] = "REDCap successfully unzipped to $dest_path";
 
                     // MOVE UNZIPPED FILES TO WEBROOT
-                    shell_exec("mv " . $result . "/redcap/* " . $this->install_path);
+                    shell_exec("mv " . $dest_path . "/redcap/* " . $this->install_path);
+
+                    // CLEAN UP FILES
+//                    exec(sprintf("rm -rf %s", escapeshellarg($dest_path)));
+//                    unlink($zip_path);
 
                     // TODO - what should happen here is to refresh this page and include the redcap_connect so we can
-                    // just use all the redcap logic to complete the setup....  Saving that for another day...
 
                     // TODO - Add users automatically to this dev instance since setting up table-based users is such a PITA.
 
                     // CREATE DATABASE.PHP
-                    $dest_path = $this->install_path . "database.php";
-                    $this->buildDatabaseDotPhp($dest_path);
+                    $this->buildDatabaseDotPhp($this->install_path);
 
                     // SETUP DATABASE
                     if (! $this->initializeDatabase()) throw new RuntimeException("Unable to initialize Database.  Proceed with manual database setup.");
@@ -100,7 +109,14 @@ public function __construct() {
                     // TEST IF DATABASE IS ALREADY SET UP
                     $q = $this->db_query("SHOW TABLES LIKE 'redcap%'");
                     $redcap_tables = mysqli_num_rows($q);
-                    if ($redcap_tables > 0) throw new RuntimeException("There are $redcap_tables redcap* tables in the " . $this->db . " database.  Please update manually.");
+                    if ($redcap_tables > 0) throw new RuntimeException("There are $redcap_tables existing tables" .
+                        " starting with 'redcap' in their name in the " . $this->db . " database." .
+                        " This script will halt automatic table creation of a new REDCap database.<br><br>" .
+                        " If you wish to delete the existing database and start new, you need to remove the docker volume" .
+                        " that contains the database files.  The name of this volumne will contain <strong>" .
+                        $_ENV['MYSQL_DIR'] . "</strong> and can be found by executing this command on your terminal:" .
+                        " <code>docker volume ls</code>.  You can then remove the volume with <code>docker volume rm" .
+                        " XXX</code> where XXX is the name of the volume <i>e.g. rdc_mysql-volume</i>");
 
                     // GET THE INSTALL SQL
                     $install_url = "http://localhost" . $this->redcap_webroot_path . "install.php";
@@ -121,8 +137,11 @@ public function __construct() {
                     if ($redcap_tables == 0) throw new RuntimeException("Install SQL did not appear to work.  Check database and do manual setup.");
 
                     $this->successes[] = "Installed $redcap_tables REDCap tables to " . $this->db . " on " . $this->hostname;
-                    $this->successes[] = "Resume setup at <a href='" . $install_url . "'>$install_url</a>";
+                    $this->successes[] = "<h5>Initial setup complete!</h5>You should <strong>SKIP step 1</strong> on" .
+                        " the next page this script has already created your database.<br>Simply press 'Save Changes'" .
+                        " and move onto the next steps.  Click <a href='" . $install_url . "'>$install_url</a>. to continue.";
                     $this->db_conn->close();
+                    $this->step = 99; // DONE
                 }
             }
         }
@@ -165,8 +184,9 @@ public function buildDatabaseDotPhp($dest_path) {
         $contents[] = '$username = "' . $this->username . '";';
         $contents[] = '$password = "' . $this->password . '";';
         $contents[] = '$salt     = "' . $this->salt     . '";';
+        $contents[] = '';
 
-        file_put_contents($dest_path, implode("\n\t",$contents));
+        file_put_contents($dest_path . "database.php", implode("\n\t",$contents));
         return true;
     } catch (RuntimeException $e) {
         $this->errors[] = $e->getMessage() . " in " . __FUNCTION__;
@@ -391,61 +411,20 @@ public function handleUpload($field_name, $strip_redcap_folder = TRUE) {
  * @return mixed    FALSE if failure, otherwise PATH to unzipped contents
  */
 
-public function unzipFile($source_path) {
+public function unzipFile($source_path, $dest_path) {
     try {
         // UNZIP IT
         $zip = new ZipArchive;
         $res = $zip->open($source_path);
 
         if ($res === TRUE) {
-            $dest_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "redcap-installer";
             $zip->extractTo($dest_path);
-            //echo "<br>Opened Zip file at $path";
-//            if ($strip_redcap_folder) {
-//                // REMOVE THE /redcap FOLDER FROM THE ARCHIVE
-//                $subfolder_to_extract = 'redcap';
-//                $count = 0;
-//
-//                // Loop through archive
-//                //for ($i = 0; $i < 3; $i++) {
-//                for ($i = 0; $i < $zip->numFiles; $i++) {
-//                    $filename = $zip->getNameIndex($i);
-//
-//                    // $count will only be 1 if zip file starts with $subfolder_to_extract
-//                    $filename2 = preg_replace('/^' . $subfolder_to_extract . '\//', "", $filename, 1, $count);
-//                    if ($count == 1) {
-//                        $isDir = (substr($filename2, -1, 1) == '/');
-//                        $dest_file = $this->install_path . $filename2;
-//
-//                        // If source item in zip is a directory, check if it exists
-//                        // filename2 is empty for the 'base' directory after $subfolder_to_extract is removed
-//                        if ($isDir || empty($filename2)) {
-//                            if (!is_dir($dest_file)) {
-//                                mkdir($dest_file, 0777, true);
-//                            }
-//                        } else {
-//                            // Zip item is a file
-//                            // Make sure required destination directory exists
-//                            $dest_path = pathinfo($dest_file);
-//                            if (!file_exists($dest_path['dirname'])) {
-//                                mkdir($dest_path['dirname'], 0777, true);
-//                            }
-//
-//                            // Extract file
-//                            copy("zip://" . $source_path . "#" . $filename, $dest_file);
-//                        }
-//                    }
-//                }
-//            } else {
-//                // Simply unzip to the directory root
-//                $zip->extractTo(__DIR__);
-//            }
             $zip->close();
         } else {
             throw new RuntimeException('Failed to unzip source file:' + $source_path);
         }
 
-        return $dest_path;
+        return true;
     } catch (RuntimeException $e) {
         $this->errors[] = $e->getMessage() . " in " . __FUNCTION__;
         return false;
@@ -543,7 +522,7 @@ public function displayPageHeader() {
         }
         .bg-cardinal {background-color: #8c1515}
         .install-option {display:none;}
-        .initiate-installation {display:none;}
+        .card-footer {display:none;}
     </style>
 </head>
 <body>
@@ -579,7 +558,7 @@ if ($RI->step == 1) {
     <form id="form-upload" enctype="multipart/form-data" class="form" method="POST">
         <div class="mt-2 card install">
             <div class="card-header bg-cardinal text-light">
-                <h3><i class="fas arrow-alt-circle-up"></i> REDCap Installation Options</h3>
+                <h3><i class="fas fa-arrow-up"></i> REDCap Installation Options</h3>
             </div>
             <div class="card-body">
                 <div>
@@ -634,7 +613,7 @@ if ($RI->step == 1) {
                 </div>
 
                 <div class="install-option option-upload mt-2 p-2 border border-secondary rounded">
-                    <h5>Upload redcap_vx.y.z.zip Installer:</h5>
+                    <h5>Select the path to your <code>redcap_vx.y.z.zip</code> full-installer file:</h5>
                     <div class="input-group mb-3">
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="installer-upload" name="installer-upload">
@@ -649,7 +628,7 @@ if ($RI->step == 1) {
                         <a target="_blank" href="http://localhost<?php echo $RI->redcap_webroot_path ?>">
                             http://localhost<?php echo $RI->redcap_webroot_path ?>
                         </a> once complete.
-                        <small class="form-text text-muted">This configuration can be changed by modifying the REDCAP_WEBROOT_PATH option in the <code>.env</code> file.</small>
+                        <small class="form-text text-muted">This configuration can be changed by modifying the <strong>REDCAP_WEBROOT_PATH</strong> option in the <code>.env</code> file.</small>
                     </div>
                 </div>
 
@@ -716,7 +695,7 @@ if ($RI->step == 1) {
             $('div.option-' + option).fadeIn();
 
             // Show the installation option
-            $('button.initiate-installation').fadeIn();
+            $('.card-footer').fadeIn();
         });
 
 
