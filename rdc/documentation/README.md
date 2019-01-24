@@ -17,121 +17,35 @@ interesting.
 1. Install docker on your machine.
    * [Docker Community Edition](https://store.docker.com/search?type=edition&offering=community)
       * You might also consider installing a docker GUI such as [Kitematic](https://kitematic.com/)
-1. Download or clone [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose) to your computer.  
+1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose) to your computer.  
    * A zip file is available here: [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
    * Unzip this into a good place on your computer (e.g. desktop or documents)
-1. Download the full install version of REDCap from the community consortium.
-   * [REDCap Community Download Page](https://community.projectredcap.org/page/download.html) - requires authentication.
+1. Obtain a copy of the full redcap installer or know your consortium username and password.
      * Can't log in? Talk to your site's REDCap administrator if you need help getting the source code or if you need 
        to [apply for community access](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
-   * If you want the *setup assistant* to help you install REDCap, place the `redcapx.y.z.zip` file in the
-   `REDCAP-DOWNLOADS` folder from the previous step and it will be auto-extracted
-   and installed to your webroot.
 
 ## Configuration on Windows Docker hosts
 
-1. Open the `.env` file in the redcap-docker-compose folder with a text editor or IDE.
+1. Open the `.env` file in the redcap-docker-compose folder `rdc/` with a text editor or IDE.
    * Review the settings and see what you can easily customize 
-     * You will want to select where your `WEBROOT_DIR` folder will reside on your computer.  This is where your redcap
-       source code will go. You might want this in your Documents or Desktop folder for easy access.  The default will
-       be inside the `VOLUMES/www` folder.
-     * You will want to understand where the log files will be located.  Default is `VOLUMES/logs`
+     * By default, your web files will go into the `www` folder once you unzip this repo.  You can change this by modifying
+       the `WEBROOT_DIR` key in the .env file.
+     * You will want to understand where the log files will be located.  Default is `logs`
      * If you are on a MAC, you should set the `APACHE_RUN_USER_ID` setting to your current mac users' UID.  This can
        be found by opening your terminal and typing `id`.  Typically it is 501 for the first user on a mac.
 1. Lastly, you will start-up the containers.  This can be done from the terminal/command line by navigating to the folder
-   containing the `docker-compose.yml` file and running a docker-compose up command.
-
-## Configuration on Mac OS X and Linux Docker hosts
-
-Mac and Linux users have the option of creating their own file of environment variables. Using this file simplifies upgrades and development by not modifying `.env`.
-
-1. Create your own environment file by copying `myenv-example.txt`. i.e.,
-
-    cp myenv-example.txt myenv.txt
-
-1. Review the settings in `.env` file in the redcap-docker-compose folder. For
-any setting in .env you want to change, copy the setting from .env to
-`myenv.txt`, prefix it with the command `export` and change the value to the
-value you need in your environment. A typical `myenv.txt` might look like
-this:
-
-    ### myenv-example.txt ###
-    # Customize your environment by exporting environment
-    # variables with values suitable to your environment.
-    # Copy any variable from .env here, prefix it with
-    # the word command 'export', and set the value you need.
-
-    export TZ=America/New_York
-    export MYSQL_PORT=3386
-    export MYSQL_PASSWORD=password
-
-1. Source the `myenv.txt` before running any Docker commands
-
-    source myenv.txt
-
+   containing the `docker-compose.yml` file (typically `rdc/` and running a docker-compose up command: `docker-compose up -d`.
 
 ## Installing REDCap
 
-There are two ways to get your new docker-compose REDCap environment running - I recommend using the startup assistant,
- but you can also choose the manual method if you want to learn more or have an existing environment you are porting
- over.
-
-### A) Setup Assistant
-There is an optional *setup assistant* that can help extract your first REDCap install, configure your database.php
-file, populate your database tables and configure REDCap.
-1. Before you start up the containers the first time, download the `redcapx.x.x.zip` file from the Consortium website into the
- `REDCAP-DOWNLOADS` directory.
-1. Then go to the root of this repository and run:
-```bash
-redcap-docker-compose$ docker-compose up
-```
-The first startup might take a while, so be patient.  Keep an eye on your `WEBROOT_DIR` and review the logs.  If all
-goes well, you should have a running REDCap.  To access this REDCap, direct your web browser to [http://localhost/]( http://localhost/).
-
-If you _don't_ see a running REDCap, review the manual steps below to figure out what step failed.
-
-
-### B) Manual setup WEBROOT_DIR
-Alternately, you can manually add the contents of a redcap installer into your `WEBROOT_DIR` folder and then setup the
-`database.php` file with your connection information.
-
-1. Fire up your containers with:
-```bash
-redcap-docker-compose$ docker-compose up
-```
-1. Watch the logs, if all went well, you should be able to get a phpinfo() page at [http://localhost](http://localhost)
-1. Next, open your installer zip (or take your existing development folder) and place it into the `WEBROOT_DIR` folder
-as configured in your `.env` file.  Be sure to read the note on the `/redcap/` folder after this section.
-1. Next, we need to edit the `database.php` file in the webroot to match your *MYSQL_XXX* database parameters from the
- .env file.  Using your text editor, open `database.php` and insert something like:
-   ```php
-   <?php
-     global $log_all_errors;
-     $log_all_errors = FALSE;  // You could set this to true as well
-     $hostname  = 'db';        // Note this is the 'internal' name (as seen by a docker-container)
-     $db        = 'redcap';
-     $username  = 'redcap';
-     $password  = 'redcap123';
-     $salt      = '12345678';
-   ```
-
-> #### What should I do with the `/redcap/` folder?
->
->When you place your redcap files in your `WEBROOT_DIR` you can either include the `/redcap/` folder or leave it out.
-I prefer to leave off so the REDCap homepage will be [http://localhost](http://localhost).
->
->If you include it, your homepage will be [http://localhost/redcap](http://localhost/redcap). Please note that if you
- do leave the /redcap/ folder there, you will need to update the crontab root so the correct url is called every
- minute:  Change `wget -O /dev/null web/cron.php` to `wget -O /dev/null web/redcap/cron.php` and force a rebuild of 
- your cron container with `docker-compose up -d --no-deps --build cron`
->
->Note that if you use the *startup assistant* it leaves off the /redcap/ folder.
-
+After you start up your docker environment, you should be able to connect to `http://localhost` and see an installer to 
+guide you through the REDCap setup.
 
 ## Configure REDCap
 At this point, we assume that you have a running set of containers.  If you should now setup your database.
 
-1. Open the installer at [http://localhost/install.php](http://localhost/install.php)
+1. Open the installer at [http://localhost/install.php](http://localhost/install.php) - please note your URL may be different
+if you set custom ports or install paths.
     * You can *IGNORE* the part about creating a new database user - you already have one as defined in the MYSQL_XXX
 variables in the `.env` file.
     * IF YOU JUST GOTO `http://localhost` you will likely see an error about 'wrong version' - you have to goto the `/install.php` first!
@@ -231,4 +145,4 @@ Keep in mind any changes you make will be transitory and lost if you ever recrea
 
 ### How can I see what's running?
 The command `docker ps` shows what containers are running.  If your server is up, they will appear here.
-The command `docker ps -a` shows all contaiers regardless of run state.
+The command `docker ps -a` shows all containers regardless of run state.

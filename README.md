@@ -15,24 +15,22 @@ It consists of:
  * The official PHP-Apache docker image (Currently version 7.2)
  * The official cd MySql docker image (currently version 5.7)
  * A basic alpine-based MailHop image (for capturing outbound emails from REDCap for your review)
+ * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
 
 (optional)
- * The official PhpMyAdmin web-based mysql tool for managing the database.
- * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
- * A basic alpine-based setup image to create your first REDCap webroot, database.php, populate the REDCap tables and configure REDCap.
+ * The official PhpMyAdmin web-based mysql tool for managing the database.  This is commented out by default.  If you want to include it, edit the `docker-compose.yml` file and uncomment out the phpmyadmin section.
 
-The advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how
-these changes might affect your projects or custom code.
+The advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how these changes might affect your projects or custom code.
 
 ## Configuration
 The services are mainly configured through a `.env` environment file or shell
 environment variables.  Additional customization can be done by modifying the
 files in the `override-*` directories.
 
-See the [documentation](documentation/README.md) for more information on getting started!
+See the [documentation](rdc/documentation/README.md) for more information on getting started!
 
 ## Updates
-* 2019-01-24  Changed folder layout and optimized unzipping after upload
+* 2019-01-24  Changed folder layout and optimized unzipping after upload to be much faster
 * 2018-08-19  Added .env file and added UID override for MAC users to maintain file ownership (see .env)
 * 2018-08-04  Added support for auto-install from `redcapx.y.z.zip`
 * 2018-08-01  Major refactoring into docker-compose 3
