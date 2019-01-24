@@ -1,32 +1,36 @@
-# redcap-docker-compose
+# REDCap Docker Compose Environment
 
 ![Docker Compose][docker-compose-logo]
 ![REDCap][redcap-logo]
 
-This docker-compose script builds a working php-mysql environment designed for REDCap.
-  This is one of the easiest ways to create a local development instance of REDCap on your computer or test server.
+This repo is designed to build a local development instance of REDCap on your laptop.  It also includes some aids to try and facilitate a rapid setup of REDCap using either your consortium credentials or a complete installer you receive from a teammate at your institution.
+
+This is intended to be one of the fastest and easiest ways to create a local development instance of REDCap on your computer or test server.
+
+This is not intended to be used as a production server, although we do run something pretty similar here at Stanford.
 
 ## About
 This docker-compose will build multiple servers as part of a docker group to host REDCap on your local computer/server.
 It consists of:
  * The official PHP-Apache docker image (Currently version 7.2)
- * The official MySql docker image (currently version 5.7)
- * The official PhpMyAdmin web-based mysql tool for managing the database.
- * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
+ * The official cd MySql docker image (currently version 5.7)
  * A basic alpine-based MailHop image (for capturing outbound emails from REDCap for your review)
- * A basic alpine-based setup image to create your first REDCap webroot, database.php, populate the REDCap tables and configure REDCap.
+ * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
 
-The advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how
-these changes might affect your projects or custom code.
+(optional)
+ * The official PhpMyAdmin web-based mysql tool for managing the database.  This is commented out by default.  If you want to include it, edit the `docker-compose.yml` file and uncomment out the phpmyadmin section.
+
+The advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how these changes might affect your projects or custom code.
 
 ## Configuration
 The services are mainly configured through a `.env` environment file or shell
 environment variables.  Additional customization can be done by modifying the
 files in the `override-*` directories.
 
-See the [documentation](documentation/README.md) for more information on getting started!
+See the [documentation](rdc/documentation/README.md) for more information on getting started!
 
 ## Updates
+* 2019-01-24  Changed folder layout and optimized unzipping after upload to be much faster
 * 2018-08-19  Added .env file and added UID override for MAC users to maintain file ownership (see .env)
 * 2018-08-04  Added support for auto-install from `redcapx.y.z.zip`
 * 2018-08-01  Major refactoring into docker-compose 3

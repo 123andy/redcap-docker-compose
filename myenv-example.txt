@@ -1,9 +1,0 @@
-### myenv-example.txt ###
-# Customize your environment by exporting environment
-# variables with values suitable to your environment.
-# Copy any variable from .env here, prefix it with
-# the word command 'export', and set the value you need.
-
-export TZ=America/New_York
-export MYSQL_PORT=3386
-export MYSQL_PASSWORD=password

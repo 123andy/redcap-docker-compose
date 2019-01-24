@@ -1,9 +1,7 @@
 version: '3'
 services:
-
   web:
     build: docker-web
-#    container_name: redcap-web
     env_file:
       - .env
     restart: always
@@ -23,10 +21,8 @@ services:
 #      - "lookups.twilio.com:127.0.0.1"
 #      - "event-bridge.twilio.com:127.0.0.1"
 
-
   db:
     image: mysql:5.7
-#    container_name: redcap-db
     env_file: .env
     restart: always
     volumes:
@@ -36,34 +32,19 @@ services:
     ports:
      - "${MYSQL_PORT}:3306"
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-#    container_name: redcap-phpmyadmin
-    env_file: .env
-    depends_on:
-      - web
-      - db
-    restart: always
-    ports:
-      - "${PHPMYADMIN_PORT}:80"
-
   cron:
     build: docker-cron
-#    container_name: redcap-cron
     restart: always
     env_file: .env
-    command: ['crond', '-f', '/var/spool/cron/crontabs']
     depends_on:
       - web
       - db
     volumes:
-      - ${CRONTAB_FILE}:/var/spool/cron/crontabs/root
       - ${CRON_LOGROTATE_DIR}:/etc/logrotate.d
       - ${LOGS_DIR}:/logs-dir
 
   mailhog:
     build: docker-mailhog
-#    container_name: redcap-mailhog
     restart: always
     env_file: .env
     depends_on:
@@ -72,7 +53,7 @@ services:
       - "1025:1025"
       - "8025:8025"
     volumes:
-      - mailhog-volume:/maildir
+      - ${MAILHOG_DIR}:/maildir
       - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
     environment:
       MH_STORAGE: maildir
@@ -80,15 +61,16 @@ services:
       MH_OUTGOING_SMTP: /outgoing_smtp.json
       MH_UI_WEB_PATH: mailhog
 
-  setup:
-    build: docker-setup
-    env_file: .env
-    volumes:
-      - ${REDCAP_DOWNLOAD_DIR}:/redcap_download
-      - ${WEBROOT_DIR}:/webroot
-    environment:
-      - PARSE_ZIP_INSTALLER=true
-      - FORCE_RUN=false
+  # THIS CONTAINER IS OPTIONAL IF YOU WANT TO HAVE PHPMYADMIN - OTHERWISE COMMENT IT OUT
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin
+#    env_file: .env
+#    depends_on:
+#      - web
+#      - db
+#    restart: always
+#    ports:
+#      - "${PHPMYADMIN_PORT}:80"
 
 volumes:
   mysql-volume:

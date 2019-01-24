@@ -7,6 +7,29 @@ TEMP="/tmp"
 WEBROOT="/webroot"
 extWEBROOT="${WEBROOT_DIR}"
 
+
+# REBUILD DATABASE.PHP FILE
+dbFile="${WEBROOT}/database.php";
+if [[ ! -f "${dbFile}" ]]; then
+    echo "<?php"                                     > $dbFile
+    echo "  global \$log_all_errors;"              >> $dbFile
+    echo "  \$log_all_errors = FALSE;"             >> $dbFile
+    echo "  \$hostname  = 'db';"                   >> $dbFile
+    echo "  \$db  = '${MYSQL_DATABASE}';"          >> $dbFile
+    echo "  \$username  = '${MYSQL_USER}';"        >> $dbFile
+    echo "  \$password  = '${MYSQL_PASSWORD}';"    >> $dbFile
+    echo "  \$salt  = '12345678';"                 >> $dbFile
+    echo "${dbFile} generated"
+fi
+
+exit 0;
+
+
+
+
+
+
+
 set_redcap_config() {
     DATABASE_HOSTNAME=$1
     DATABASE_USER=$2

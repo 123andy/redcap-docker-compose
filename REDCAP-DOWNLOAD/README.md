@@ -1,1 +1,0 @@
-Place your redcap new install zip download in here and it will be auto-provisioned on a clean webroot
