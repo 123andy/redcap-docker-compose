@@ -1,7 +1,12 @@
 version: '3'
 services:
   web:
-    build: docker-web
+    build:
+      context: docker-web
+    #Note that we use the host.docker.internal  value to refer to the remote host.
+    #In Docker for Windows and Docker for Mac, it automatically resolves to the internal address of the host, letting you easily connect to it from the container.
+    environment:
+      XDEBUG_CONFIG: remote_host=host.docker.internal
     env_file:
       - .env
     restart: always
