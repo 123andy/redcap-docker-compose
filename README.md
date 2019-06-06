@@ -42,7 +42,7 @@ See the [documentation](rdc/documentation/README.md) for more information on get
 ## X-Debug Configuration (optional for PHPStorm)
 When servers are ready go to your PHPStorm preferences -> Languages & Frameworks -> PHP -> Server then create new server and name it `localhost-xdebug-server`. Specify your hostname and port. Also check "Use Path Mapping" and specify where the codebase is located under File/Directory and add `/var/www/html` under Absolute Path on Ther Server. 
 
-After creating the server on PHPStorm go to Run -> Edit COnfiguration. Create new "PHP Remote Debug" configuration. Make sure to check `Filter debug connection by IDE Key`. For server select `localhost-xdebug-server` and for IDE Key type `PHPSTORM`. You can validate your configuration by clicking on Validate under Pre-Configuration. 
+After creating the server on PHPStorm go to Run -> Edit COnfiguration. Create new "PHP Remote Debug" configuration. Make sure to check `Filter debug connection by IDE Key`. Then select `localhost-xdebug-server` for server and type `PHPSTORM`  for IDE Key. You can validate your configuration by clicking on Validate under Pre-Configuration. 
 
 Finally you need to install PHPDebug Browser debugger extension from https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html
 
