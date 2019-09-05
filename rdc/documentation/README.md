@@ -15,17 +15,27 @@ interesting.
 
 ## Getting Started
 1. Install docker on your machine.
-   * [Docker Community Edition](https://store.docker.com/search?type=edition&offering=community)
-      * You might also consider installing a docker GUI such as [Kitematic](https://kitematic.com/)
-1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose) to your computer.  
+   * As of 2019, Docker requires that you create a user account.  Register.
+   * Download the latest version of docker desktop for your platform:
+      * [MAC](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
+      * [PC](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
+   * Optional: You might also consider installing a docker GUI such as [Kitematic](https://kitematic.com/)
+1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose) 
+   to your computer.  Don't clone it unless you really want to make contributions back.
    * A zip file is available here: [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
    * Unzip this into a good place on your computer (e.g. desktop or documents)
-1. Obtain a copy of the full redcap installer or know your consortium username and password.
-     * Can't log in? Talk to your site's REDCap administrator if you need help getting the source code or if you need 
-       to [apply for community access](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
+      * On my Mac, I put it in a folder called 'redcap' under my user directory `~/redcap/`
+1. You need a copy of the REDCap Installer.  This can be done two ways:
+   * Log into Obtain a copy of the full redcap installer on the [Community Site](https://community.projectredcap.org/page/download.html)
+   * Know your community username and password (typically the username is something like andrew.b.martin.
+      * Can't log in? Talk to your site's REDCap administrator if you need help getting the source code or if you need 
+        to [apply for community access](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
 
-## Configuration on Windows Docker hosts
+## Configuration on Mac Hosts
+1. Open a terminal window and type: `id`.  You should see a list of users and uid's.  Determine the uid for YOUR user.
+   This might be something like 501 or 502...  Remember this - you'll need it when editing the .env file below.
 
+## Editing the .env File
 1. Open the `.env` file in the redcap-docker-compose folder `rdc/` with a text editor or IDE.
    * Review the settings and see what you can easily customize 
      * By default, your web files will go into the `www` folder once you unzip this repo.  You can change this by modifying
@@ -37,9 +47,15 @@ interesting.
    containing the `docker-compose.yml` file (typically `rdc/` and running a docker-compose up command: `docker-compose up -d`.
 
 ## Installing REDCap
-
 After you start up your docker environment, you should be able to connect to `http://localhost` and see an installer to 
 guide you through the REDCap setup.
+
+   * On some macs, we've seen issues with using the name `localhost`.  If you are unable to resolve a webpage
+     with [http://localhost/](http://localhost) you can try [http://127.0.0.1](http://127.0.0.1).
+     * On my mac, I have edit the local hosts file and created an entry called `redcap.local`.  To do this, type
+       `sudo open -e /etc/hosts` and make the line for 127.0.0.1 look like: 
+       ```127.0.0.1       localhost redcap.local```
+       You should now be able to open up your localhost docker with http://redcap.local
 
 ## Configure REDCap
 At this point, we assume that you have a running set of containers.  If you should now setup your database.

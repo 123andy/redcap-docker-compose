@@ -16,7 +16,8 @@ This is not intended to be used as a production server, although we do run somet
 ## Quick-Start
  * Download this repository and unzip it to your computer
  * Have Docker installed (see [documentation](rdc/documentation/README.md) for more details)
- * Open a terminal, goto the `rdc` folder and type `docker-compose up -d`
+ * Open a terminal, goto the `rdc` folder review the contents of the `.env` file.
+ * Once `.env` file settings are correct, type `docker-compose up -d`
  * Open your web browser and goto `http://localhost` and follow directions
  
 ## Details
@@ -40,15 +41,26 @@ files in the `override-*` directories.
 See the [documentation](rdc/documentation/README.md) for more information on getting started!
 
 ## X-Debug Configuration (optional for PHPStorm)
-When servers are ready go to your PHPStorm preferences -> Languages & Frameworks -> PHP -> Server then create new server and name it `localhost-xdebug-server`. Specify your hostname and port. Also check "Use Path Mapping" and specify where the codebase is located under File/Directory and add `/var/www/html` under Absolute Path on Ther Server. 
+X-Debug allows you to insert breakpoints in your php code and evaluate variables from the server in your IDE.  Directions
+for using PhpStorm are provided here.  Basically, you configure an xdebug server on PhpStorm.
+1. After your docker server is up and running, open your project folder in PhpStorm (e.g. `~/redcap/`)
+1. In PhpStorm, goto `preferences -> Languages & Frameworks -> PHP -> Server` and create new server.
+   1. Name the server 'localhost-xdebug-server' - this name matches 
+   1. Set the hostname to be 'localhost' and leave the port at '80'
+   1. Check the "Use Path Mapping" option and find the redcap-docker-compose file.
+      * On the left side, set the path of your codebase (e.g. `~/redcap/www`)
+      * On the right side under `Absolute path on the server` enter in the value `/var/www/html`
+1. After creating the server on PHPStorm go to `Run -> Edit COnfiguration`.  Create new "PHP Remote Debug" configuration.
+   1. Make sure to check `Filter debug connection by IDE Key`. 
+   1. Then select `localhost-xdebug-server` for server and type `PHPSTORM` for IDE Key.
+   1. You can validate your configuration by clicking on Validate under Pre-Configuration. 
 
-After creating the server on PHPStorm go to Run -> Edit COnfiguration. Create new "PHP Remote Debug" configuration. Make sure to check `Filter debug connection by IDE Key`. Then select `localhost-xdebug-server` for server and type `PHPSTORM`  for IDE Key. You can validate your configuration by clicking on Validate under Pre-Configuration. 
-
-Finally you need to install PHPDebug Browser debugger extension from https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html
+1. Finally you need to install the PhpDebug Browser debugger extension from 
+   [https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html]
 
 
 ## Updates
-* 2019-06-06  Add X-Debug configurtion. 
+* 2019-06-06  Add X-Debug configuration. 
 * 2019-01-24  Changed folder layout and optimized unzipping after upload to be much faster
 * 2018-08-19  Added .env file and added UID override for MAC users to maintain file ownership (see .env)
 * 2018-08-04  Added support for auto-install from `redcapx.y.z.zip`
