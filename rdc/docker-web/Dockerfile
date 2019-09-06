@@ -9,6 +9,7 @@ RUN apt-get update -qq && \
     apt-get -yq --no-install-recommends install \
     libapache2-mod-shib2 \
     msmtp-mta \
+    ca-certificates \
     git \
     ssh \
     wget \
