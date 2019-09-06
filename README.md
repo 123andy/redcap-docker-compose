@@ -60,6 +60,7 @@ for using PhpStorm are provided here.  Basically, you configure an xdebug server
 
 
 ## Updates
+* 2019-09-06  Removed ssmtp and replaced with msmtp
 * 2019-06-06  Add X-Debug configuration. 
 * 2019-01-24  Changed folder layout and optimized unzipping after upload to be much faster
 * 2018-08-19  Added .env file and added UID override for MAC users to maintain file ownership (see .env)
@@ -73,5 +74,5 @@ Licensed under the MIT license.
 ## Contributing
 Please make pull requests to extend the functionality and documentation
 
-[redcap-logo]: documentation/redcap-logo-large.png "REDCap"
-[docker-compose-logo]: documentation/docker-compose.png "Docker Compose"
+[redcap-logo]: rdc/documentation/redcap-logo-large.png "REDCap"
+[docker-compose-logo]: rdc/documentation/docker-compose.png "Docker Compose"
