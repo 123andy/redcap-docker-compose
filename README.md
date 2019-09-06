@@ -18,7 +18,7 @@ This is not intended to be used as a production server, although we do run somet
  * Have Docker installed (see [documentation](rdc/documentation/README.md) for more details)
  * Open a terminal, goto the `rdc` folder review the contents of the `.env` file.
  * Once `.env` file settings are correct, type `docker-compose up -d`
- * Open your web browser and goto `http://localhost` and follow directions
+ * Open your web browser and goto `http://localhost` (or, in some cases with macs `http://127.0.0.1`) and follow directions
  
 ## Details
 This docker-compose will build multiple servers as part of a docker group to host REDCap on your local computer/server.
