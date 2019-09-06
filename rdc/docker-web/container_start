@@ -12,7 +12,8 @@
 [ -d /etc/container-config/shibboleth ]      && cp -RT /etc/container-config/shibboleth  /etc/shibboleth
 [ -d /etc/container-config/apache2 ]         && cp -RT /etc/container-config/apache2     /etc/apache2
 [ -d /etc/container-config/php ]             && cp -RT /etc/container-config/php         /usr/local/etc/php/conf.d
-[ -d /etc/container-config/ssmtp ]           && cp -RT /etc/container-config/ssmtp       /etc/ssmtp
+#[ -d /etc/container-config/ssmtp ]           && cp -RT /etc/container-config/ssmtp       /etc/ssmtp
+[ -d /etc/container-config/msmtp ]           && cp -RT /etc/container-config/msmtp       /etc/
 
 # RUN STARTUP SCRIPTS
 [ -d /etc/container-config/startup-scripts ] && for cmds in /etc/container-config/startup-scripts/*.sh ; do . ${cmds} ; done

@@ -1,11 +1,11 @@
-version: '3'
+version: '3.7'
 services:
   web:
     build:
       context: docker-web
-    #Note that we use the host.docker.internal  value to refer to the remote host.
-    #In Docker for Windows and Docker for Mac, it automatically resolves to the internal address of the host, letting you easily connect to it from the container.
     environment:
+      # For X-Debug to connect to your IDE, we need to resolve the IP of your laptop.  We use the host.docker.internal
+      # which will automatically resolve to the host on Docker containers.
       XDEBUG_CONFIG: remote_host=host.docker.internal
     env_file:
       - .env
@@ -19,6 +19,7 @@ services:
       - ${WEBROOT_DIR}:/var/www/html
       - ${LOGS_DIR}:/var/log/apache2
 # You can prevent your REDCap from accessing certain sites (like twilio) using these settings
+# If you leave these commented out, you WILL be able to use Twilio from your docker
 #    extra_hosts:
 #      - "api.twilio.com:127.0.0.1"
 #      - "www.twilio.com:127.0.0.1"
@@ -79,5 +80,8 @@ services:
 
 volumes:
   mysql-volume:
+    name: "${DOCKER_VOLUME_PREFIX}_mysql-volume"
   logs-volume:
+    name: "${DOCKER_VOLUME_PREFIX}_logs-volume"
   mailhog-volume:
+    name: "${DOCKER_VOLUME_PREFIX}_mailhog-volume"

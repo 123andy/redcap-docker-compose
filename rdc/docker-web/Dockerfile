@@ -1,4 +1,5 @@
-FROM php:7.2-apache
+FROM php:7.3-apache
+# I see there is now php:7.3-apache and 7.4 is a release candidate
 ## https://hub.docker.com/_/php/
 
 MAINTAINER andy123@stanford.edu
@@ -7,7 +8,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qq && \
     apt-get -yq --no-install-recommends install \
     libapache2-mod-shib2 \
-    ssmtp \
+    msmtp-mta \
     git \
     ssh \
     wget \
@@ -16,7 +17,6 @@ RUN apt-get update -qq && \
     zip \
     && docker-php-ext-configure zip --with-libzip \
     && docker-php-ext-install gd zip mysqli \
-#    && docker-php-ext-enable mysqli \
     ### cleanup \
     && rm -r /var/lib/apt/lists/*
 
@@ -37,6 +37,8 @@ ENV APACHE_RUN_HOME /var/www
 ENV APACHE_DOCUMENT_ROOT /var/www/html
 ENV APACHE_ERROR_LOG /dev/stdout
 ENV APACHE_ACCESS_LOG /dev/stdout
+
+ENV SMTP_SMARTHOST mailhog
 
 # APACHE_RUN_USER APACHE_RUN_GROUP
 
