@@ -1,4 +1,0 @@
-# This file will append additional configuration for the default virtual host
-
-# To support the custom setup page
-DirectoryIndex index.php index.html redcap-setup.php

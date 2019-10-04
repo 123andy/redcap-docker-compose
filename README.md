@@ -3,6 +3,23 @@
 ![Docker Compose][docker-compose-logo]
 ![REDCap][redcap-logo]
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [About](#about)
+- [Features](#features)
+- [Quick-Start](#quick-start)
+- [Full Documentation](#full-documentation)
+- [Updates](#updates)
+- [License](#license)
+- [Contributing](#contributing)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+[![documentation-button](rdc/documentation/button_documentation.png)](rdc/documentation/README.md)
+
+
 ## About
 This repo is designed to build a local development instance of REDCap on your laptop.  It also includes some aids 
 to try and facilitate a rapid setup of REDCap using either your consortium credentials or a complete installer you 
@@ -12,54 +29,33 @@ This is intended to be one of the fastest and easiest ways to create a local dev
 computer or test server.
 
 This is not intended to be used as a production server, although we do run something pretty similar here at Stanford.
+Should you want to run this as production, be sure to edit the `redcap.ini` file in the `override-web/php` folder
+to have production-ready php settings.
+
+## Features
+ * Mailhog to capture outbound email for review
+ * X-Debug support for detailed server-side inspection
+ * PhpMyAdmin support for easy database maintenance / backups / restores
+ * Easy to modify php-version or mysql-version and rebuild your environment in minutes
 
 ## Quick-Start
- * Download this repository and unzip it to your computer
- * Have Docker installed (see [documentation](rdc/documentation/README.md) for more details)
- * Open a terminal, goto the `rdc` folder review the contents of the `.env` file.
- * Once `.env` file settings are correct, type `docker-compose up -d`
- * Open your web browser and goto `http://localhost` (or, in some cases with macs `http://127.0.0.1`) and follow directions
+ * Install Docker Community Edition (requires docker account which is free)
+ * [Download this repository](https://github.com/123andy/redcap-docker-compose/archive/master.zip) and unzip it to your computer
+ * Open your download directory using a good IDE (
+ [phpStorm](https://www.jetbrains.com/phpstorm/), 
+ [Visual Studio Code](https://code.visualstudio.com/),
+ [Atom](https://atom.io/), etc... )
+ * Edit the `.env` file located in the `rdc` folder review the contents, making changes as necessary.
+ * Once `.env` file settings are correct, from the `rdc` folder type `docker-compose up -d`
+ * Open your web browser and goto `http://localhost` (or, in some cases with macs `http://127.0.0.1`) and follow
+  directions for further installation
  
-## Details
-This docker-compose will build multiple servers as part of a docker group to host REDCap on your local computer/server.
-It consists of:
- * The official PHP-Apache docker image (Currently version 7.2)
- * The official cd MySql docker image (currently version 5.7)
- * A basic alpine-based MailHop image (for capturing outbound emails from REDCap for your review)
- * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
-
-(optional)
- * The official PhpMyAdmin web-based mysql tool for managing the database.  This is commented out by default.  If you want to include it, edit the `docker-compose.yml` file and uncomment out the phpmyadmin section.
-
-The advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how these changes might affect your projects or custom code.
-
-## Configuration
-The services are mainly configured through a `.env` environment file or shell
-environment variables.  Additional customization can be done by modifying the
-files in the `override-*` directories.
-
-See the [documentation](rdc/documentation/README.md) for more information on getting started!
-
-## X-Debug Configuration (optional for PHPStorm)
-X-Debug allows you to insert breakpoints in your php code and evaluate variables from the server in your IDE.  Directions
-for using PhpStorm are provided here.  Basically, you configure an xdebug server on PhpStorm.
-1. After your docker server is up and running, open your project folder in PhpStorm (e.g. `~/redcap/`)
-1. In PhpStorm, goto `preferences -> Languages & Frameworks -> PHP -> Server` and create new server.
-   1. Name the server 'localhost-xdebug-server' - this name matches 
-   1. Set the hostname to be 'localhost' and leave the port at '80'
-   1. Check the "Use Path Mapping" option and find the redcap-docker-compose file.
-      * On the left side, set the path of your codebase (e.g. `~/redcap/www`)
-      * On the right side under `Absolute path on the server` enter in the value `/var/www/html`
-1. After creating the server on PHPStorm go to `Run -> Edit COnfiguration`.  Create new "PHP Remote Debug" configuration.
-   1. Make sure to check `Filter debug connection by IDE Key`. 
-   1. Then select `localhost-xdebug-server` for server and type `PHPSTORM` for IDE Key.
-   1. You can validate your configuration by clicking on Validate under Pre-Configuration. 
-
-1. Finally you need to install the PhpDebug Browser debugger extension from 
-   [https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html]
-
+## Full Documentation
+See the [detailed documentation](rdc/documentation/README.md) for more information!  Keep in mind this is a community
+effort so feedback is appreciated.  Please create issues here with any suggestions or make a pull request with improvements.
 
 ## Updates
+* 2019-10-03  Improved documentation and cleanup of unused settings (issue #4)
 * 2019-09-06  Removed ssmtp and replaced with msmtp
 * 2019-06-06  Add X-Debug configuration. 
 * 2019-01-24  Changed folder layout and optimized unzipping after upload to be much faster
