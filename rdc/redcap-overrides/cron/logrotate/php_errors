@@ -1,0 +1,8 @@
+/logs-dir/php_errors.log {
+    su www-data root
+    rotate 4
+	weekly
+	nocompress
+	missingok
+	notifempty
+}
