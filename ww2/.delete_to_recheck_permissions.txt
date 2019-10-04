@@ -1,1 +1,0 @@
-Delete this file and recreate the web container to verify the file permissions of this directory

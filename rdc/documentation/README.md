@@ -23,6 +23,9 @@
   - [Shutting down](#shutting-down)
   - [Logging into the server](#logging-into-the-server)
   - [How can I see what's running?](#how-can-i-see-whats-running)
+  - [If I remove my docker container will I loose my database?](#if-i-remove-my-docker-container-will-i-loose-my-database)
+  - [How can I REALLY delete everything?](#how-can-i-really-delete-everything)
+  - [How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?](#how-can-i-switch-mysql-versions--for-example-go-from-mysql-57-to-mysql-80)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -327,3 +330,43 @@ If you remove a container, by default it DOES NOT remove the volumes.
 See the question above -- basically the volumes that docker-compose creates are normally not deleted.  To really clean
 out and restart your docker-compose, you may have to remove them all.  You can also remove the network with the
 equivalent `docker network ls` and `docker network rm redcap_network`
+
+### How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?
+This docker-compose has been tested to work with mySql 8.  To make the switch you are going to have to regenerate your
+mysql database and volume.  So, follow these steps:
+1. Make a backup of your local mysql database.  This is most easily done using phpmyadmin.
+   1. Goto http://localhost/phpmyadmin/ (if you don't have phpmyadmin running, make sure it isn't disabled in your
+  docker-compose.yml file.
+   1. Select Export -> Custom -> select redcap -> set compression to gzip -> and press go!
+1. Stop your database container.
+   ```
+   $ docker-compose stop db
+   ```
+1. Delete the docker volume that contains your actual database data
+   ```
+   $ docker volume ls
+   // Look for the volume like redcap-mysql_volume
+   $ docker volume rm redcap-mysql_volume
+   ```
+1. Modify the version of mySql you want to run.  Goto the mysql docker page: https://hub.docker.com/_/mysql and pick a
+version, something like `8.0`
+1. Open the `docker-mysql/Dockerfile` in the `rdc` directory and change the `FROM mysql:5.7` to your new version
+   ```
+   FROM mysql:8.0
+   #FROM mysql:5.7
+   ```
+1. Now rebuild your mysql image
+   ```shell script
+   $ docker-compose build db
+   ```
+1. Now run it
+   ```shell script
+   $ docker-compose up db -d
+   // Follow the logs if you like...
+   $ docker-compose logs -f
+   ```
+1. Restore your backup using phpmyadmin.  Open http://localhost/phpmyadmin/  Choose IMPORT and then `Choose File` to
+select your redcap.sql.gz from step 1.
+
+At this point you should be running your dev server on a new version of mySql.  You can use the same process to change
+your database version anytime.
