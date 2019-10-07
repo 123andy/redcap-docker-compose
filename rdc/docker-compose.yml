@@ -90,6 +90,8 @@ services:
       - web
       - db
     #restart: always
+    volumes:
+      - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
     ports:
       - "${PHPMYADMIN_PORT}:80"
     networks:
