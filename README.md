@@ -48,7 +48,7 @@ to have production-ready php settings.
  * Edit the `.env` file located in the `rdc` folder review the contents, making changes as necessary.
  * Once `.env` file settings are correct, from the `rdc` folder type `docker-compose up -d`
  * Open your web browser and goto `http://localhost` (or, in some cases with macs `http://127.0.0.1`) and follow
-  directions for further installation
+  directions for further installation -> https://docs.google.com/document/d/1UsQmK1Jw0L_wD3UcjlQo_6iDjXadLeFHT427e50XR8M/edit
  
 ## Full Documentation
 See the [detailed documentation](rdc/documentation/README.md) for more information!  Keep in mind this is a community
