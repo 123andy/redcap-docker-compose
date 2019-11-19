@@ -17,6 +17,7 @@
   - [I can't access my server at http://localhost even though docker is running!](#i-cant-access-my-server-at-httplocalhost-even-though-docker-is-running)
   - [How do I make a custom localhost alias?](#how-do-i-make-a-custom-localhost-alias)
   - [Useful Docker-compose Commands](#useful-docker-compose-commands)
+  - [Working with External Modules](#working-with-external-modules)
   - [Can I change the location of my webroot files?](#can-i-change-the-location-of-my-webroot-files)
   - [Can I run more than one instance of REDCap-Docker-Compose at the same time?](#can-i-run-more-than-one-instance-of-redcap-docker-compose-at-the-same-time)
   - [Can you explain how I would change the PHP version?](#can-you-explain-how-i-would-change-the-php-version)
@@ -238,6 +239,18 @@ located (unless you specify additional parameters).
      example, if you call this any saved email messages from mailhub would be removed.
    * `docker ps` - shows you all running containers - see the docker command reference
    * `docker ps -a` - shows you all running *and stopped* containers.
+
+
+### Working with External Modules
+You may install modules from the REDCap repository via the web GUI as usual at **Control Center** > **External Modules** > **View modules available in the REDCap Repo**.  
+External Modules are stored in the [`modules`](/rdc/modules/) directory, which is mounted as a [volume](https://docs.docker.com/storage/volumes/) in your REDCap instance. The source code for any module you download will appear in this directory in its own subdirectory with its [semantic version](https://semver.org/) appended to the directory name, multiple versions of the same module will have distinct directories for each version.
+
+If you are developing your own - or improving someone else's - module, you should `git clone` the repository (if it already exists) to the [`modules`](/rdc/modules) directory to use it in your REDCap Docker instance. After cloning or creating the module you are doing development work on, you will need to append a version to it as `_vX.Y.Z` or REDCap will not recognize it. `0.0.0` is encouraged for development versions of modules (e.g. a module named My Custom Module should be stored in the [`modules`](/rdc/modules) directory in a child directory named `my_custom_module_v0.0.0`).  
+This can be done on the command line in the [`modules`](/rdc/modules) directory:
+```bash
+mv my_custom_module my_custom_module_v0.0.0
+```
+Once you have manually added a module directory here it may be activated in the **Control Center** under **External Modules**.
 
 
 ### Can I change the location of my webroot files?
