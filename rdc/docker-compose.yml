@@ -19,6 +19,7 @@ services:
       - ${WEB_OVERRIDES}:/etc/container-config-override
       - ${WEBROOT_DIR}:/var/www/html
       - ${LOGS_DIR}:/var/log/apache2
+      - ${MODULES}:/var/www/html/modules
     networks:
       - redcap_network
 # You can prevent your REDCap from accessing certain sites (like twilio) using these settings
