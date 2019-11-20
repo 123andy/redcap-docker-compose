@@ -157,12 +157,17 @@ public function __construct() {
 }
 
 
-//TODO
-public function createUser($username, $email, $first_name, $last_name, $password, $super = 0) {
+public function createUser($username, $email, $first_name, $last_name, $password, $super = 0, $account_manager = 0, $salt_string = 'my_salt_string') {
     $sql = sprintf("insert into redcap_user_information " .
-        "(username, user_email, user_firstname, user_lastname, super_user, user_creation) values " .
-        "('%s', '%s', '%s', '%s', %i, NOW())", $username, $email, $first_name, $last_name, $super);
+        "(username, user_email, user_firstname, user_lastname, super_user, user_creation, account_manager) values " .
+        "('%s', '%s', '%s', '%s', %s, NOW(), %s)", $username, $email, $first_name, $last_name, $super, $account_manager);
+    if (!$this->db_query($sql)) return;
+    // REDCap will automatically create a new salt and corresponding hashed password for users marked as using legacy_hash (i.e. md5)
+    $sql = sprintf("insert into redcap_auth " .
+        "(username, password, password_salt, legacy_hash, temp_pwd, password_question, password_answer, password_question_reminder, password_reset_key) values " .
+        "('%s', md5(concat('%s', '%s')), '%s', 1, 0, NULL, NULL, NULL, NULL)", $username, $password, $salt_string, $salt_string);
     $result = $this->db_query($sql);
+    return $result;
 }
 
 
