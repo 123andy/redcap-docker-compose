@@ -147,6 +147,11 @@ public function __construct() {
                     $redcap_tables = mysqli_num_rows($q);
                     if ($redcap_tables == 0) throw new RuntimeException("Install SQL did not appear to work.  Check database and do manual setup.");
 
+                    // Set the REDCap Base URL to circumvent errors in install.php step 3 when the port
+                    // is not the default for the protocol
+                    $q = $this->db_query("UPDATE redcap_config set value = '$this->redcap_webroot_url' where field_name='redcap_base_url'");
+
+                    // Direct the user to the remainder of the REDCap install.php
                     $this->successes[] = "Installed $redcap_tables REDCap tables to " . $this->db . " on " . $this->hostname;
                     $this->successes[] = "<h5>Initial setup complete!</h5>You should <strong>SKIP step 1</strong> on" .
                         " the next page this script has already created your database.<br>Simply press 'Save Changes'" .
