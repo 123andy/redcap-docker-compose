@@ -68,8 +68,8 @@ services:
     depends_on:
       - web
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "${SMTP_PORT}:1025"
+      - "${MAILHOG_PORT}:8025"
     volumes:
       - ${MAILHOG_DIR}:/maildir
       - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
