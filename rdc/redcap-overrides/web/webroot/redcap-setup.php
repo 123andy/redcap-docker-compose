@@ -26,6 +26,7 @@ public $debug = array();        // place to dump debug output
 
 public $redcap_webroot_path;    // This is the path relative to the web root where REDCap will be run (default is '/').
 public $redcap_webroot_url;     // The url to the webroot
+public $redcap_webroot_url_internal; // The url of the web root from the web server's perspective
 
 public $install_path;           // The full file path where REDCap is being installed
 
@@ -47,11 +48,15 @@ public function __construct() {
         $this->password = empty($_ENV['MYSQL_PASSWORD']) ? FALSE : $_ENV['MYSQL_PASSWORD'];
         $this->salt = empty($_ENV['REDCAP_SALT']) ? '12345678' : $_ENV['REDCAP_SALT'];
 
-        // GET THE INSTALL PATH FROM THE .ENV
+        // GET THE INSTALL PATH FROM THE .ENV...
         $this->redcap_webroot_path = (empty($_ENV['REDCAP_WEBROOT_PATH'])) ? '/' : $_ENV['REDCAP_WEBROOT_PATH'];
 
         $this->redcap_webroot_url = 'http://localhost' .
-            (($ENV['WEB_PORT'] == "80") ? "" : ":" . $ENV['WEB_PORT']) .
+            (($_ENV['WEB_PORT'] == "80") ? "" : ":" . $_ENV['WEB_PORT']) .
+            $this->redcap_webroot_path;
+
+        // ...but inside the container we neither need nor want the port number.
+        $this->redcap_webroot_url_internal = 'http://localhost' .
             $this->redcap_webroot_path;
 
         // INCLUDE REDCAP CONNECT!
@@ -124,9 +129,10 @@ public function __construct() {
                         " XXX</code> where XXX is the name of the volume <i>e.g. rdc_mysql-volume</i>");
 
                     // GET THE INSTALL SQL
+                    $install_url_internal = $this->redcap_webroot_url_internal . "install.php";
                     $install_url = $this->redcap_webroot_url . "install.php";
-                    $sql = file_get_contents($install_url . "?sql=1");
-                    if (empty($sql)) throw new RuntimeException("Unable to obtain installation SQL from $install_url");
+                    $sql = file_get_contents($install_url_internal . "?sql=1");
+                    if (empty($sql)) throw new RuntimeException("Unable to obtain installation SQL from $install_url_internal which is exposed to you as $install_url");
 
                     // RUN THE INSTALL SQL
                     $commands = 0;
@@ -141,6 +147,11 @@ public function __construct() {
                     $redcap_tables = mysqli_num_rows($q);
                     if ($redcap_tables == 0) throw new RuntimeException("Install SQL did not appear to work.  Check database and do manual setup.");
 
+                    // Set the REDCap Base URL to circumvent errors in install.php step 3 when the port
+                    // is not the default for the protocol
+                    $q = $this->db_query("UPDATE redcap_config set value = '$this->redcap_webroot_url' where field_name='redcap_base_url'");
+
+                    // Direct the user to the remainder of the REDCap install.php
                     $this->successes[] = "Installed $redcap_tables REDCap tables to " . $this->db . " on " . $this->hostname;
                     $this->successes[] = "<h5>Initial setup complete!</h5>You should <strong>SKIP step 1</strong> on" .
                         " the next page this script has already created your database.<br>Simply press 'Save Changes'" .
