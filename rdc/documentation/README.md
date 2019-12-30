@@ -249,10 +249,36 @@ of specifying the `APACHE_RUN_USER_ID` on MACs.
 
 
 ### Can I run more than one instance of REDCap-Docker-Compose at the same time?
-Yes you can, but you want to make sure they don't clobber each other.  The safe way to do this is to make sure each
-version of the rdc folder has a different value in the `DOCKER_PREFIX` variable of the `.env` file.  This will ensure
+Yes you can, but you want to make sure they don't clobber each other.  The safe way to do this is to make a complete copy of the redcap-docker-compose folder and then modify the `rdc/.env` file. Each version of the rdc folder must have a different value in the `DOCKER_PREFIX` variable of the `.env` file.  This will ensure
 that the networks and volumes are uniquely named and do not collide.  If you want to run both instances simultaneously
 you will have to change the ports on one so they are unique, such as 81 for web and 3387 for database.
+As of this writing, these ports are defined in .env
+
+```
+WEB_PORT=80
+MYSQL_PORT=3306
+PHPMYADMIN_PORT=8080
+SMTP_PORT=1025
+MAILHOG_PORT=8025
+```
+
+When you go to pick port numbers, it is generally safest to pick from the range 1024 - 65535. Each of the values selected for these port numbers needs to be unique to across the running instances.
+
+If you want to run a lot of instances at once, consider a pattern for setting the ports wherein the REDCap version forms the last 3 or 4 digits of the port number while the first digit indicates which of the 5 assignments is which. You could work the `DOCKER_PREFIX` into the pattern as well. e.g., REDCap 9.4.2 would get these parameters:
+
+```
+DOCKER_PREFIX=rc942
+WEB_PORT=1942
+MYSQL_PORT=2942
+PHPMYADMIN_PORT=3942
+SMTP_PORT=4942
+MAILHOG_PORT=5942
+```
+
+You can paste a block of parameters like this at the end of the .env file to override all of the parameters above.
+
+Once you have changed the WEB_PORT to something other than 80, you'll need to append a ":" and the port number to "localhost" in all of URLs examples in this document that use no port number. e.g. Using the above port example, the installation step would require you to visit `http://localhost:1942/`. The proxy service in the web container would make phpMyAdmin accessible at http://localhost:1942/phpmyadmin/, but it's also accessible at http://localhost:3942 because of the port definition above. Use whichever method works best for you.
+
 
 ### Can you explain how I would change the PHP version?
 Sure.  Say you want to test out a new version of PHP and see if your External Module will continue to run. 
