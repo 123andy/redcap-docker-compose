@@ -58,6 +58,7 @@ class REDCapInstaller {
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+                $init_table = empty($_POST['init-table']) ? false : true;
                 $this->install_path = __DIR__ . $this->redcap_webroot_path;
                 $install_option = empty($_POST['install-option']) ? false : $_POST['install-option'];
 
@@ -148,6 +149,23 @@ class REDCapInstaller {
                         $this->successes[] = "<h5>Initial setup complete!</h5>You should <strong>SKIP step 1</strong> on" .
                             " the next page this script has already created your database.<br>Simply press 'Save Changes'" .
                             " and move onto the next steps.  Click <a href='" . $install_url . "'>$install_url</a>. to continue.";
+
+                        if ($init_table) {
+
+                            $defaultUsers = $this->createDefaultUsersArray();
+                            $users_added = "";
+                            foreach($defaultUsers as $user) {
+                                $result = $this->createUser(...$user);
+                                $users_added .= $user[0] . "\n";
+                            }
+
+                            $this->successes[] = "Created users: $users_added";
+                            // Turn on table-based auth
+                            $this->db_query("UPDATE redcap_config SET value = 'table' WHERE field_name = 'auth_meth_global'");
+                            // revoke site_admin's admin privs to avoid warning
+                            $this->db_query("UPDATE redcap_user_information SET super_user = 0 WHERE username = 'site_admin'");
+                        }
+
                         $this->db_conn->close();
                         $this->step = 99; // DONE
                     }
@@ -171,6 +189,46 @@ class REDCapInstaller {
                 "('%s', md5(concat('%s', '%s')), '%s', 1, 0, NULL, NULL, NULL, NULL)", $username, $password, $salt_string, $salt_string);
         $result = $this->db_query($sql);
         return $result;
+    }
+
+    private function createDefaultUsersArray($email = "you@example.org") {
+        // Create 5 default users with a variable email address
+        $admin = [
+            /* $username = */ 'admin',
+            /* $email = */ $email,
+            /* $first_name = */ 'joe',
+            /* $last_name = */ 'admin',
+            /* $password = */ 'password',
+            /* $super = */ 1,
+            /* $account_manager = */ 0,
+            /* $salt_string = */ 'my_salt_string'
+        ];
+
+        $alice = [
+            /* $username = */ 'alice',
+            /* $email = */ $email,
+            /* $first_name = */ 'alice',
+            /* $last_name = */ 'manager',
+            /* $password = */ 'password',
+            /* $super = */ 0,
+            /* $account_manager = */ 1,
+            /* $salt_string = */ 'my_salt_string'
+        ];
+
+        $bob = [
+            /* $username = */ 'bob', /* $email = */ $email, /* $first_name = */ 'bob', /* $last_name = */ 'user', /* $password = */ 'password', /* $super = */ 0, /* $account_manager = */ 0, /* $salt_string = */ 'my_salt_string'
+        ];
+
+        $carol = [
+            /* $username = */ 'carol', /* $email = */ $email, /* $first_name = */ 'carol', /* $last_name = */ 'user', /* $password = */ 'password', /* $super = */ 0, /* $account_manager = */ 0, /* $salt_string = */ 'my_salt_string'
+        ];
+
+        $dan = [
+            /* $username = */ 'dan', /* $email = */ $email, /* $first_name = */ 'dan', /* $last_name = */ 'user', /* $password = */ 'password', /* $super = */ 0, /* $account_manager = */ 0, /* $salt_string = */ 'my_salt_string'
+        ];
+
+
+        return [$admin, $alice, $bob, $carol, $dan];
     }
 
 

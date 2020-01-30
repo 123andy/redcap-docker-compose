@@ -109,6 +109,14 @@ if ($RI->step == 1) {
                     </div>
                 </div>
 
+                Would you like to prepopulate with table-based users and activate table authentication?
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox" value=1 class="form-check-input" name="init-table">
+                            Yes
+                        </label>
+                    </div>
+
             </div>
 
             <div class="card-footer">
