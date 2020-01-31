@@ -152,14 +152,15 @@ class REDCapInstaller {
 
                         if ($init_table) {
 
-                            $defaultUsers = $this->createDefaultUsersArray();
+                            $init_table_email = ($_POST['init-table-email']) ?: "you@example.org";
+                            $defaultUsers = $this->createDefaultUsersArray($init_table_email);
                             $users_added = "";
                             foreach($defaultUsers as $user) {
                                 $result = $this->createUser(...$user);
                                 $users_added .= $user[0] . "\n";
                             }
-
                             $this->successes[] = "Created users: $users_added";
+
                             // Turn on table-based auth
                             $this->db_query("UPDATE redcap_config SET value = 'table' WHERE field_name = 'auth_meth_global'");
                             // revoke site_admin's admin privs to avoid warning
@@ -594,6 +595,7 @@ color: #999;
         .bg-cardinal {background-color: #8c1515}
         .install-option {display:none;}
         .card-footer {display:none;}
+        .supplement-options {display:none;}
         </style>
             </head>
             <body>
