@@ -109,6 +109,54 @@ if ($RI->step == 1) {
                     </div>
                 </div>
 
+                <br>
+
+                <div id="supplement">
+                <h5>These quality of life items will be automatically applied to you REDCap instance after installation if you select them.</h5>
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox" value=1 class="form-check-input" name="init-table">
+                            Prepopulate with table-based users and activate table authentication
+                        </label>
+                        <div class="supplement-options form-group" id="init-table">
+                            <label class="form-check-label" for="init-table-email">
+                                Email address
+                            </label>
+                            <input type="email" class="supplement-option form-control" name="init-table-email" placeholder="you@example.org">
+                            <small class="form-text text-muted">This email will be set for each created user</small>
+
+                            <p>The following 5 users will be made:</p>
+                            <table class="table table-sm table-hover">
+                                <caption>All users will be initialized with the password "password".</caption>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                </tr>
+                                <tr>
+                                    <td>admin</td>
+                                    <td>admin/superuser</td>
+                                </tr>
+                                <tr>
+                                    <td>alice</td>
+                                    <td>account manager</td>
+                                </tr>
+                                <tr>
+                                    <td>bob</td>
+                                    <td>user</td>
+                                </tr>
+                                <tr>
+                                    <td>carol</td>
+                                    <td>user</td>
+                                </tr>
+                                <tr>
+                                    <td>dan</td>
+                                    <td>user</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="card-footer">
@@ -117,7 +165,7 @@ if ($RI->step == 1) {
                         class="input-group btn btn-lg btn-success initiate-installation text-center d-block">INSTALL
                     REDCAP
                 </button>
-                <small class="form-text text-muted text-center">Any existing files will be overwritten. This make time some time to
+                <small class="form-text text-muted text-center">Any existing files will be overwritten. This may time some time to
                     download and extract... Be patient!
                 </small>
             </div>
@@ -205,6 +253,20 @@ if ($RI->step == 1) {
             .select2({
                 'theme': 'bootstrap4'
             });
+
+
+        // Reveal additional config for supplemental options on click
+        // of supplemental option
+        $('#supplement input:not(".supplement-option")').bind('click', function() {
+            let option = $(this).prop("checked");
+            let name = $(this).prop('name');
+            let $supplementDiv = $('div#' + name);
+            $('div.supplement-options').hide();
+            if (option) {
+                $supplementDiv.fadeIn();
+            }
+
+        });
 
     });
 
