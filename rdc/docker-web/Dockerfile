@@ -47,6 +47,6 @@ ENV SMTP_SMARTHOST mailhog
 ENV REMOVE_DEFAULT_VHOST false
 
 # Copy main startup script
-COPY container_start /etc/container_start
-RUN chmod +x /etc/container_start
-CMD ["/etc/container_start"]
+COPY container_start /etc/container_start.sh
+RUN chmod +x /etc/container_start.sh
+CMD ["/etc/container_start.sh"]
