@@ -394,3 +394,50 @@ select your redcap.sql.gz from step 1.
 
 At this point you should be running your dev server on a new version of mySql.  You can use the same process to change
 your database version anytime.
+
+1. How can I use Docker to run various commands against my database?
+   ```shell script
+   # SEE THE NETWORK FOR YOUR DOCKER-COMPOSE CONTAINERS (e.g. rdc_default)
+   docker network list
+
+   # BASIC TEST OF CONNECTION
+   docker run --rm \
+     --network=rdc_default \
+     imega/mysql-client \
+     mysql --host=db --user=root --password=root --execute='show databases;'
+
+   # GET A SHELL
+   docker run -it \
+     --network=rdc_default \
+     --volume $(pwd):/mysqldump \
+     imega/mysql-client \
+     /bin/sh
+
+   # GET A MYSQL SHELL
+   docker run -it \
+     --network=rdc_default \
+     --volume $(pwd):/mysqldump \
+     imega/mysql-client \
+     mysql --host=db --user=root --password=root
+
+   # GET A MYSQL DUMP
+   docker run --rm \
+     --network=rdc_default \
+     --volume $(pwd):/mysqldump \
+     imega/mysql-client \
+     /bin/sh -c "mysqldump --host=db --user=root --password=root redcap > /mysqldump/redcap_backup.sql"
+
+   # GET A MYSQL DUMP GZIPPED (doing the sh -c seemed necessary as volume wasn't otherwise immediately ready?)
+   docker run --rm \
+     --network=rdc_default \
+     --volume $(pwd):/mysqldump \
+     imega/mysql-client \
+     /bin/sh -c "mysqldump --host=db --user=root --password=root redcap | gzip > /mysqldump/redcap_backup.sql.gz"
+
+   # RESTORE A MYSQL DUMP FROM sql.gz FILE
+   docker run -it \
+     --network=rdc_default \
+     --volume $(pwd):/mysqldump \
+     imega/mysql-client \
+     /bin/sh -c "mysql --host=db --user=root --password=root --execute 'create database if not exists new_db'; gunzip < /mysqldump/redcap_backup.sql.gz | mysql --host=db --user=root --password=root new_db"
+   ```
