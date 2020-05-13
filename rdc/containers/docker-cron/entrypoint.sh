@@ -4,7 +4,7 @@ set -e
 
 # ADD USERID TO MATCH APACHE
 if [ ! -z "$APACHE_RUN_USER_ID" ]; then
-    if [ $(getent passwd "${APACHE_RUN_USER_ID}" | cut -d: -f1) ]; then
+    if [ ! -z $(getent passwd "${APACHE_RUN_USER_ID}" | cut -d: -f1) ]; then
         echo "User ID ${APACHE_RUN_USER_ID} already exists"
     else
         echo "Creating user ID ${APACHE_RUN_USER_ID} as www-data"

@@ -1,24 +1,21 @@
 version: '3.7'
 services:
   web:
-    container_name: ${DOCKER_PREFIX}_web
+    container_name: ${DOCKER_PREFIX:-rdc}_web
     build:
-      context: docker-web
-    environment:
-      # For X-Debug to connect to your IDE, we need to resolve the IP of your laptop.  We use the host.docker.internal
-      # which will automatically resolve to the host on Docker containers.
-      XDEBUG_CONFIG: remote_host=host.docker.internal
+      context: containers/docker-web
+    image: ${DOCKER_PREFIX:-rdc}_web
     env_file:
       - .env
     restart: always
     depends_on:
       - db
     ports:
-      - "${WEB_PORT}:80"
+      - "${WEB_PORT:-80}:80"
     volumes:
-      - ${WEB_OVERRIDES}:/etc/container-config-override
-      - ${WEBROOT_DIR}:/var/www/html
-      - ${LOGS_DIR}:/var/log/apache2
+      - ${WEB_OVERRIDES:-./redcap-overrides/web}:/etc/container-config-override
+      - ${WEBROOT_DIR:-../www}:/var/www/html:delegated
+      - ${LOGS_DIR:-../logs}:/var/log/apache2:delegated
     networks:
       - redcap_network
 # You can prevent your REDCap from accessing certain sites (like twilio) using these settings
@@ -31,47 +28,52 @@ services:
 #      - "event-bridge.twilio.com:127.0.0.1"
 
   db:
-    container_name: ${DOCKER_PREFIX}_db
-    #image: ${MYSQL_IMAGE}
-    build: docker-mysql
-    env_file: .env
+    container_name: ${DOCKER_PREFIX:-rdc}_db
+    build: containers/docker-mysql
+    image: ${DOCKER_PREFIX:-rdc}_db
+    env_file:
+      - .env
     restart: always
     volumes:
-      - ${MYSQL_DIR}:/var/lib/mysql
-      - ${LOGS_DIR}:/var/log/mysql
-      - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
-      - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
+      - ${MYSQL_DIR:-mysql-volume}:/var/lib/mysql
+      - ${LOGS_DIR:-../logs}:/var/log/mysql:delegated
+      - ${MYSQL_OVERRIDES:-./redcap-overrides/mysql/config}:/etc/mysql/mysql.conf.d
+      - ${MYSQL_SCRIPTS:-./redcap-overrides/mysql/scripts}:/docker-entrypoint-initdb.d/
     ports:
-     - "${MYSQL_PORT}:3306"
+     - "${MYSQL_PORT:-3306}:3306"
     networks:
       - redcap_network
 
   cron:
-    container_name: ${DOCKER_PREFIX}_cron
-    build: docker-cron
+    container_name: ${DOCKER_PREFIX:-rdc}_cron
+    build: containers/docker-cron
+    image: ${DOCKER_PREFIX:-rdc}_cron
     restart: always
-    env_file: .env
+    env_file:
+      - .env
     depends_on:
       - web
       - db
     volumes:
-      - ${CRON_LOGROTATE_DIR}:/etc/logrotate.d
-      - ${LOGS_DIR}:/logs-dir
+      - ${CRON_LOGROTATE_DIR:-./redcap-overrides/cron/logrotate}:/etc/logrotate.d
+      - ${LOGS_DIR:-../logs}:/logs-dir:delegated
     networks:
       - redcap_network
 
   mailhog:
-    container_name: ${DOCKER_PREFIX}_mailhog
-    build: docker-mailhog
+    container_name: ${DOCKER_PREFIX:-rdc}_mailhog
+    build: containers/docker-mailhog
+    image: ${DOCKER_PREFIX:-rdc}_mailhog
     restart: always
-    env_file: .env
+    env_file:
+      - .env
     depends_on:
       - web
-    ports:
-      - "${MAILHOG_PORT}:8025"
+#    ports:
+#      - "${MAILHOG_PORT:-8025}:8025"
     volumes:
-      - ${MAILHOG_DIR}:/maildir
-      - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
+      - ${MAILHOG_DIR:-mailhog-volume}:/maildir
+      - ${MAILHOG_OUTGOING_SMTP_FILE:-./redcap-overrides/mailhog/outgoing_smtp.json}:/outgoing_smtp.json
     environment:
       MH_STORAGE: maildir
       MH_MAILDIR_PATH: /maildir
@@ -83,27 +85,29 @@ services:
   # THIS CONTAINER IS OPTIONAL IF YOU WANT TO HAVE PHPMYADMIN - OTHERWISE COMMENT IT OUT
   phpmyadmin:
     container_name: ${DOCKER_PREFIX}_phpmyadmin
-    image: phpmyadmin/phpmyadmin
-    env_file: .env
+    image: phpmyadmin/phpmyadmin:fpm-alpine
+    env_file:
+      - .env
     depends_on:
       - web
       - db
     #restart: always
     volumes:
       - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
-    ports:
-      - "${PHPMYADMIN_PORT}:80"
+#    ports:
+#      - "${PHPMYADMIN_PORT:-8080}:80"
+    command: ${PHPMYADMIN_STARTUP:-php-fpm}
     networks:
       - redcap_network
 
 volumes:
   mysql-volume:
-    name: "${DOCKER_PREFIX}_mysql-volume"
+    name: "${DOCKER_PREFIX:-rdc}_mysql-volume"
   logs-volume:
-    name: "${DOCKER_PREFIX}_logs-volume"
+    name: "${DOCKER_PREFIX:-rdc}_logs-volume"
   mailhog-volume:
-    name: "${DOCKER_PREFIX}_mailhog-volume"
+    name: "${DOCKER_PREFIX:-rdc}_mailhog-volume"
 
 networks:
   redcap_network:
-    name: "${DOCKER_PREFIX}_redcap_network"
+    name: "${DOCKER_PREFIX:-rdc}_redcap_network"

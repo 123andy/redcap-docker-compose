@@ -20,7 +20,7 @@ $RI->displayPageHeader();
             <img style="height: 75px;" src="https://www.ctsi.ufl.edu/files/2017/07/REDCap-App-Icon.png">
         </a>
         <h1 class="text-light">REDCap Docker-Compose Installer</h1>
-        <small class="text-light">By <a class="text-light" href="mailto:andy123@stanford.edu">Andy Martin</a></small>
+        <small class="text-light">By <a class="text-light" href="mailto:andy123@stanford.edu">Report Issues</a></small>
     </div>
 
     <div class="container">
