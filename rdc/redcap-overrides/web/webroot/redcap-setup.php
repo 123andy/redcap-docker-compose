@@ -172,7 +172,7 @@ if ($RI->step == 1) {
         </div>
 
         <div class="text-center mt-4">
-            This installer was created by Andy Martin with assistance from Rob Taylor and Philip Chase
+            This installer was created by Andy Martin with assistance from Rob Taylor, Philip Chase, and Kyle Chesney
         </div>
 
     </form>
