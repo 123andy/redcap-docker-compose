@@ -158,6 +158,20 @@ class REDCapInstaller {
                             foreach($defaultUsers as $user) {
                                 $result = $this->createUser(...$user);
                                 $users_added .= $user[0] . "\n";
+
+                                $redcap_version = $this->db_query("SELECT value FROM `redcap_config` WHERE field_name='redcap_version'")
+                                    ->fetch_assoc()['value'];
+
+                                if ( version_compare($redcap_version, '10.1.0', '>=') ) {
+                                    $admin_sql = "UPDATE redcap_user_information SET
+                                        access_system_config=1,
+                                        access_system_upgrade=1,
+                                        access_external_module_install=1,
+                                        admin_rights=1,
+                                        access_admin_dashboards=1
+                                            WHERE username='admin'";
+                                $this->db_query($admin_sql);
+                                }
                             }
                             $this->successes[] = "Created users: $users_added";
 
