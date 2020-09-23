@@ -43,12 +43,12 @@ class REDCapInstaller {
             // GET THE INSTALL PATH FROM THE .ENV...
             $this->redcap_webroot_path = (empty($_ENV['REDCAP_WEBROOT_PATH'])) ? '/' : $_ENV['REDCAP_WEBROOT_PATH'];
 
-            $this->redcap_webroot_url = 'http://localhost' .
+            $this->redcap_webroot_url = $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['SERVER_NAME'] .
                 (($_ENV['WEB_PORT'] == "80") ? "" : ":" . $_ENV['WEB_PORT']) .
                 $this->redcap_webroot_path;
 
             // ...but inside the container we neither need nor want the port number.
-            $this->redcap_webroot_url_internal = 'http://localhost' .
+            $this->redcap_webroot_url_internal = $_SERVER['SERVER_NAME'] .
                 $this->redcap_webroot_path;
 
             // INCLUDE REDCAP CONNECT!
