@@ -66,6 +66,8 @@ containers for REDCap testing and production.
 1. Install docker on your machine.
    * Docker now requires that you create a user account.  Register.
    * [Download the latest version of docker](https://docs.docker.com/get-docker/) desktop for your platform:
+     * For PC, I had to install the latest WSL2 Linux kernel update package and restart but gui walks you through the process.  Also, upon launching
+     VS Code, I installed the WSL extension.
    * Optional: You might also consider installing a docker GUI such as [Kitematic](https://kitematic.com/)
 1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose) 
    to your computer.  If you plan on contributing to the project, you may instead want to fork it and then clone your fork.
