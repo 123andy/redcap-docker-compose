@@ -58,7 +58,7 @@ fi
 
 
 # Setup git subrepo
-if [ $ENABLE_GITSUBREPO -eq 1 ]; then
+if [[ "$ENABLE_GITSUBREPO" -eq 1 ]]; then
   git clone https://github.com/ingydotnet/git-subrepo.git /usr/bin/git-subrepo && \
       cd /usr/bin/git-subrepo && \
       git checkout release/0.4.2
