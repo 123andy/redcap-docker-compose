@@ -39,7 +39,7 @@ to have production-ready php settings.
  * Easy to modify php-version or mysql-version and rebuild your environment in minutes
 
 ## Quick-Start
- * Install Docker Community Edition (requires docker account which is free)
+ * [Install Docker Community Edition](https://docs.docker.com/get-docker) (requires docker account which is free)
  * [Download this repository](https://github.com/123andy/redcap-docker-compose/archive/master.zip) and unzip it to your computer
  * Open your download directory using a good IDE (
  [phpStorm](https://www.jetbrains.com/phpstorm/), 

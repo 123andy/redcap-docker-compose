@@ -2,3 +2,7 @@
 .DS_Store
 www/*
 logs/*
+rdc/.env
+.vscode*
+
+

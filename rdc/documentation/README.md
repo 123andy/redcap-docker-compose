@@ -58,51 +58,40 @@ Many of these docker containers are further customized through a series of start
 is a LAMP stack that could be used for any project.  However, the `redcap-overrides` and Docker-compose file provides
 a mechanism to add addition REDCap-specific customizations.
 
-For example, `docker-web/container-config/php` sets up a generic SMTP service, but `redcap-overrides/web/php` sets up 
-typical REDCap php settings.  It should be possible to reuse this framework to create other version, such as SAML-enabled
+For example, `docker-web/container-config/php/70-sendmail_path` sets up a generic msmtp mail service, but `redcap-overrides/web/php` sets up 
+typical REDCap php settings.  It should be possible to reuse this framework to create other version, such as SAML-enabled, or open-IDC
 containers for REDCap testing and production.
 
 ## Configuration
 1. Install docker on your machine.
-   * As of 2019, Docker requires that you create a user account.  Register.
-   * Download the latest version of docker desktop for your platform:
-      * [MAC](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
-      * [PC](https://hub.docker.com/editions/community/docker-ce-desktop-windows)
+   * Docker now requires that you create a user account.  Register.
+   * [Download the latest version of docker](https://docs.docker.com/get-docker/) desktop for your platform:
    * Optional: You might also consider installing a docker GUI such as [Kitematic](https://kitematic.com/)
 1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose) 
-   to your computer.  Don't clone it unless you really want to make contributions back.
+   to your computer.  If you plan on contributing to the project, you may instead want to fork it and then clone your fork.
    * A zip file is available here: [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
    * Unzip this into a good place on your computer (e.g. desktop or documents)
       * On my Mac, I put it in a folder called 'redcap' under my user directory `~/redcap/`
-1. You need a copy of the REDCap Installer.
-   * If you are a member of the REDCap Consortium Community, you can:
-      1. [Download](https://community.projectredcap.org/page/download.html) the latest full installer as a zip file.
-      2. Alternately, if you know your username and password, there is a built-in setup tool that can complete
-      the installation for you.
-        * You can find your community username under your community profile (typically something like jane.b.doe
-   * If you do not have an access code for the Community Consortium, you can ask your local site's REDCap administrator
-   to provide you with a copy of the latest FULL ZIP installer (provide the instructions above).  
-      * If your institution has a license you should be able to install a local development version under that license
-      * If you represent your institution, you can request a community account [here](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
-   * If you are not affiliated with an institution that has a license with REDCap, you CANNOT access the source code
-   and will be unable to use this tool.  You can contact REDCap to request a license [here](https://project-redcap.org). 
 1. INSTALL A GOOD IDE.  This really makes things easier.  I can recommend:
-   * [phpStorm](https://www.jetbrains.com/phpstorm/), 
    * [Visual Studio Code](https://code.visualstudio.com/),
-   * [Atom](https://atom.io/), etc... )
-1. Open the folder where this files downloaded in step 2 were placed:
+   * [phpStorm](https://www.jetbrains.com/phpstorm/), 
+   * and fancy editors like: [Atom](https://atom.io/), etc... )
+1. From your IDE, open the folder where redcap-docker-compose was placed:
     ![Folder Tree](folder_tree.png)
-1. Inside the `rdc` folder open the `.env` file.  
-   * If you do not see the `.env` file, you probably aren't using a real IDE.  In windows and MAC, 
-   dot-files are hidden by default unless you tell it to show them.
-1. Review the contents of the `.env` file.  This is where the majority of configuration changes are made.
-   * If you are on a MAC, make sure you open your terminal and run `id` to get your USER ID.  Typically it will be 
-   501-505 depending on how many users you have on your MAC.  Make sure this value matches to reduce issues with
-   file permissions in your mapped WEB directory.
-   * If you are not running another local web-server or mysql server, your ports should be open.  Otherwise, you may
-   have to change some of the ports for WEB or MYSQL services.  You will get errors when building if the ports are 
+1. Inside the `rdc` folder, find the `.env-example` file.  
+   * If you do not see the `.env-example` file, you probably aren't using a real IDE.  In windows and MAC, dot-files are hidden by default unless you tell it to show them.
+1. Copy the `.env-example` file to `.env`.
+1. Review the contents of the `.env` file, **REALLY**.  This is where the majority of configuration changes are made.  You should take a glance through so you understand what you can change.
+   * If you are on a MAC, make sure you open your terminal and run `id` to get your USER ID.  Typically it will be 501-505 depending on how many users you have on your MAC.  Make sure this value matches to reduce issues with file permissions in your mapped WEB directory.
+   * If you are not running another local web-server or mysql server, your ports should be open.  Otherwise, you may have to change some of the ports for WEB or MYSQL services.  You will get errors when building if the ports are 
    being used.
-1. Turn it on!  The first time it may take a while as it has to download some of the images.
+     * On a MAC, you can test if your ports are open (default 80 for web and 3386 for mysql) with:
+     ```
+     $ lsof -i tcp:80
+     $ lsof -i tcp:3386
+     ```
+     If you get nothing back, they are free.  Otherwise you can change the ports in your `.env` file.
+1. Let's get ready to rumble.  After you have reviewed your `.env` we are ready to fire things up.  The first time it may take a while as it has to download some of the container images from docker hub.
    * Bring up the container
         ```
         $ cd rdc
@@ -112,8 +101,24 @@ containers for REDCap testing and production.
         ```
         $ docker-compose logs -f
         ```
-1.  Hopefully you can now reach your server at `http://localhost` or `http://127.0.0.1`
-1.  Configure REDCap
+1. Hopefully you can now reach your server at `http://localhost` or `http://127.0.0.1`
+   * I prefer to access my 'local' redcap with a custom domain of 'redcap.local'.  To do this, on my MAC, I edit my /etc/hosts and append `redcap.local` after localhost:
+     ```
+     127.0.0.1       localhost redcap.local
+     ```
+     Then I access the server at http://redcap.local
+1. You need a copy of the REDCap Installer.
+   * If you are a member of the REDCap Consortium Community, you can:
+      1. [Download](https://community.projectredcap.org/page/download.html) the latest full installer as a zip file.
+      2. Alternately, if you know your community username and password, there is a built-in setup tool that can complete
+      the installation for you.
+        * You can find your community username under your community profile (typically something like jane.b.doe)
+   * If you do not have an access code for the Community Consortium, you can ask your local site's REDCap administrator
+   to provide you with a copy of the latest FULL ZIP installer (provide the instructions above).  
+      * If your institution has a license you should be able to install a local development version under that license
+      * If you represent your institution, you can request a community account [here](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
+   * If you are not affiliated with an institution that has a license with REDCap, you CANNOT access the source code and will be unable to use this tool.  You can contact REDCap to request a license [here](https://project-redcap.org). 
+1. Configure REDCap
    * At this point, we assume that you have a running set of containers.  Use the REDCap Setup tool to complete your
     installation.  Please note that you DO NOT need to create a new database user as the `.env` and setup scripts for
     MySql have already done so.  You can find the usernames and passwords in the `.env` file.
