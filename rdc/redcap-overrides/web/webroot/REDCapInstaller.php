@@ -48,8 +48,7 @@ class REDCapInstaller {
                 $this->redcap_webroot_path;
 
             // ...but inside the container we neither need nor want the port number.
-            $this->redcap_webroot_url_internal = $_SERVER['SERVER_NAME'] .
-                $this->redcap_webroot_path;
+            $this->redcap_webroot_url_internal = $_SERVER['REQUEST_SCHEME'] . "://" . "localhost" . $this->redcap_webroot_path;
 
             // INCLUDE REDCAP CONNECT!
             if (file_exists("." . $this->redcap_webroot_path . "redcap_connect.php")) {
@@ -299,7 +298,7 @@ class REDCapInstaller {
             $opt_groups = array();
             foreach ($results as $branch => $versions) {
                 $options = array();
-                if (empty($versions)) continue;
+                if (!is_array($versions)) continue;
                 foreach ($versions as $version) {
                     $val = $branch . "--" . $version['version_number'];
                     $options[] = "<option value='$val'>v" .
@@ -384,7 +383,7 @@ class REDCapInstaller {
             // Pull File
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 600);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
             curl_setopt($ch, CURLOPT_FILE, $fp);
