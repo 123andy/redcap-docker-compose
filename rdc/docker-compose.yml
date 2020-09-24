@@ -7,7 +7,8 @@ services:
     environment:
       # For X-Debug to connect to your IDE, we need to resolve the IP of your laptop.  We use the host.docker.internal
       # which will automatically resolve to the host on Docker containers.
-      XDEBUG_CONFIG: remote_host=host.docker.internal
+      XDEBUG_CONFIG: ${XDEBUG_CONFIG}
+      
     env_file:
       - .env
     restart: always

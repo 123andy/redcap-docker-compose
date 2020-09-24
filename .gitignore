@@ -3,3 +3,6 @@
 www/*
 logs/*
 rdc/.env
+.vscode*
+
+
