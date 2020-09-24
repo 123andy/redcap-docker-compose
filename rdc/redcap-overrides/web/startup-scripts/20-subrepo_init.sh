@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # This script enables gitsubrepo - a git module that helps to manage multiple embedded git repos.  I'm deactivating it by default and you can enable it if you like
-exit 0;
 
 # Give www-data user a shell (/var/www)
 usermod -s /bin/bash $APACHE_RUN_USER
@@ -59,31 +58,30 @@ fi
 
 
 # Setup git subrepo
-git clone https://github.com/ingydotnet/git-subrepo.git /usr/bin/git-subrepo && \
-    cd /usr/bin/git-subrepo && \
-    git checkout release/0.4.0
-echo -e "\nsource /usr/bin/git-subrepo/.rc\n" >> $HOME_DIR/.bash_profile
+if [ $ENABLE_GITSUBREPO -eq 1 ]; then
+  git clone https://github.com/ingydotnet/git-subrepo.git /usr/bin/git-subrepo && \
+      cd /usr/bin/git-subrepo && \
+      git checkout release/0.4.2
+  echo -e "\nsource /usr/bin/git-subrepo/.rc\n" >> $HOME_DIR/.bash_profile
 
-
-
-# Setup webroot repo
-if [ ! -z "$WEBROOT_REPO_SSH_URL" ]; then
- # dont pull code down if a .git folder exists
- if [ ! -d "$WEBROOT_DIR/.git" ]; then
-   echo "NO GIT in $WEBROOT_DIR"
-   # Pull down code from git for our site!
-   # Remove the test index file
-   cd $WEBROOT_DIR
-   rm -f index.*
-   if [ ! -z "$WEBROOT_REPO_BRANCH" ]; then
-     /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone -b $WEBROOT_REPO_BRANCH $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
-   else
-    echo "git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR/"
-    /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
-   fi
- fi
+  # Setup webroot repo
+  if [ ! -z "$WEBROOT_REPO_SSH_URL" ]; then
+  # dont pull code down if a .git folder exists
+  if [ ! -d "$WEBROOT_DIR/.git" ]; then
+    echo "NO GIT in $WEBROOT_DIR"
+    # Pull down code from git for our site!
+    # Remove the test index file
+    cd $WEBROOT_DIR
+    rm -f index.*
+    if [ ! -z "$WEBROOT_REPO_BRANCH" ]; then
+      /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone -b $WEBROOT_REPO_BRANCH $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
+    else
+      echo "git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR/"
+      /sbin/runuser $APACHE_RUN_USER -s /bin/bash -c "cd $WEBROOT_DIR; git clone $WEBROOT_REPO_SSH_URL $WEBROOT_DIR"
+    fi
+  fi
+  fi
 fi
-
 
 # Set up web repo folders for each env variable
 if [ ! -z "$WEBROOT_REPO_FOLDERS" ]; then
