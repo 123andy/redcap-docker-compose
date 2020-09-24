@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# This script enables gitsubrepo - a git module that helps to manage multiple embedded git repos.  I'm deactivating it by default and you can enable it if you like
+exit 0;
 
 # Give www-data user a shell (/var/www)
 usermod -s /bin/bash $APACHE_RUN_USER

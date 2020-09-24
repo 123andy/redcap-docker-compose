@@ -143,11 +143,18 @@ class REDCapInstaller {
                         // is not the default for the protocol
                         $q = $this->db_query("UPDATE redcap_config set value = '$this->redcap_webroot_url' where field_name='redcap_base_url'");
 
+                        $redcap_version = $this->db_query("SELECT value FROM `redcap_config` WHERE field_name='redcap_version'")
+                        ->fetch_assoc()['value'];
+
                         // Direct the user to the remainder of the REDCap install.php
                         $this->successes[] = "Installed $redcap_tables REDCap tables to " . $this->db . " on " . $this->hostname;
-                        $this->successes[] = "<h5>Initial setup complete!</h5>You should <strong>SKIP step 1</strong> on" .
-                            " the next page this script has already created your database.<br>Simply press 'Save Changes'" .
-                            " and move onto the next steps.  Click <a href='" . $install_url . "'>$install_url</a>. to continue.";
+                        $nextUrl = $this->redcap_webroot_url . "redcap_v" . $redcap_version . "/ControlCenter/check.php";
+                        $this->successes[] = "<h5>Initial setup complete!</h5>" . 
+                            //  "You should <strong>SKIP step 1</strong> on" .
+                            //    " the next page as this script has already created your database structures.<br>Simply press 'Save Changes'" .
+                            //    " and move onto the next steps." .
+                            // <br>Click <a href='" . $install_url . "'>$install_url</a>. to continue." . 
+                            "<br>Click <a href='$nextUrl'>$nextUrl</a> to continue.";
 
                         if ($init_table) {
 
@@ -157,21 +164,19 @@ class REDCapInstaller {
                             foreach($defaultUsers as $user) {
                                 $result = $this->createUser(...$user);
                                 $users_added .= $user[0] . "\n";
-
-                                $redcap_version = $this->db_query("SELECT value FROM `redcap_config` WHERE field_name='redcap_version'")
-                                    ->fetch_assoc()['value'];
-
-                                if ( version_compare($redcap_version, '10.1.0', '>=') ) {
-                                    $admin_sql = "UPDATE redcap_user_information SET
-                                        access_system_config=1,
-                                        access_system_upgrade=1,
-                                        access_external_module_install=1,
-                                        admin_rights=1,
-                                        access_admin_dashboards=1
-                                            WHERE username='admin'";
-                                $this->db_query($admin_sql);
-                                }
                             }
+
+                            if ( version_compare($redcap_version, '10.1.0', '>=') ) {
+                                $admin_sql = "UPDATE redcap_user_information SET
+                                    access_system_config=1,
+                                    access_system_upgrade=1,
+                                    access_external_module_install=1,
+                                    admin_rights=1,
+                                    access_admin_dashboards=1
+                                        WHERE username='admin'";
+                                $this->db_query($admin_sql);
+                            }
+
                             $this->successes[] = "Created users: $users_added";
 
                             // Turn on table-based auth
