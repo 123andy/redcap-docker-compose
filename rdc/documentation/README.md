@@ -104,11 +104,13 @@ containers for REDCap testing and production.
         $ docker-compose logs -f
         ```
 1. Hopefully you can now reach your server at `http://localhost` or `http://127.0.0.1`
-   * I prefer to access my 'local' redcap with a custom domain of 'redcap.local'.  To do this, on my MAC, I edit my /etc/hosts and append `redcap.local` after localhost:
-     ```
-     127.0.0.1       localhost redcap.local
-     ```
-     Then I access the server at http://redcap.local
+   * I prefer to access my 'local' redcap with a custom domain of 'redcap.local'.  
+     * MAC Instructions: edit my /etc/hosts and append `redcap.local` after localhost:
+       ```
+       127.0.0.1       localhost redcap.local
+       ```
+       Then I access the server at http://redcap.local
+     * PC Instructions: edit `C:\Windows\System32\drivers\etc\hosts` and make the same change as above.  You will have to be an administrator to save the file (or VS Code helps you)
 1. You need a copy of the REDCap Installer.
    * If you are a member of the REDCap Consortium Community, you can:
       1. [Download](https://community.projectredcap.org/page/download.html) the latest full installer as a zip file.

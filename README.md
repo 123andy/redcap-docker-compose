@@ -44,7 +44,7 @@ to have production-ready php settings.
  * Open your download directory using a good IDE (
  [phpStorm](https://www.jetbrains.com/phpstorm/), 
  [Visual Studio Code](https://code.visualstudio.com/),
- [Atom](https://atom.io/), etc... )
+ [Atom](https://atom.io/) - does not support xdebug, etc... )
  * Edit the `.env` file located in the `rdc` folder review the contents, making changes as necessary.
  * Once `.env` file settings are correct, from the `rdc` folder type `docker-compose up -d`
  * Open your web browser and goto `http://localhost` (or, in some cases with macs `http://127.0.0.1`) and follow
@@ -62,6 +62,7 @@ effort so feedback is appreciated.  Please create issues here with any suggestio
 * 2018-08-19  Added .env file and added UID override for MAC users to maintain file ownership (see .env)
 * 2018-08-04  Added support for auto-install from `redcapx.y.z.zip`
 * 2018-08-01  Major refactoring into docker-compose 3
+* 2020-09-24  Minor documentation cleanup and testing for Windows
 
 ## License
 Copyright (c) 2016 Andrew Martin
