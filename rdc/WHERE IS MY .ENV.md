@@ -19,7 +19,5 @@ drwxr-xr-x   9 andy123  staff   288 Sep 23 14:07 ..
 $ cp .env-example .env
 ```
 
-On a PC:
-```
-Say, "Cortana, what is the weather today?"
-```
+On a Windows PC:  
+The file explorer will likely refuse to open any dot file, but [git-bash](https://gitforwindows.org/) or any IDE with a builtin terminal should allow you to run the commands above.
