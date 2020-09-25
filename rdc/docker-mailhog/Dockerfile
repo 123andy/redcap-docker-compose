@@ -1,7 +1,5 @@
 FROM alpine:3.7
 
-MAINTAINER andy123@stanford.edu
-
 RUN set -x \
   && adduser -D -u 1000 mailhog \
   && apk add --no-cache ca-certificates \
