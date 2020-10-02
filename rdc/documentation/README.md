@@ -141,8 +141,9 @@ for using PhpStorm are provided here.  Basically, you configure an xdebug server
 1. After creating the server on PHPStorm go to `Run -> Edit Configuration`.  Create new "PHP Remote Debug" configuration.
    1. Make sure to check `Filter debug connection by IDE Key`. 
    1. Then select `localhost-xdebug-server` for server and type `PHPSTORM` for IDE Key.
-   1. You can validate your configuration by clicking on Validate under Pre-Configuration. 
+   1. You can validate your configuration by clicking on Validate under Pre-Configuration. You need to specify your www directory in the 'validation script' directory, e.g. /Users/andy/redcap-docker-compose/www . 
 1. Finally you need to install the [PhpDebug Browser debugger extension](https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html)
+To debug, launch the debug configuration by clicking the green bug icon, then click the "start listening for Php debug connections" icon. Then browse to the page you want to debug. 
 
 
 ## FAQ and Other Information
