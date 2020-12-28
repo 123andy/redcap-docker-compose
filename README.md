@@ -55,6 +55,7 @@ See the [detailed documentation](rdc/documentation/README.md) for more informati
 effort so feedback is appreciated.  Please create issues here with any suggestions or make a pull request with improvements.
 
 ## Updates
+* 2020-12-28  Made defaults php7.4, xdebug 3.0, mysql 8
 * 2019-10-03  Improved documentation and cleanup of unused settings (issue #4)
 * 2019-09-06  Removed ssmtp and replaced with msmtp
 * 2019-06-06  Add X-Debug configuration. 

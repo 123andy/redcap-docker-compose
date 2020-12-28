@@ -133,16 +133,19 @@ X-Debug allows you to insert breakpoints in your php code and evaluate variables
 for using PhpStorm are provided here.  Basically, you configure an xdebug server on PhpStorm.
 1. After your docker server is up and running, open your project folder in PhpStorm (e.g. `~/redcap/`)
 1. In PhpStorm, goto `preferences -> Languages & Frameworks -> PHP -> Server` and create new server.
-   1. Name the server 'localhost-xdebug-server' - this name matches 
+   1. Name the server 
    1. Set the hostname to be 'localhost' and leave the port at '80'
    1. Check the "Use Path Mapping" option and find the redcap-docker-compose file.
       * On the left side, set the path of your codebase (e.g. `~/redcap/www`)
       * On the right side under `Absolute path on the server` enter in the value `/var/www/html`
 1. After creating the server on PHPStorm go to `Run -> Edit Configuration`.  Create new "PHP Remote Debug" configuration.
-   1. Make sure to check `Filter debug connection by IDE Key`. 
-   1. Then select `localhost-xdebug-server` for server and type `PHPSTORM` for IDE Key.
+   With xdebug 3.0 I ended up with two configuratinos here - one for my local url 'redcap.local' and a second for 'web' which catches
+   the cron container's calls to the cron.php
+   * In my latest build, I did not enable the filter by IDE key below
+      1. Make sure to check `Filter debug connection by IDE Key`. 
+      1. Then select `localhost-xdebug-server` for server and type `PHPSTORM` for IDE Key.
    1. You can validate your configuration by clicking on Validate under Pre-Configuration. 
-1. Finally you need to install the [PhpDebug Browser debugger extension](https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html)
+1. Finally, you need to install the [PhpDebug Browser debugger extension](https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html)
 
 
 ## FAQ and Other Information
