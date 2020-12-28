@@ -18,8 +18,8 @@ services:
       - "${WEB_PORT}:80"
     volumes:
       - ${WEB_OVERRIDES}:/etc/container-config-override
-      - ${WEBROOT_DIR}:/var/www/html
-      - ${LOGS_DIR}:/var/log/apache2
+      - ${WEBROOT_DIR}:/var/www/html:cached
+      - ${LOGS_DIR}:/var/log/apache2:delegated
     networks:
       - redcap_network
 # You can prevent your REDCap from accessing certain sites (like twilio) using these settings
@@ -39,7 +39,7 @@ services:
     restart: always
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
-      - ${LOGS_DIR}:/var/log/mysql
+      - ${LOGS_DIR}:/var/log/mysql:delegated
       - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
       - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
     ports:
@@ -57,7 +57,7 @@ services:
       - db
     volumes:
       - ${CRON_LOGROTATE_DIR}:/etc/logrotate.d
-      - ${LOGS_DIR}:/logs-dir
+      - ${LOGS_DIR}:/logs-dir:delegated
     networks:
       - redcap_network
 

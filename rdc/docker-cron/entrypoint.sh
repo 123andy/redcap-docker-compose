@@ -13,7 +13,7 @@ if [ ! -z "$APACHE_RUN_USER_ID" ]; then
 fi
 
 # ADD REDCap CRON ENTRIES
-echo "*   * * * *   wget web${REDCAP_WEBROOT_PATH}cron.php --spider >/dev/null 2>&1" >> /var/spool/cron/crontabs/root
+echo "*   * * * *   wget web${REDCAP_WEBROOT_PATH}cron.php --spider >/dev/null 2>&1" > /var/spool/cron/crontabs/root
 
 # Add logrotate scripts
 echo "*/5 * * * *   /usr/sbin/logrotate /etc/logrotate.conf"    >> /var/spool/cron/crontabs/root
