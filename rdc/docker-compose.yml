@@ -19,6 +19,7 @@ services:
     volumes:
       - ${WEB_OVERRIDES}:/etc/container-config-override
       - ${WEBROOT_DIR}:/var/www/html
+      - ${CREDENTIALS_DIR}:/var/credentials
       - ${LOGS_DIR}:/var/log/apache2
     networks:
       - redcap_network
