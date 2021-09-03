@@ -4,28 +4,29 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [Overview](#overview)
-  - [Docker-Compose Design](#docker-compose-design)
-- [Configuration](#configuration)
-  - [X-Debug Configuration (optional for PHPStorm)](#x-debug-configuration-optional-for-phpstorm)
-- [FAQ and Other Information](#faq-and-other-information)
-  - [How do I prevent SMS messages from going out?](#how-do-i-prevent-sms-messages-from-going-out)
-  - [How do I stop phpMyAdmin](#how-do-i-stop-phpmyadmin)
-  - [Connecting to the database](#connecting-to-the-database)
-  - [Local URLS](#local-urls)
-  - [Logging](#logging)
-  - [I can't access my server at http://localhost even though docker is running!](#i-cant-access-my-server-at-httplocalhost-even-though-docker-is-running)
-  - [How do I make a custom localhost alias?](#how-do-i-make-a-custom-localhost-alias)
-  - [Useful Docker-compose Commands](#useful-docker-compose-commands)
-  - [Can I change the location of my webroot files?](#can-i-change-the-location-of-my-webroot-files)
-  - [Can I run more than one instance of REDCap-Docker-Compose at the same time?](#can-i-run-more-than-one-instance-of-redcap-docker-compose-at-the-same-time)
-  - [Can you explain how I would change the PHP version?](#can-you-explain-how-i-would-change-the-php-version)
-  - [Shutting down](#shutting-down)
-  - [Logging into the server](#logging-into-the-server)
-  - [How can I see what's running?](#how-can-i-see-whats-running)
-  - [If I remove my docker container will I loose my database?](#if-i-remove-my-docker-container-will-i-loose-my-database)
-  - [How can I REALLY delete everything?](#how-can-i-really-delete-everything)
-  - [How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?](#how-can-i-switch-mysql-versions--for-example-go-from-mysql-57-to-mysql-80)
+- [redcap-docker-compose documentation](#redcap-docker-compose-documentation)
+  - [Overview](#overview)
+    - [Docker-Compose Design](#docker-compose-design)
+  - [Configuration](#configuration)
+    - [X-Debug Configuration (optional for PHPStorm)](#x-debug-configuration-optional-for-phpstorm)
+  - [FAQ and Other Information](#faq-and-other-information)
+    - [How do I prevent SMS messages from going out?](#how-do-i-prevent-sms-messages-from-going-out)
+    - [How do I stop phpMyAdmin](#how-do-i-stop-phpmyadmin)
+    - [Connecting to the database](#connecting-to-the-database)
+    - [Local URLS](#local-urls)
+    - [Logging](#logging)
+    - [I can't access my server at http://localhost even though docker is running!](#i-cant-access-my-server-at-httplocalhost-even-though-docker-is-running)
+    - [How do I make a custom localhost alias?](#how-do-i-make-a-custom-localhost-alias)
+    - [Useful Docker-compose Commands](#useful-docker-compose-commands)
+    - [Can I change the location of my webroot files?](#can-i-change-the-location-of-my-webroot-files)
+    - [Can I run more than one instance of REDCap-Docker-Compose at the same time?](#can-i-run-more-than-one-instance-of-redcap-docker-compose-at-the-same-time)
+    - [Can you explain how I would change the PHP version?](#can-you-explain-how-i-would-change-the-php-version)
+    - [Shutting down](#shutting-down)
+    - [Logging into the server](#logging-into-the-server)
+    - [How can I see what's running?](#how-can-i-see-whats-running)
+    - [If I remove my docker container will I loose my database?](#if-i-remove-my-docker-container-will-i-loose-my-database)
+    - [How can I REALLY delete everything?](#how-can-i-really-delete-everything)
+    - [How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?](#how-can-i-switch-mysql-versions-for-example-go-from-mysql-57-to-mysql-80)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -37,9 +38,9 @@ The build consists of:
  * A basic alpine-based MailHog image (for capturing outbound emails from REDCap for your review)
  * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
  * (optional) The official PhpMyAdmin web-based mysql tool for managing the database.
-   * You can comment this out or stop the service after startup (see FAQ)  
+   * You can comment this out or stop the service after startup (see FAQ)
 
-The big advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how 
+The big advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how
 these changes might affect your projects or custom code.  It also provides a nice mechanism for you and your development
 team to work in identical environments for consistency.
 
@@ -58,7 +59,7 @@ Many of these docker containers are further customized through a series of start
 is a LAMP stack that could be used for any project.  However, the `redcap-overrides` and Docker-compose file provides
 a mechanism to add addition REDCap-specific customizations.
 
-For example, `docker-web/container-config/php/70-sendmail_path` sets up a generic msmtp mail service, but `redcap-overrides/web/php` sets up 
+For example, `docker-web/container-config/php/70-sendmail_path` sets up a generic msmtp mail service, but `redcap-overrides/web/php` sets up
 typical REDCap php settings.  It should be possible to reuse this framework to create other version, such as SAML-enabled, or open-IDC
 containers for REDCap testing and production.
 
@@ -69,42 +70,42 @@ containers for REDCap testing and production.
      * For PC, I had to install the latest WSL2 Linux kernel update package and restart but gui walks you through the process.  Also, upon launching
      VS Code, I installed the WSL extension.
    * Optional: You might also consider installing a docker GUI such as [Kitematic](https://kitematic.com/)
-1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose) 
+1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose)
    to your computer.  If you plan on contributing to the project, you may instead want to fork it and then clone your fork.
    * A zip file is available here: [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
    * Unzip this into a good place on your computer (e.g. desktop or documents)
       * On my Mac, I put it in a folder called 'redcap' under my user directory `~/redcap/`
 1. INSTALL A GOOD IDE.  This really makes things easier.  I can recommend:
    * [Visual Studio Code](https://code.visualstudio.com/),
-   * [phpStorm](https://www.jetbrains.com/phpstorm/), 
+   * [phpStorm](https://www.jetbrains.com/phpstorm/),
    * and fancy editors like: [Atom](https://atom.io/), etc... )
 1. From your IDE, open the folder where redcap-docker-compose was placed:
     ![Folder Tree](folder_tree.png)
-1. Inside the `rdc` folder, find the `.env-example` file.  
+1. Inside the `rdc` folder, find the `.env-example` file.
    * If you do not see the `.env-example` file, you probably aren't using a real IDE.  In windows and MAC, dot-files are hidden by default unless you tell it to show them.
 1. Copy the `.env-example` file to `.env`.
 1. Review the contents of the `.env` file, **REALLY**.  This is where the majority of configuration changes are made.  You should take a glance through so you understand what you can change.
    * If you are on a MAC, make sure you open your terminal and run `id` to get your USER ID.  Typically it will be 501-505 depending on how many users you have on your MAC.  Make sure this value matches to reduce issues with file permissions in your mapped WEB directory.
-   * If you are not running another local web-server or mysql server, your ports should be open.  Otherwise, you may have to change some of the ports for WEB or MYSQL services.  You will get errors when building if the ports are 
+   * If you are not running another local web-server or mysql server, your ports should be open.  Otherwise, you may have to change some of the ports for WEB or MYSQL services.  You will get errors when building if the ports are
    being used.
      * On a MAC, you can test if your ports are open (default 80 for web and 3386 for mysql) with:
-     ```
+     ```shell
      $ lsof -i tcp:80
      $ lsof -i tcp:3386
      ```
      If you get nothing back, they are free.  Otherwise you can change the ports in your `.env` file.
 1. Let's get ready to rumble.  After you have reviewed your `.env` we are ready to fire things up.  The first time it may take a while as it has to download some of the container images from docker hub.
    * Bring up the container
-        ```
+        ```shell
         $ cd rdc
         $ docker-compose up -d
         ```
    * You can tail the logs with
-        ```
+        ```shell
         $ docker-compose logs -f
         ```
 1. Hopefully you can now reach your server at `http://localhost` or `http://127.0.0.1`
-   * I prefer to access my 'local' redcap with a custom domain of 'redcap.local'.  
+   * I prefer to access my 'local' redcap with a custom domain of 'redcap.local'.
      * MAC Instructions: edit my /etc/hosts and append `redcap.local` after localhost:
        ```
        127.0.0.1       localhost redcap.local
@@ -118,10 +119,10 @@ containers for REDCap testing and production.
       the installation for you.
         * You can find your community username under your community profile (typically something like jane.b.doe)
    * If you do not have an access code for the Community Consortium, you can ask your local site's REDCap administrator
-   to provide you with a copy of the latest FULL ZIP installer (provide the instructions above).  
+   to provide you with a copy of the latest FULL ZIP installer (provide the instructions above).
       * If your institution has a license you should be able to install a local development version under that license
       * If you represent your institution, you can request a community account [here](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
-   * If you are not affiliated with an institution that has a license with REDCap, you CANNOT access the source code and will be unable to use this tool.  You can contact REDCap to request a license [here](https://project-redcap.org). 
+   * If you are not affiliated with an institution that has a license with REDCap, you CANNOT access the source code and will be unable to use this tool.  You can contact REDCap to request a license [here](https://project-redcap.org).
 1. Configure REDCap
    * At this point, we assume that you have a running set of containers.  Use the REDCap Setup tool to complete your
     installation.  Please note that you DO NOT need to create a new database user as the `.env` and setup scripts for
@@ -133,7 +134,7 @@ X-Debug allows you to insert breakpoints in your php code and evaluate variables
 for using PhpStorm are provided here.  Basically, you configure an xdebug server on PhpStorm.
 1. After your docker server is up and running, open your project folder in PhpStorm (e.g. `~/redcap/`)
 1. In PhpStorm, goto `preferences -> Languages & Frameworks -> PHP -> Server` and create new server.
-   1. Name the server 
+   1. Name the server 'localhost-xdebug-server' - this name matches
    1. Set the hostname to be 'localhost' and leave the port at '80'
    1. Check the "Use Path Mapping" option and find the redcap-docker-compose file.
       * On the left side, set the path of your codebase (e.g. `~/redcap/www`)
@@ -176,7 +177,7 @@ There are at least three ways to connect to your database:
 1. You have phpMyAdmin running inside this service - simply visit [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
    * Note that the trailing slash is required!
 1. You can connect to the database from the command line as illustrated in the example below:
-```
+```shell
 $ docker-compose exec db mysql -u redcap -predcap123
 redcap-docker-compose$ docker-compose exec db mysql -u redcap -predcap123
 Welcome to the MySQL monitor.  Commands end with ; or \g.
@@ -184,7 +185,7 @@ Server version: 5.7.23-log MySQL Community Server (GPL)
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-mysql> 
+mysql>
 ```
 
 
@@ -198,13 +199,13 @@ mysql>
 
 
 ### Logging
-* Some logs (like apache access and cron) are passed through to the docker runtime and can be viewed by calling 
-`docker-compose logs` or can be viewed using a gui tool.  
+* Some logs (like apache access and cron) are passed through to the docker runtime and can be viewed by calling
+`docker-compose logs` or can be viewed using a gui tool.
 * Other log files (like mysql slow queries and php_errors.log) are mapped through to a log volume on your computer for
 easy monitoring using tools like notepad++ (pc), console (mac), or just `tail -f *` from the terminal.
-* Custom application logs should be written to `/var/log/redcap` inside the web image that maps to the `$LOG_DIR` 
+* Custom application logs should be written to `/var/log/redcap` inside the web image that maps to the `$LOG_DIR`
 as configured in the `.env` file.
-* Log rotation can be configured so your log files don't grow too large - see `redcap-overrides/cron/logrotate` for an example. 
+* Log rotation can be configured so your log files don't grow too large - see `redcap-overrides/cron/logrotate` for an example.
 
 
 
@@ -212,13 +213,13 @@ as configured in the `.env` file.
    * On some macs, we've seen issues with using the name `localhost`.  If you are unable to resolve a webpage
      with [http://localhost/](http://localhost) you can try [http://127.0.0.1](http://127.0.0.1).
      * On my mac, I have edit the local hosts file and created an entry called `redcap.local`.  To do this, type
-       `sudo open -e /etc/hosts` and make the line for 127.0.0.1 look like: 
+       `sudo open -e /etc/hosts` and make the line for 127.0.0.1 look like:
        ```127.0.0.1       localhost redcap.local```
        You should now be able to open up your localhost docker with http://redcap.local
 
 ### How do I make a custom localhost alias?
 I prefer to use http://redcap.local for my local server.  On my MAC, I accomplish this by editing my hosts file.
-```
+```shell
 $ cat /etc/hosts
 ...
 127.0.0.1       localhost
@@ -230,10 +231,10 @@ I then modify this to read as:
 ```
 
 ### Useful Docker-compose Commands
-Please note that **all commands** must be run from the root directory where the `docker-compose.yaml` file is 
-located (unless you specify additional parameters).  
+Please note that **all commands** must be run from the root directory where the `docker-compose.yaml` file is
+located (unless you specify additional parameters).
 
-   * `docker-compose up -d` - this will run and detach form the containers leaving them to run in the background.  
+   * `docker-compose up -d` - this will run and detach form the containers leaving them to run in the background.
    This is the most common way I run these containers.  You can view the status and logs from other `docker-compose`
    commands or from the GUI of docker-compose tools like [Kitematic](https://kitematic.com/)
    * `docker-compose up` - this will run the containers in the current window.  If you close your window the containers
@@ -244,7 +245,7 @@ located (unless you specify additional parameters).
    * `docker-compose up -d --no-deps --build <CONTAINER_NAME>` - If you just want to rebuild one container and not all
      of them. Valid names are `web`, `db`, `cron`, `mailhog`, `phpmyadmin` and `startup`)
    * `docker-compose stop` - this will stop the docker process (which would be good to do if you want to save battery)
-   * `docker-compose down` - this will stop **and remove** the containers - meaning the next time you call up they will be 
+   * `docker-compose down` - this will stop **and remove** the containers - meaning the next time you call up they will be
      recreated (this is similar to the --force-recreate tag)
    * `docker-compose down -v` - this will stop and remove the containers *along with their internal volumes*.  For
      example, if you call this any saved email messages from mailhub would be removed.
@@ -291,13 +292,13 @@ Once you have changed the WEB_PORT to something other than 80, you'll need to ap
 
 
 ### Can you explain how I would change the PHP version?
-Sure.  Say you want to test out a new version of PHP and see if your External Module will continue to run. 
+Sure.  Say you want to test out a new version of PHP and see if your External Module will continue to run.
 
 1. The quick way:
    * Modify the `Dockerfile` in `docker-web` and change the `FROM: php:7.3-apache` to the version you
 want to run.  You can see a list of options here: [docker php](https://hub.docker.com/_/php?tab=tags&page=1&name=-apache)
    * Execute this one statement from the `rdc` directory in your terminal (assuming you're already running):
-   
+
      `docker-compose up -d --no-deps --build web`
 1. Alternately, you can stop ALL your services, make changes, and restart.  This would go something like:
    * Stop your Docker-compose by opening a terminal in the `rdc` folder and running `docker-compose stop`.
@@ -315,7 +316,7 @@ Stopping redcap ... done
 Stopping mailhog ... done
 ```
 
-This stops your running containers but does not delete them.  They are still there on your machine and will be 
+This stops your running containers but does not delete them.  They are still there on your machine and will be
 restarted when you run `docker-compose up` again.  You can remove them (but not the volumes) with `docker-compose rm`.
 Try restarting again with `docker-compose up -d` - it should be MUCH faster after the initial load.  Adding the `-d` means
 detached so you can close your terminal window and the service will continue to run.
@@ -323,9 +324,9 @@ detached so you can close your terminal window and the service will continue to 
 
 ### Logging into the server
 To get a bash shell as root in the redcap server, you can run:
-```
+```shell
 $ docker-compose exec web /bin/bash
-root@5af71d765e77:/# 
+root@5af71d765e77:/#
 
 # become the apache user instead of root to avoid file permission issues
 root@5af71d765e77:/# sudo www-data
@@ -350,7 +351,7 @@ The command `docker ps -a` shows all containers regardless of run state.
 
 ### If I remove my docker container will I loose my database?
 No, by default the database is stored in a docker volume.  You can see the docker volumes with:
-```
+```shell
 andy123  redcap-docker-compose  rdc $ docker volume ls
 DRIVER              VOLUME NAME
 local               redcap_logs-volume
@@ -360,7 +361,7 @@ local               redcap_mysql-volume
 # Delete a volume (such as your mysql database)
 andy123  redcap-docker-compose  rdc $ docker volume rm redcap_mysql-volume
 ```
-If you remove a container, by default it DOES NOT remove the volumes.  
+If you remove a container, by default it DOES NOT remove the volumes.
 
 ### How can I REALLY delete everything?
 See the question above -- basically the volumes that docker-compose creates are normally not deleted.  To really clean
@@ -375,11 +376,11 @@ mysql database and volume.  So, follow these steps:
   docker-compose.yml file.
    1. Select Export -> Custom -> select redcap -> set compression to gzip -> and press go!
 1. Stop your database container.
-   ```
+   ```shell
    $ docker-compose stop db
    ```
 1. Delete the docker volume that contains your actual database data
-   ```
+   ```shell
    $ docker volume ls
    // Look for the volume like redcap-mysql_volume
    $ docker volume rm redcap-mysql_volume

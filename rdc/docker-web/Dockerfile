@@ -2,7 +2,6 @@ FROM php:7.3-apache
 # I see there is now php:7.3-apache and 7.4 is a release candidate
 ## https://hub.docker.com/_/php/
 
-MAINTAINER andy123@stanford.edu
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq && \
