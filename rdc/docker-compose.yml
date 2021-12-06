@@ -15,7 +15,7 @@ services:
     depends_on:
       - db
     ports:
-      - "${WEB_PORT}:80"
+      - 127.0.0.1:${WEB_PORT}:80
     volumes:
       - ${WEB_OVERRIDES}:/etc/container-config-override
       - ${WEBROOT_DIR}:/var/www/html
@@ -44,7 +44,7 @@ services:
       - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
       - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
     ports:
-     - "${MYSQL_PORT}:3306"
+      - 127.0.0.1:${MYSQL_PORT}:3306
     networks:
       - redcap_network
 
@@ -70,7 +70,7 @@ services:
     depends_on:
       - web
     ports:
-      - "${MAILHOG_PORT}:8025"
+      - 127.0.0.1:${MAILHOG_PORT}:8025
     volumes:
       - ${MAILHOG_DIR}:/maildir
       - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
@@ -94,7 +94,7 @@ services:
     volumes:
       - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
     ports:
-      - "${PHPMYADMIN_PORT}:80"
+      - 127.0.0.1:${PHPMYADMIN_PORT}:80
     networks:
       - redcap_network
 
