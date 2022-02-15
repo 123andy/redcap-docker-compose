@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.15
 
 RUN set -x \
   && adduser -D -u 1000 mailhog \
@@ -12,6 +12,8 @@ RUN set -x \
 
 EXPOSE 1025 8025
 
+COPY ./outgoing_smtp.json /outgoing_smtp.json
 COPY entrypoint.sh /
+
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
