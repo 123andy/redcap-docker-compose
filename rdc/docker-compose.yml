@@ -90,7 +90,6 @@ services:
     environment:
       - UPLOAD_LIMIT=128M
     depends_on:
-      - web
       - db
     #restart: always
 #    volumes:
