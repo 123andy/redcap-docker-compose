@@ -15,12 +15,12 @@ services:
     depends_on:
       - db
     ports:
-      - "${WEB_PORT}:80"
+      - 127.0.0.1:${WEB_PORT}:80
     volumes:
       - ${WEB_OVERRIDES}:/etc/container-config-override
-      - ${WEBROOT_DIR}:/var/www/html
+      - ${WEBROOT_DIR}:/var/www/html:cached
       - ${CREDENTIALS_DIR}:/var/credentials
-      - ${LOGS_DIR}:/var/log/apache2
+      - ${LOGS_DIR}:/var/log/apache2:delegated
     networks:
       - redcap_network
 # You can prevent your REDCap from accessing certain sites (like twilio) using these settings
@@ -33,18 +33,20 @@ services:
 #      - "event-bridge.twilio.com:127.0.0.1"
 
   db:
+    image: mysql:8.0
+    platform: linux/amd64
     container_name: ${DOCKER_PREFIX}_db
-    #image: ${MYSQL_IMAGE}
-    build: docker-mysql
     env_file: .env
     restart: always
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
-      - ${LOGS_DIR}:/var/log/mysql
+      - ${LOGS_DIR}:/var/log/mysql:delegated
       - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
       - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
     ports:
-     - "${MYSQL_PORT}:3306"
+     - 127.0.0.1:${MYSQL_PORT}:3306
     networks:
       - redcap_network
 
@@ -57,7 +59,6 @@ services:
       - web
       - db
     volumes:
-      - ${CRON_LOGROTATE_DIR}:/etc/logrotate.d
       - ${LOGS_DIR}:/logs-dir
     networks:
       - redcap_network
@@ -70,10 +71,9 @@ services:
     depends_on:
       - web
     ports:
-      - "${MAILHOG_PORT}:8025"
+      - 127.0.0.1:${MAILHOG_PORT}:8025
     volumes:
       - ${MAILHOG_DIR}:/maildir
-      - ${MAILHOG_OUTGOING_SMTP_FILE}:/outgoing_smtp.json
     environment:
       MH_STORAGE: maildir
       MH_MAILDIR_PATH: /maildir
@@ -91,10 +91,10 @@ services:
       - web
       - db
     #restart: always
-    volumes:
-      - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
+#    volumes:
+#      - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
     ports:
-      - "${PHPMYADMIN_PORT}:80"
+      - 127.0.0.1:${PHPMYADMIN_PORT}:80
     networks:
       - redcap_network
 
