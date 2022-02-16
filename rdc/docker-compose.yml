@@ -87,6 +87,8 @@ services:
     container_name: ${DOCKER_PREFIX}_phpmyadmin
     image: phpmyadmin/phpmyadmin
     env_file: .env
+    environment:
+      - UPLOAD_LIMIT=128M
     depends_on:
       - web
       - db
