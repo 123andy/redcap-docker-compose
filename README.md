@@ -6,15 +6,13 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
-- [REDCap Docker Compose Environment](#redcap-docker-compose-environment)
-  - [About](#about)
-  - [Features](#features)
-  - [Quick-Start](#quick-start)
-  - [Full Documentation](#full-documentation)
-  - [Updates](#updates)
-  - [License](#license)
-  - [Contributing](#contributing)
+- [About](#about)
+- [Features](#features)
+- [Quick-Start](#quick-start)
+- [Full Documentation](#full-documentation)
+- [Updates](#updates)
+- [License](#license)
+- [Contributing](#contributing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -40,22 +38,25 @@ to have production-ready php settings.
  * Easy to modify php-version or mysql-version and rebuild your environment in minutes
 
 ## Quick-Start
- * [Install Docker Community Edition](https://docs.docker.com/get-docker) (requires docker account which is free)
+ * [Install Docker Desktop](https://docs.docker.com/get-docker) (requires docker account which is free)
  * [Download this repository](https://github.com/123andy/redcap-docker-compose/archive/master.zip) and unzip it to your computer
  * Open your download directory using a good IDE (
  [phpStorm](https://www.jetbrains.com/phpstorm/),
  [Visual Studio Code](https://code.visualstudio.com/),
  [Atom](https://atom.io/) - does not support xdebug, etc... )
- * Edit the `.env` file located in the `rdc` folder review the contents, making changes as necessary.
- * Once `.env` file settings are correct, from the `rdc` folder type `docker-compose up -d`
+ * Copy/Rename the `.env-example` to make a `.env` file - it is located in the `rdc` folder review the contents, making changes as necessary.
+ * Once `.env` file settings are correct, from the `rdc` folder type `docker compose up -d`
  * Open your web browser and goto `http://localhost` (or, in some cases with macs `http://127.0.0.1`) and follow
   directions for further installation
+
+:warning: **If you have a previous version of redcap-docker-compose make sure you change the `DOCKER_PREFIX` variable otherwise you may corrupt your existing installation.  Please see the full docs for more detail**
 
 ## Full Documentation
 See the [detailed documentation](rdc/documentation/README.md) for more information!  Keep in mind this is a community
 effort so feedback is appreciated.  Please create issues here with any suggestions or make a pull request with improvements.
 
 ## Updates
+* 2022-02-16  Made defaults php 8.1, mysql 8.0, xdebug 3.1.3 and incorporated some pull requests
 * 2020-12-28  Made defaults php7.4, xdebug 3.0, mysql 8
 * 2020-09-24  Minor documentation cleanup and testing for Windows
 * 2019-10-03  Improved documentation and cleanup of unused settings (issue #4)
@@ -72,6 +73,8 @@ Licensed under the MIT license.
 
 ## Contributing
 Please make pull requests to extend the functionality and documentation
+
+I'd like to thank the many people who have contributed to making this repo better!
 
 [redcap-logo]: rdc/documentation/redcap-logo-large.png "REDCap"
 [docker-compose-logo]: rdc/documentation/docker-compose.png "Docker Compose"
