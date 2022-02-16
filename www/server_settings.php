@@ -165,7 +165,7 @@ class Plugin {
 				$obj = "OBJ";
 				$msg = print_r($message, true);
 			} elseif (is_string($message) || is_numeric($message)) {
-				$obj = "qgit swSTR";
+				$obj = "STR";
 				$msg = $message;
 			} elseif (is_bool($message)) {
 				$obj = "BOOL";
