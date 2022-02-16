@@ -85,14 +85,14 @@ services:
   # THIS CONTAINER IS OPTIONAL IF YOU WANT TO HAVE PHPMYADMIN - OTHERWISE COMMENT IT OUT
   phpmyadmin:
     container_name: ${DOCKER_PREFIX}_phpmyadmin
-    image: phpmyadmin/phpmyadmin:fpm-alpine
+    image: phpmyadmin/phpmyadmin
     env_file: .env
     depends_on:
       - web
       - db
     #restart: always
-    volumes:
-      - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
+#    volumes:
+#      - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
     ports:
       - 127.0.0.1:${PHPMYADMIN_PORT}:80
     networks:
