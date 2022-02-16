@@ -3,41 +3,41 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
-- [redcap-docker-compose documentation](#redcap-docker-compose-documentation)
-  - [Overview](#overview)
-    - [Docker-Compose Design](#docker-compose-design)
-  - [Configuration](#configuration)
-    - [X-Debug Configuration (optional for PHPStorm)](#x-debug-configuration-optional-for-phpstorm)
-  - [FAQ and Other Information](#faq-and-other-information)
-    - [How do I prevent SMS messages from going out?](#how-do-i-prevent-sms-messages-from-going-out)
-    - [How do I stop phpMyAdmin](#how-do-i-stop-phpmyadmin)
-    - [Connecting to the database](#connecting-to-the-database)
-    - [Local URLS](#local-urls)
-    - [Logging](#logging)
-    - [I can't access my server at http://localhost even though docker is running!](#i-cant-access-my-server-at-httplocalhost-even-though-docker-is-running)
-    - [How do I make a custom localhost alias?](#how-do-i-make-a-custom-localhost-alias)
-    - [Useful Docker-compose Commands](#useful-docker-compose-commands)
-    - [Can I change the location of my webroot files?](#can-i-change-the-location-of-my-webroot-files)
-    - [Can I run more than one instance of REDCap-Docker-Compose at the same time?](#can-i-run-more-than-one-instance-of-redcap-docker-compose-at-the-same-time)
-    - [Can you explain how I would change the PHP version?](#can-you-explain-how-i-would-change-the-php-version)
-    - [Shutting down](#shutting-down)
-    - [Logging into the server](#logging-into-the-server)
-    - [How can I see what's running?](#how-can-i-see-whats-running)
-    - [If I remove my docker container will I loose my database?](#if-i-remove-my-docker-container-will-i-loose-my-database)
-    - [How can I REALLY delete everything?](#how-can-i-really-delete-everything)
-    - [How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?](#how-can-i-switch-mysql-versions-for-example-go-from-mysql-57-to-mysql-80)
+- [Overview](#overview)
+  - [Docker-Compose Design](#docker-compose-design)
+- [Configuration](#configuration)
+  - [X-Debug Configuration (optional)](#x-debug-configuration-optional)
+    - [Directions for PHPStorm:](#directions-for-phpstorm)
+- [FAQ and Other Information](#faq-and-other-information)
+  - [How do I upgrade to the latest version of redcap-docker-compose?](#how-do-i-upgrade-to-the-latest-version-of-redcap-docker-compose)
+  - [How do I prevent SMS messages from going out?](#how-do-i-prevent-sms-messages-from-going-out)
+  - [How do I stop phpMyAdmin](#how-do-i-stop-phpmyadmin)
+  - [Connecting to the database](#connecting-to-the-database)
+  - [Local URLS](#local-urls)
+  - [Logging](#logging)
+  - [I can't access my server at http://localhost even though docker is running!](#i-cant-access-my-server-at-httplocalhost-even-though-docker-is-running)
+  - [How do I make a custom localhost alias?](#how-do-i-make-a-custom-localhost-alias)
+  - [Useful Docker-compose Commands](#useful-docker-compose-commands)
+  - [Can I change the location of my webroot files?](#can-i-change-the-location-of-my-webroot-files)
+  - [Can I run more than one instance of REDCap-Docker-Compose at the same time?](#can-i-run-more-than-one-instance-of-redcap-docker-compose-at-the-same-time)
+  - [Can you explain how I would change the PHP version?](#can-you-explain-how-i-would-change-the-php-version)
+  - [Shutting down](#shutting-down)
+  - [Logging into the server](#logging-into-the-server)
+  - [How can I see what's running?](#how-can-i-see-whats-running)
+  - [If I remove my docker container will I loose my database?](#if-i-remove-my-docker-container-will-i-loose-my-database)
+  - [How can I REALLY delete everything?](#how-can-i-really-delete-everything)
+  - [How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?](#how-can-i-switch-mysql-versions--for-example-go-from-mysql-57-to-mysql-80)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 This docker-compose will build multiple docker containers as part of a server group to host REDCap on your local computer/server.
 The build consists of:
- * The official PHP-Apache docker image (Currently version 7.3)
- * The official MySql docker image (currently version 5.7)
+ * The official PHP-Apache docker image (Currently version 8.1)
+ * The official MySql docker image (currently version 8.0)
  * A basic alpine-based MailHog image (for capturing outbound emails from REDCap for your review)
  * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
- * (optional) The official PhpMyAdmin web-based mysql tool for managing the database.
+ * (optional) The official alpine-based PhpMyAdmin web-based mysql tool for managing the database.
    * You can comment this out or stop the service after startup (see FAQ)
 
 The big advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how
@@ -129,27 +129,42 @@ containers for REDCap testing and production.
     MySql have already done so.  You can find the usernames and passwords in the `.env` file.
 
 
-### X-Debug Configuration (optional for PHPStorm)
-X-Debug allows you to insert breakpoints in your php code and evaluate variables from the server in your IDE.  Directions
-for using PhpStorm are provided here.  Basically, you configure an xdebug server on PhpStorm.
-1. After your docker server is up and running, open your project folder in PhpStorm (e.g. `~/redcap/`)
-1. In PhpStorm, goto `preferences -> Languages & Frameworks -> PHP -> Server` and create new server.
-   1. Name the server 'localhost-xdebug-server' - this name matches
-   1. Set the hostname to be 'localhost' and leave the port at '80'
-   1. Check the "Use Path Mapping" option and find the redcap-docker-compose file.
-      * On the left side, set the path of your codebase (e.g. `~/redcap/www`)
-      * On the right side under `Absolute path on the server` enter in the value `/var/www/html`
-1. After creating the server on PHPStorm go to `Run -> Edit Configuration`.  Create new "PHP Remote Debug" configuration.
-   With xdebug 3.0 I ended up with two configuratinos here - one for my local url 'redcap.local' and a second for 'web' which catches
-   the cron container's calls to the cron.php
-   * In my latest build, I did not enable the filter by IDE key below
-      1. Make sure to check `Filter debug connection by IDE Key`. 
-      1. Then select `localhost-xdebug-server` for server and type `PHPSTORM` for IDE Key.
-   1. You can validate your configuration by clicking on Validate under Pre-Configuration. 
-1. Finally, you need to install the [PhpDebug Browser debugger extension](https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html)
+### X-Debug Configuration (optional)
+X-Debug allows you to insert breakpoints in your php code and evaluate variables from the server in your IDE.  It has a small
+learning curve to pick up but is really helpful in the long run.  I strongly encourage php developers
+to try and learn how to use this tool.
 
+#### Directions for PHPStorm:
+1. After your docker server is up and running, open your project folder in PhpStorm (e.g. `~/redcap/`)
+2. In PhpStorm, goto `preferences -> PHP -> Server` and create new server.
+   1. Name the server whatever you like
+   2. Set the hostname to be `localhost` (or if you are using a host alias like `redcap.local`, use that)  and leave the port at '80'
+   3. Check the "Use Path Mapping" option to map your webroot (`www`) in the redcap-docker-compose folder file to the docker container's webroot path which is `/var/www/html`.
+   ![Xdebug Server][phpstorm-xdebug-server]
+3. After creating the server, goto the PHPStorm go to `preferences > PHP -> Debug` and review the settings for Xdebug.
+   1. I chose to uncheck some of the 'Force break' options to prevent excessive debugging sessions from starting on their own because my mappings were not quite right.
+   ![Xdebug Options][phpstorm-xdebug-options]
+4. Finally, install the [PhpDebug Browser debugger extension](https://www.jetbrains.com/help/phpstorm/browser-debugging-extensions.html)
+   1. This tool lets you decide when you want to debug.  To debug you have to first make sure your debug server is listening in phpStorm (this is the phone icon in the top-right toolbar.  Next, you need to make sure the toolbar extension is set to the green bug which sets a cookie that tells you to debug.
+      1. I don't know if it matters, but in my toolbar configuration I set the IDEKEY to be 'PHPSTORM' but I don't think the IDEKEY is used any longer in phpStorm.
+* Note: If you want to debug cron calls, you may have to do more!
+  * When the cron container calls the web container it uses the url of  `http://web/cron.php`.  So, your xdebug server will not have a 'server' defined with a host of `web`.  So, in my case, I made aq second Server (step 2 above) also called web with the same configuration.
+  * Alternately, you could disable the cronjob container with `docker compose stop cron` at the command prompt in the rdc folder and just make calls to the cron endpoint manually from your local browser (e.g. `http://localhost/cron.php` to trigger and test a cron job.  In this case, your normal xdebug server settings should capture the event)
 
 ## FAQ and Other Information
+
+### How do I upgrade to the latest version of redcap-docker-compose?
+We periodically make improvements to this package but do not ensure a smooth upgrade process.  For this reason I suggest a clean start on each update.  I would encourage a process like this:
+1. First, make a backup of your current development server database.  This can easily be done ensuring that you are running phpmyadmin (check your docker-compose.yml file if you commented it out) and then dump your redcap database to a .sql or .sql.gz file.
+2. Take note of your current redcap version number (e.g. 12.2.1).
+3. Shut down your current docker rdc environment (e.g. `docker compose down`).  This will free the local ports on your system.
+4. Download the latest RDC version from github and unzip in a new location
+5. Copy the new default `.env-example` to `.env` in the fresh download folder
+6. Compare your old `.env` with the latest `.env` to update variables as necessary.  There may be some changes here so look carefully.
+7. **IMPORTANT** Make sure you change the `DOCKER_PREFIX` in your new `.env` as this is used to name the volumes Docker creates.  If you try to make a NEW instance of your development environment with the same `DOCKER_PREFIX` your new instance will use the same volume for things like the mysql database which could lead to corruption.
+8. Copy the webroot (`/www`) contents from your old environment to the new one
+9. Bring up the new environment (e.g. `docker compose up`) and goto phpmyadmin again.
+10. Restore your backed up database
 
 ### How do I prevent SMS messages from going out?
 If you do not want your local instance to be able to send text messages, you can:
@@ -454,3 +469,5 @@ your database version anytime.
      imega/mysql-client \
      /bin/sh -c "mysql --host=db --user=root --password=root --execute 'create database if not exists new_db'; gunzip < /mysqldump/redcap_backup.sql.gz | mysql --host=db --user=root --password=root new_db"
    ```
+[phpstorm-xdebug-server]: xdebug_server.png "PHPStorm X-Debug Server"
+[phpstorm-xdebug-options]: xdebug_options.png "PHPStorm X-Debug Options"
