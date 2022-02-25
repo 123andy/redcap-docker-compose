@@ -51,6 +51,10 @@ to have production-ready php settings.
 
 :warning: **If you have a previous version of redcap-docker-compose make sure you change the `DOCKER_PREFIX` variable otherwise you may corrupt your existing installation.  Please see the full docs for more detail**
 
+## Upgrading The Framework
+If you have an existing REDCap Docker Compose development setup and wish to swtich to the latest version, please review
+the section in the [detailed documentation](rdc/documentation/README.md#how-do-i-upgrade-to-the-latest-version-of-redcap-docker-compose)
+
 ## Full Documentation
 See the [detailed documentation](rdc/documentation/README.md) for more information!  Keep in mind this is a community
 effort so feedback is appreciated.  Please create issues here with any suggestions or make a pull request with improvements.

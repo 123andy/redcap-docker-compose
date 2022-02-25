@@ -154,17 +154,28 @@ to try and learn how to use this tool.
 ## FAQ and Other Information
 
 ### How do I upgrade to the latest version of redcap-docker-compose?
-We periodically make improvements to this package but do not ensure a smooth upgrade process.  For this reason I suggest a clean start on each update.  I would encourage a process like this:
-1. First, make a backup of your current development server database.  This can easily be done ensuring that you are running phpmyadmin (check your docker-compose.yml file if you commented it out) and then dump your redcap database to a .sql or .sql.gz file.
+We periodically make improvements to this package and if you are not careful, simply bringing up the latest
+version of this framework on your old docker volumes could lead to corruption.  There are many permutations
+here so I would reach out for advice but in general I would follow a process like this:
+
+#### A Clean Start
+Ideally, do a CLEAN new development environment.  This means that you bring down your current docker compose, 
+otherwise you will get a port conflict error.  Alternately, you can change the public ports in the `.env` file for
+the new environment.  You also want to MAKE SURE you change the `DOCKER_PREFIX` variable in the new `.env` to be
+different from your existing environment.  Otherwise docker may reuse the same volumes which can corrupt your database.
+
+#### Migrating to the new version
+I would probably try a process like the following:
+1. First, make a backup of your current development server database.  This can easily be done with phpmyadmin (check your docker-compose.yml file if you commented it out) and then dump your redcap database to a .sql or .sql.gz file.
 2. Take note of your current redcap version number (e.g. 12.2.1).
 3. Shut down your current docker rdc environment (e.g. `docker compose down`).  This will free the local ports on your system.
-4. Download the latest RDC version from github and unzip in a new location
-5. Copy the new default `.env-example` to `.env` in the fresh download folder
-6. Compare your old `.env` with the latest `.env` to update variables as necessary.  There may be some changes here so look carefully.
-7. **IMPORTANT** Make sure you change the `DOCKER_PREFIX` in your new `.env` as this is used to name the volumes Docker creates.  If you try to make a NEW instance of your development environment with the same `DOCKER_PREFIX` your new instance will use the same volume for things like the mysql database which could lead to corruption.
-8. Copy the webroot (`/www`) contents from your old environment to the new one
-9. Bring up the new environment (e.g. `docker compose up`) and goto phpmyadmin again.
-10. Restore your backed up database
+4. Follow the [clean start](#a-clean-start) directions to download the latest RDC version from github and unzip in a new location
+   1. Copy the new default `.env-example` to `.env` in the fresh download folder.  Don't try to move your old `.env` as there could be some changes in the new version.
+   2. Compare your old `.env` with the latest `.env` to update variables as necessary.  There may be some changes here so look carefully.
+   3. **IMPORTANT** Make sure you change the `DOCKER_PREFIX` in your new `.env` as this is used to name the volumes Docker creates.  If you try to make a NEW instance of your development environment with the same `DOCKER_PREFIX` your new instance will use the same volume for things like the mysql database which could lead to corruption.
+5. Copy the webroot (`/www`) contents from your old environment to the new one
+6. Bring up the new environment (e.g. `docker compose up`) and goto phpmyadmin again.
+7. Restore your backed up database to overwrite the REDCap database
 
 ### How do I prevent SMS messages from going out?
 If you do not want your local instance to be able to send text messages, you can:
