@@ -462,7 +462,7 @@ class REDCapInstaller {
             }
 
             // As of 8.7.3, size is 26475806
-            if ($_FILES[$field_name]['size'] > 50000000) {
+            if ($_FILES[$field_name]['size'] > 70000000) {
                 throw new RuntimeException('Exceeded filesize limit.');
             }
 
