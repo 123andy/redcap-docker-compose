@@ -94,7 +94,13 @@ containers for REDCap testing and production.
      $ lsof -i tcp:3386
      ```
      If you get nothing back, they are free.  Otherwise you can change the ports in your `.env` file.
-1. Let's get ready to rumble.  After you have reviewed your `.env` we are ready to fire things up.  The first time it may take a while as it has to download some of the container images from docker hub.
+1. Let's get ready to rumble.  After you have reviewed your `.env` we are ready to build
+   * Build all containers
+        ```shell
+        $ cd rdc
+        $ docker-compose build
+        ```
+2. Now lets fire things up.  The first time it may take a while as it has to download some of the container images from docker hub.
    * Bring up the container
         ```shell
         $ cd rdc
