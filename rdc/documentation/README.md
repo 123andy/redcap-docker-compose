@@ -95,7 +95,7 @@ containers for REDCap testing and production.
      ```
      If you get nothing back, they are free.  Otherwise you can change the ports in your `.env` file.
 1. Let's get ready to rumble.  After you have reviewed your `.env` we are ready to build
-   * Build all containers
+   * Building the containers is required if you are upgrading, or else it might reuse an older container
         ```shell
         $ cd rdc
         $ docker-compose build
