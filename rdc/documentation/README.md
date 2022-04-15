@@ -488,3 +488,19 @@ your database version anytime.
    ```
 [phpstorm-xdebug-server]: xdebug_server.png "PHPStorm X-Debug Server"
 [phpstorm-xdebug-options]: xdebug_options.png "PHPStorm X-Debug Options"
+
+1. How do I run Vanderbilt's static analysis checker Psalm, required when submitting to their EM repo?
+
+After following Vanderbilt's installation instructions, you can launch psalm inside Docker. First verify the name of your webserver container
+with
+
+```docker ps```
+
+then use 'docker exec' to run a shell in which you first change to your EM directory then launch psalm,
+
+```docker exec -it <your_redcap_web> sh -c "cd modules-local/<your_em>_v9.9.9 ; vendor/bin/psalm --taint-analysis"```
+
+For example if your webserver is called 'redcap_2022_1_web' and your EM 'shazam', the command would be
+
+```docker exec -it redcap_2022_1_web sh -c "cd modules-local/shazam_v9.9.9 ; vendor/bin/psalm --taint-analysis"```
+
