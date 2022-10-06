@@ -10,6 +10,8 @@
     - [Directions for PHPStorm:](#directions-for-phpstorm)
 - [FAQ and Other Information](#faq-and-other-information)
   - [How do I upgrade to the latest version of redcap-docker-compose?](#how-do-i-upgrade-to-the-latest-version-of-redcap-docker-compose)
+    - [A Clean Start](#a-clean-start)
+    - [Migrating to the new version](#migrating-to-the-new-version)
   - [How do I prevent SMS messages from going out?](#how-do-i-prevent-sms-messages-from-going-out)
   - [How do I stop phpMyAdmin](#how-do-i-stop-phpmyadmin)
   - [Connecting to the database](#connecting-to-the-database)
@@ -48,8 +50,8 @@ team to work in identical environments for consistency.
 This docker-compose script relies on a number of underlying images which are build or pulled to build your containers
 * docker-cron (built from Dockerfile)
 * docker-mailhog (built from Dockerfile)
-* docker-web (build from Dockerfile)
-* mysql image (pulled as official image)
+* docker-web (built from Dockerfile)
+* docker-db (built from Dockerfile as pulled official image)
 * phpmyadmin image (pulled as official image)
 
 Those images that use Dockerfiles can be modified by tweaking the Dockerfile or scripts in each folder.  You must
@@ -59,48 +61,60 @@ Many of these docker containers are further customized through a series of start
 is a LAMP stack that could be used for any project.  However, the `redcap-overrides` and Docker-compose file provides
 a mechanism to add addition REDCap-specific customizations.
 
-For example, `docker-web/container-config/php/70-sendmail_path` sets up a generic msmtp mail service, but `redcap-overrides/web/php` sets up
-typical REDCap php settings.  It should be possible to reuse this framework to create other version, such as SAML-enabled, or open-IDC
-containers for REDCap testing and production.
+For example, `docker-web/container-config/php/70-sendmail_path` sets up a generic msmtp mail service, but
+`redcap-overrides/web/php` sets up typical REDCap php settings.  It should be possible to reuse this framework to 
+create other version, such as SAML-enabled, or open-IDC containers for REDCap testing and production.  The override
+script merges the overrides into the default folders, so to remove a default you have to use the same filename.
 
 ## Configuration
 1. Install docker on your machine.
    * Docker now requires that you create a user account.  Register.
    * [Download the latest version of docker](https://docs.docker.com/get-docker/) desktop for your platform:
-     * For PC, I had to install the latest WSL2 Linux kernel update package and restart but gui walks you through the process.  Also, upon launching
-     VS Code, I installed the WSL extension.
-   * Optional: You might also consider installing a docker GUI such as [Kitematic](https://kitematic.com/)
+     * For PC, I had to install the latest WSL2 Linux kernel update package and restart but gui walks you through 
+     the process.  Also, upon launching VS Code, I installed the WSL extension.
 1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose)
-   to your computer.  If you plan on contributing to the project, you may instead want to fork it and then clone your fork.
+   to your computer.  If you plan on contributing to the project, you may instead want to fork it and then clone your
+   fork so you can push changes and issue a pull request to the main repo.  Otherwise, just use the ZIP option.
    * A zip file is available here: [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
    * Unzip this into a good place on your computer (e.g. desktop or documents)
       * On my Mac, I put it in a folder called 'redcap' under my user directory `~/redcap/`
 1. INSTALL A GOOD IDE.  This really makes things easier.  I can recommend:
-   * [Visual Studio Code](https://code.visualstudio.com/),
    * [phpStorm](https://www.jetbrains.com/phpstorm/),
+   * [Visual Studio Code](https://code.visualstudio.com/),
    * and fancy editors like: [Atom](https://atom.io/), etc... )
 1. From your IDE, open the folder where redcap-docker-compose was placed:
+
     ![Folder Tree](folder_tree.png)
 1. Inside the `rdc` folder, find the `.env-example` file.
-   * If you do not see the `.env-example` file, you probably aren't using a real IDE.  In windows and MAC, dot-files are hidden by default unless you tell it to show them.
+   * If you do not see the `.env-example` file, you probably aren't using a real IDE.  In windows and MAC, dot-files are
+   hidden by default unless you tell it to show them.
 1. Copy the `.env-example` file to `.env`.
-1. Review the contents of the `.env` file, **REALLY**.  This is where the majority of configuration changes are made.  You should take a glance through so you understand what you can change.
-   * If you are on a MAC, make sure you open your terminal and run `id` to get your USER ID.  Typically it will be 501-505 depending on how many users you have on your MAC.  Make sure this value matches to reduce issues with file permissions in your mapped WEB directory.
-   * If you are not running another local web-server or mysql server, your ports should be open.  Otherwise, you may have to change some of the ports for WEB or MYSQL services.  You will get errors when building if the ports are
-   being used.
+1. Review the contents of the `.env` file, **REALLY**.  This is where the majority of configuration changes are made. 
+   You should take a glance through so you understand what you can change.
+   * If you are on a MAC, make sure you open your terminal and run `id` to get your USER ID.  Typically it will be
+     501-505 depending on how many users you have on your MAC.  Make sure this value matches to reduce issues with 
+     file permissions in your mapped WEB directory.
+   * If you are not running another local web-server or mysql server, your ports should be open.  Otherwise, 
+     you may have to change some of the ports for WEB or MYSQL services.  You will get errors when building if the 
+     ports are being used.
      * On a MAC, you can test if your ports are open (default 80 for web and 3386 for mysql) with:
      ```shell
      $ lsof -i tcp:80
      $ lsof -i tcp:3386
      ```
-     If you get nothing back, they are free.  Otherwise you can change the ports in your `.env` file.
-1. Let's get ready to rumble.  After you have reviewed your `.env` we are ready to build
+     If you get nothing back, they are free.  Otherwise, you can change the ports in your `.env` file.
+1. **Let's get ready to rumble.**  After you have reviewed your `.env` we are ready to build
    * Building the containers is required if you are upgrading, or else it might reuse an older container
         ```shell
         $ cd rdc
-        $ docker-compose build
+        $ docker compose build
         ```
-2. Now lets fire things up.  The first time it may take a while as it has to download some of the container images from docker hub.
+     If you got any errors here, stop and get help to resolve them.  If you have made changes to the docker files or
+     have upgrade to a newer version of redcap-docker-compose then I strong recommend you issue this 
+     command: `docker compose build --no-cache` which will ensure that all of your
+     docker images are rebuilt from scratch
+2. Now that you have docker images (which you could see with the `docker images -a` commmand, you need to make some
+   docker containers.  The first time you start your containers they may take a while
    * Bring up the container
         ```shell
         $ cd rdc
@@ -112,12 +126,13 @@ containers for REDCap testing and production.
         ```
 1. Hopefully you can now reach your server at `http://localhost` or `http://127.0.0.1`
    * I prefer to access my 'local' redcap with a custom domain of 'redcap.local'.
-     * MAC Instructions: edit my /etc/hosts and append `redcap.local` after localhost:
+     * MAC Instructions: edit your /etc/hosts and append `redcap.local` after localhost (must be done as sudo):
        ```
        127.0.0.1       localhost redcap.local
        ```
        Then I access the server at http://redcap.local
-     * PC Instructions: edit `C:\Windows\System32\drivers\etc\hosts` and make the same change as above.  You will have to be an administrator to save the file (or VS Code helps you)
+     * PC Instructions: edit `C:\Windows\System32\drivers\etc\hosts` and make the same change as above.  You will have
+       to be an administrator to save the file (or VS Code helps you)
 1. You need a copy of the REDCap Installer.
    * If you are a member of the REDCap Consortium Community, you can:
       1. [Download](https://community.projectredcap.org/page/download.html) the latest full installer as a zip file.
@@ -172,16 +187,20 @@ different from your existing environment.  Otherwise docker may reuse the same v
 
 #### Migrating to the new version
 I would probably try a process like the following:
-1. First, make a backup of your current development server database.  This can easily be done with phpmyadmin (check your docker-compose.yml file if you commented it out) and then dump your redcap database to a .sql or .sql.gz file.
-2. Take note of your current redcap version number (e.g. 12.2.1).
-3. Shut down your current docker rdc environment (e.g. `docker compose down`).  This will free the local ports on your system.
-4. Follow the [clean start](#a-clean-start) directions to download the latest RDC version from github and unzip in a new location
+1. First, make a backup of your current development server database.  This can easily be done with phpmyadmin (check
+   your docker-compose.yml file if you commented it out) and then dump your redcap database to a .sql or .sql.gz file.
+1. Take note of your current redcap version number (e.g. 12.2.1).
+1. Shut down your current docker rdc environment (e.g. `docker compose down`).  This will free the local ports on your system.
+1. Follow the [clean start](#a-clean-start) directions to download the latest RDC version from github and unzip in a new location
    1. Copy the new default `.env-example` to `.env` in the fresh download folder.  Don't try to move your old `.env` as there could be some changes in the new version.
    2. Compare your old `.env` with the latest `.env` to update variables as necessary.  There may be some changes here so look carefully.
    3. **IMPORTANT** Make sure you change the `DOCKER_PREFIX` in your new `.env` as this is used to name the volumes Docker creates.  If you try to make a NEW instance of your development environment with the same `DOCKER_PREFIX` your new instance will use the same volume for things like the mysql database which could lead to corruption.
-5. Copy the webroot (`/www`) contents from your old environment to the new one
-6. Bring up the new environment (e.g. `docker compose up`) and goto phpmyadmin again.
-7. Restore your backed up database to overwrite the REDCap database
+1. Copy the webroot (`/www`) contents from your old environment to the new one
+1. Rebuild your images (e.g. `docker compose build --no-cache`)
+1. Bring up the new environment (e.g. `docker compose up -d`) and goto phpmyadmin again.
+1. Restore your backed up database to overwrite the REDCap database
+1. Make sure you move your redcap web folders into the www directory (or download a clean install version of the same
+   version of redcap you had previously in your database).
 
 ### How do I prevent SMS messages from going out?
 If you do not want your local instance to be able to send text messages, you can:
@@ -201,6 +220,7 @@ If you have another mysql admin tool you'd prefer to use, you can prevent your d
 phpMyAdmin container.  Either:
 * After startup (e.g. `docker-compose up -d`) you could run `docker-compose stop phpmyadmin`
 * Alternately, you can comment out the phpmyadmin section of the `docker-compose.yml` file with `#` before each line.
+  If you don't use it, you might as well turn it off so it isn't running all the time.
 
 ### Connecting to the database
 There are at least three ways to connect to your database:
@@ -238,7 +258,6 @@ easy monitoring using tools like notepad++ (pc), console (mac), or just `tail -f
 * Custom application logs should be written to `/var/log/redcap` inside the web image that maps to the `$LOG_DIR`
 as configured in the `.env` file.
 * Log rotation can be configured so your log files don't grow too large - see `redcap-overrides/cron/logrotate` for an example.
-
 
 
 ### I can't access my server at http://localhost even though docker is running!

@@ -1,5 +1,5 @@
-FROM php:8.1.3RC1-apache-buster
-## https://hub.docker.com/_/php/
+FROM php:8.1-apache-buster
+## https://hub.docker.com/_/php/tags?page=1&name=apache
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -21,9 +21,11 @@ RUN apt-get update -qq && \
 RUN yes | pecl install xdebug \
     && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini
 
-# MOUNT A VOLUME WITH OUR DEFAULT CONTAINER CONFIG
-# THIS CAN BE OVERWRITTEN BY MOUNTING TO THE /etc/container-config-overwrite FOLDER
+# COPY OUR DEFAULT CONTAINER CONFIG
 COPY ./container-config /etc/container-config
+# THESE CONFIG FILES CAN BE SUPPLEMENTED OR OVERWRITTEN BY THE container_start.sh SCRIPT
+# BY MOUNTING ADDITIONAL FILES INTO /etc/container-config-overwrite FOLDER.  THIS FOLDER
+# IS ALIASED AS THE `WEB_OVERRIDES` ENV VARIABLE IN THE .env FILE
 
 ENV SERVER_NAME localhost
 ENV SERVER_ADMIN root
