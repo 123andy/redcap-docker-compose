@@ -8,6 +8,7 @@ RUN apt-get update -qq && \
     msmtp-mta \
     ca-certificates \
     git \
+    vim \
     ssh \
     wget \
     libpng-dev \
