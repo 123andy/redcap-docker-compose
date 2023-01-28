@@ -357,6 +357,9 @@ want to run.  You can see a list of options here: [docker php](https://hub.docke
    * Rebuild the modified containers by running `docker-compose build <<CONTAINER NAME>>`
    * Restart all of the containers with `docker-compose up -d`
 
+Note: The X-Debug version corresponds to the PHP version.  Switching major version of PHP requires the X-Debug to changed. To downgrade from PHP8 to PHP7 X-Debug is downgraded from version 3 to version 2. 
+To load a specific version of X-Debug, modify the `Dockerfile` in `docker-web` and change the `RUN yes | pecl install xdebug \` to `RUN yes | pecl install xdebug-2.9.8 \`.
+
 ### Shutting down
 You can shut down your servers by pressing ctrl-c in the window where you ran `docker-compose up`.  After a few seconds
  it should report all are off.
