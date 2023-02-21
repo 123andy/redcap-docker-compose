@@ -29,6 +29,7 @@
   - [If I remove my docker container will I loose my database?](#if-i-remove-my-docker-container-will-i-loose-my-database)
   - [How can I REALLY delete everything?](#how-can-i-really-delete-everything)
   - [How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?](#how-can-i-switch-mysql-versions--for-example-go-from-mysql-57-to-mysql-80)
+  - [Scanning External Modules for REPO Submission](#scanning-external-modules-for-repo-submission)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
