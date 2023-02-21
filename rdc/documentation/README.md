@@ -511,7 +511,8 @@ your database version anytime.
 [phpstorm-xdebug-server]: xdebug_server.png "PHPStorm X-Debug Server"
 [phpstorm-xdebug-options]: xdebug_options.png "PHPStorm X-Debug Options"
 
-1. How do I run Vanderbilt's static analysis checker Psalm, required when submitting to their EM repo?
+### Scanning External Modules for REPO Submission
+How do I run Vanderbilt's static analysis checker Psalm, required when submitting to their EM repo?
 
 With modern REDCap, the scan tool is now built into REDCap's release.  When you go to submit to the repository, you will be asked about having run the scanner.  
 
