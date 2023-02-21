@@ -513,16 +513,38 @@ your database version anytime.
 
 1. How do I run Vanderbilt's static analysis checker Psalm, required when submitting to their EM repo?
 
-After following Vanderbilt's installation instructions, you can launch psalm inside Docker. First verify the name of your webserver container
-with
+With modern REDCap, the scan tool is now built into REDCap's release.  When you go to submit to the repository, you will be asked about having run the scanner.  
 
-```docker ps```
+Keep in mind that in order to use the scanning tool with REDCap Docker Compose, you need to execute the scan inside the web container directly.  There are two ways to do this:
 
-then use 'docker exec' to run a shell in which you first change to your EM directory then launch psalm,
+First get a command prompt for your web container, from the rdc folder:
+```
+$ docker compose exec -it web /bin/bash
+```
+alternately, you can view all of your docker containers and execute the same command without compose as: 
+```
+$ docker ps
+$ docker exec -it WEB_CONTAINER_ID /bin/bash
+```
 
-```docker exec -it <your_redcap_web> sh -c "cd modules-local/<your_em>_v9.9.9 ; vendor/bin/psalm --taint-analysis"```
+You can then install the scan script the first time with:
+```
+$ php <redcap-root>/redcap_v13.3.1/ExternalModules/bin/install-scan-script.php
+```
 
-For example if your webserver is called 'redcap_2022_1_web' and your EM 'shazam', the command would be
+And, finally, execute the scan with:
+```
+$ <redcap-root>/bin/scan <path-to-module>
+```
 
-```docker exec -it redcap_2022_1_web sh -c "cd modules-local/shazam_v9.9.9 ; vendor/bin/psalm --taint-analysis"```
+Although, it appears that the scan tool will now auto-install on its own, so the installer might not be necessary.
 
+You can also run the scan from your parent operating system terminal as a larger docker command, such as:
+```
+$ docker compose exec -it web /var/www/html/bin/scan modules-lab/realtime_randomization_v9.9.9
+```
+or
+```
+$ docker exec -it 1dc2023b8753 /var/www/html/bin/scan modules-lab/realtime_randomization_v9.9.9
+```
+where 1dc... is the container ID from the `docker ps` command.
