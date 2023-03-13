@@ -14,13 +14,21 @@ RUN apt-get update -qq && \
     libpng-dev \
     libzip-dev \
     zip \
+    libmagickwand-dev \
+# INSTALL IMAGICK
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+# INSTALL MYSQLI AND OTHER DOCKER FUN
     && docker-php-ext-install gd zip mysqli \
-    ### cleanup \
+# INSTALL XDEBUG
+    && pecl install xdebug \
+    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > "/usr/local/etc/php/conf.d/xdebug.ini" \
+### cleanup
     && rm -r /var/lib/apt/lists/*
 
 # install and configure x-debug 3 when running for first time
-RUN yes | pecl install xdebug \
-    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini
+#RUN yes | pecl install xdebug \
+#    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini
 
 # COPY OUR DEFAULT CONTAINER CONFIG
 COPY ./container-config /etc/container-config
