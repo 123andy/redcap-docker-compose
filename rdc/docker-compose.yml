@@ -18,6 +18,10 @@ services:
       - ${WEBROOT_DIR}:/var/www/html
       - ${CREDENTIALS_DIR}:/var/credentials
       - ${LOGS_DIR}:/var/log/apache2
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - redcap_network
 # You can prevent your REDCap from accessing certain sites (like twilio) using these settings
