@@ -18,6 +18,10 @@ services:
       - ${WEBROOT_DIR}:/var/www/html
       - ${CREDENTIALS_DIR}:/var/credentials
       - ${LOGS_DIR}:/var/log/apache2
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - redcap_network
 # You can prevent your REDCap from accessing certain sites (like twilio) using these settings
@@ -32,8 +36,6 @@ services:
   db:
     container_name: ${DOCKER_PREFIX}_db
     build: ./docker-mysql
-#    image: mysql:8.0
-#    platform: linux/amd64
     env_file: ./.env
     restart: always
     cap_add:
@@ -83,7 +85,8 @@ services:
   # THIS CONTAINER IS OPTIONAL IF YOU WANT TO HAVE PHPMYADMIN - OTHERWISE COMMENT IT OUT
   phpmyadmin:
     container_name: ${DOCKER_PREFIX}_phpmyadmin
-    image: phpmyadmin/phpmyadmin
+#    image: phpmyadmin/phpmyadmin
+    image: arm64v8/phpmyadmin
     env_file: .env
     environment:
       - UPLOAD_LIMIT=128M

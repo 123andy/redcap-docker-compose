@@ -13,6 +13,7 @@
     - [A Clean Start](#a-clean-start)
     - [Migrating to the new version](#migrating-to-the-new-version)
   - [How do I prevent SMS messages from going out?](#how-do-i-prevent-sms-messages-from-going-out)
+  - [Does this work with ARM64 processors, like the M1 or M2 "Apple Silicon" MACs?](#does-this-work-with-arm64-processors-like-the-m1-or-m2-apple-silicon-macs)
   - [How do I stop phpMyAdmin](#how-do-i-stop-phpmyadmin)
   - [Connecting to the database](#connecting-to-the-database)
   - [Local URLS](#local-urls)
@@ -215,6 +216,16 @@ If you do not want your local instance to be able to send text messages, you can
     #      - "event-bridge.twilio.com:127.0.0.1"
     ```
   * Then restart the web container with `docker-compose up -d --no-deps --build web`
+
+### Does this work with ARM64 processors, like the M1 or M2 "Apple Silicon" MACs?
+Having recently switched to an M2 MAC, I found that I had to make some subtle changes.  I was able
+to identify multi-platform images for most dependencies except for phpmyadmin.  So, if you are using
+an ARM64 processor, you will have to modify the `docker-compose.yml` file and switch the `images`
+command to look like this:
+```dockerfile
+#   image: phpmyadmin/phpmyadmin
+    image: arm64v8/phpmyadmin
+```
 
 ### How do I stop phpMyAdmin
 If you have another mysql admin tool you'd prefer to use, you can prevent your docker-compose from instantiating the
