@@ -1,4 +1,5 @@
 FROM php:8.1-apache-buster
+
 ## https://hub.docker.com/_/php/tags?page=1&name=apache
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -14,6 +15,7 @@ RUN apt-get update -qq && \
     libpng-dev \
     libzip-dev \
     zip \
+    ghostscript \
     libmagickwand-dev \
 # INSTALL IMAGICK
     && pecl install imagick \
@@ -25,6 +27,9 @@ RUN apt-get update -qq && \
     && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > "/usr/local/etc/php/conf.d/xdebug.ini" \
 ### cleanup
     && rm -r /var/lib/apt/lists/*
+
+# Update ImageMagick policy
+RUN sed -i 's/policy\ domain=\"coder\" rights=\"none\" pattern=\"PDF\"/policy domain=\"coder\" rights=\"read\" pattern=\"PDF\"/g' /etc/ImageMagick-6/policy.xml
 
 # install and configure x-debug 3 when running for first time
 #RUN yes | pecl install xdebug \
