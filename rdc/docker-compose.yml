@@ -13,6 +13,8 @@ services:
       - db
     ports:
       - 127.0.0.1:${WEB_PORT}:80
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
     volumes:
       - ${WEB_OVERRIDES}:/etc/container-config-override
       - ${WEBROOT_DIR}:/var/www/html
@@ -36,14 +38,17 @@ services:
   db:
     container_name: ${DOCKER_PREFIX}_db
     build: ./docker-mysql
+#    environment:
+#      user: ${APACHE_RUN_USER_ID}
     env_file: ./.env
     restart: always
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
-      - ${LOGS_DIR}:/var/log/mysql
-      - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
+      - ${LOGS_DIR}/mysql:/var/log
+#      - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
+      - ${MYSQL_OVERRIDES}:/etc/mysql/conf.d
       - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
     ports:
      - 127.0.0.1:${MYSQL_PORT}:3306
