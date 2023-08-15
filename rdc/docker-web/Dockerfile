@@ -1,4 +1,4 @@
-FROM php:8.1-apache-buster
+FROM php:8.2-apache-buster
 
 ## https://hub.docker.com/_/php/tags?page=1&name=apache
 
