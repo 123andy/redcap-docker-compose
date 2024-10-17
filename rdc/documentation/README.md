@@ -39,7 +39,7 @@ This docker-compose will build multiple docker containers as part of a server gr
 The build consists of:
  * The official PHP-Apache docker image (Currently version 8.1)
  * The official MySql docker image (currently version 8.0)
- * A basic alpine-based MailHog image (for capturing outbound emails from REDCap for your review)
+ * Mailpit (for capturing outbound emails from REDCap for your review)
  * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
  * (optional) The official alpine-based PhpMyAdmin web-based mysql tool for managing the database.
    * You can comment this out or stop the service after startup (see FAQ)
@@ -51,7 +51,6 @@ team to work in identical environments for consistency.
 ### Docker-Compose Design
 This docker-compose script relies on a number of underlying images which are build or pulled to build your containers
 * docker-cron (built from Dockerfile)
-* docker-mailhog (built from Dockerfile)
 * docker-web (built from Dockerfile)
 * docker-db (built from Dockerfile as pulled official image)
 * phpmyadmin image (pulled as official image)
@@ -268,9 +267,9 @@ mysql>
 ### Local URLS
 * You can access your webroot at [http://localhost](http://localhost/) or [http://127.0.0.1](http://127.0.0.1/)
    * If this isn't working, see FAQ below
-* You can access your mailhog at [http://localhost/mailhog/](http://localhost/mailhog/)
+* You can access your mail via proxy at [http://localhost/mail/](http://localhost/mail/)
    * (don't forget the trailing slash)
-* You can access your phpMyAdmin at [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
+* You can access your phpMyAdmin via proxy at [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/)
    * (don't forget the trailing slash)
 
 
@@ -318,12 +317,12 @@ located (unless you specify additional parameters).
      files and need those changes to be incorporated into the containers -- otherwise your changes will not appear in the
      running images.
    * `docker-compose up -d --no-deps --build <CONTAINER_NAME>` - If you just want to rebuild one container and not all
-     of them. Valid names are `web`, `db`, `cron`, `mailhog`, `phpmyadmin` and `startup`)
+     of them. Valid names are `web`, `db`, `cron`, `mailpit`, `phpmyadmin` and `startup`)
    * `docker-compose stop` - this will stop the docker process (which would be good to do if you want to save battery)
    * `docker-compose down` - this will stop **and remove** the containers - meaning the next time you call up they will be
      recreated (this is similar to the --force-recreate tag)
    * `docker-compose down -v` - this will stop and remove the containers *along with their internal volumes*.  For
-     example, if you call this any saved email messages from mailhub would be removed.
+     example, if you call this any saved email messages would be removed.
    * `docker ps` - shows you all running containers - see the docker command reference
    * `docker ps -a` - shows you all running *and stopped* containers.
 
@@ -346,7 +345,6 @@ As of this writing, these ports are defined in .env
 WEB_PORT=80
 MYSQL_PORT=3306
 PHPMYADMIN_PORT=8080
-MAILHOG_PORT=8025
 ```
 
 When you go to pick port numbers, it is generally safest to pick from the range 1024 - 65535. Each of the values selected for these port numbers needs to be unique to across the running instances.
@@ -358,7 +356,6 @@ DOCKER_PREFIX=rc942
 WEB_PORT=1942
 MYSQL_PORT=2942
 PHPMYADMIN_PORT=3942
-MAILHOG_PORT=4942
 ```
 
 You can paste a block of parameters like this at the end of the .env file to override all of the parameters above.
@@ -391,11 +388,10 @@ You can shut down your servers by pressing ctrl-c in the window where you ran `d
 ```
 ^CGracefully stopping... (press Ctrl+C again to force)
 Stopping redcap ... done
-Stopping mailhog ... done
 ```
 
-This stops your running containers but does not delete them.  They are still there on your machine and will be
-restarted when you run `docker-compose up` again.  You can remove them (but not the volumes) with `docker-compose rm`.
+This stops your running containers but does not delete them.   If you run `docker-compose up` again, they will resume.
+You can remove the containers by `docker-compose down` or `docker-compose rm`.
 Try restarting again with `docker-compose up -d` - it should be MUCH faster after the initial load.  Adding the `-d` means
 detached so you can close your terminal window and the service will continue to run.
 
@@ -403,7 +399,7 @@ detached so you can close your terminal window and the service will continue to 
 ### Logging into the server
 To get a bash shell as root in the redcap server, you can run:
 ```shell
-$ docker-compose exec web /bin/bash
+$ docker compose exec web /bin/bash
 root@5af71d765e77:/#
 
 # become the apache user instead of root to avoid file permission issues
@@ -433,7 +429,6 @@ No, by default the database is stored in a docker volume.  You can see the docke
 andy123  redcap-docker-compose  rdc $ docker volume ls
 DRIVER              VOLUME NAME
 local               redcap_logs-volume
-local               redcap_mailhog-volume
 local               redcap_mysql-volume
 
 # Delete a volume (such as your mysql database)

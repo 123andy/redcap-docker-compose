@@ -1,4 +1,5 @@
-version: '3.7'
+name: REDCap-docker-compose
+
 services:
   web:
     container_name: ${DOCKER_PREFIX}_web
@@ -68,22 +69,24 @@ services:
     networks:
       - redcap_network
 
-  mailhog:
-    container_name: ${DOCKER_PREFIX}_mailhog
-    build: docker-mailhog
-    restart: always
-    env_file: .env
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: ${DOCKER_PREFIX}_mail
+    restart: unless-stopped
+    volumes:
+      - ${LOGS_DIR}/mailpit_data:/data
     depends_on:
       - web
-    ports:
-      - 127.0.0.1:${MAILHOG_PORT}:8025
-    volumes:
-      - ${MAILHOG_DIR}:/maildir
+#    ports:
+#      - 8025:8025
+#      - 1025:1025
     environment:
-      MH_STORAGE: maildir
-      MH_MAILDIR_PATH: /maildir
-      MH_OUTGOING_SMTP: /outgoing_smtp.json
-      MH_UI_WEB_PATH: mailhog
+      MP_MAX_MESSAGES: 5000
+      MP_WEBROOT: mail
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      TZ: ${TZ}
     networks:
       - redcap_network
 
@@ -110,8 +113,6 @@ volumes:
     name: "${DOCKER_PREFIX}_mysql-volume"
   logs-volume:
     name: "${DOCKER_PREFIX}_logs-volume"
-  mailhog-volume:
-    name: "${DOCKER_PREFIX}_mailhog-volume"
 
 networks:
   redcap_network:

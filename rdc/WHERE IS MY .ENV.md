@@ -7,7 +7,7 @@ $ ls -latr
 -rw-r--r--   1 andy123  staff  1068 Sep 23 14:07 LICENSE
 -rw-r--r--   1 andy123  staff  2912 Sep 23 14:07 docker-compose.yml
 drwxr-xr-x   4 andy123  staff   128 Sep 23 14:07 docker-cron
-drwxr-xr-x   5 andy123  staff   160 Sep 23 14:07 docker-mailhog
+drwxr-xr-x   5 andy123  staff   160 Sep 23 14:07 docker-mailpit
 drwxr-xr-x   3 andy123  staff    96 Sep 23 14:07 docker-mysql
 drwxr-xr-x   5 andy123  staff   160 Sep 23 14:07 docker-web
 drwxr-xr-x   7 andy123  staff   224 Sep 23 14:07 documentation

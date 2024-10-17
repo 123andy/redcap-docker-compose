@@ -32,7 +32,7 @@ Should you want to run this as production, be sure to edit the `redcap.ini` file
 to have production-ready php settings.
 
 ## Features
- * Mailhog to capture outbound email for review
+ * Mailpit to capture outbound email on your server for review
  * X-Debug support for detailed server-side inspection
  * PhpMyAdmin support for easy database maintenance / backups / restores
  * Easy to modify php-version or mysql-version and rebuild your environment in minutes

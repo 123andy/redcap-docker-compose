@@ -48,7 +48,6 @@ ENV APACHE_RUN_HOME /var/www
 ENV APACHE_DOCUMENT_ROOT /var/www/html
 ENV APACHE_ERROR_LOG /dev/stdout
 ENV APACHE_ACCESS_LOG /dev/stdout
-ENV SMTP_SMARTHOST mailhog
 
 # If you are overriding this container, you might want to remove the default vhost
 ENV REMOVE_DEFAULT_VHOST false

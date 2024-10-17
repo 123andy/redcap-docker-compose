@@ -46,7 +46,7 @@ if ($RI->step == 1) {
                     <div class="form-check">
                         <label class="form-check-label">
                             <input type="radio" value="consortium" class="form-check-input" name="dl-option">Use your
-                            <a target="_blank" href="https://community.projectredcap.org">Community Consortium</a> login
+                            <a target="_blank" href="https://redcap.vumc.org/community/">Community Consortium</a> login
                             to download your favorite REDCap version automatically
                         </label>
                     </div>
