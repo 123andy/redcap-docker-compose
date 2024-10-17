@@ -173,6 +173,18 @@ to try and learn how to use this tool.
 * Note: If you want to debug cron calls, you may have to do more!
   * When the cron container calls the web container it uses the url of  `http://web/cron.php`.  So, your xdebug server will not have a 'server' defined with a host of `web`.  So, in my case, I made aq second Server (step 2 above) also called web with the same configuration.
   * Alternately, you could disable the cronjob container with `docker compose stop cron` at the command prompt in the rdc folder and just make calls to the cron endpoint manually from your local browser (e.g. `http://localhost/cron.php` to trigger and test a cron job.  In this case, your normal xdebug server settings should capture the event)
+5.  Xdebug's default mode is "debug". To profile the code instead of debug
+   1. Create a new file "/usr/local/etc/php/conf.d/81-xdebug.ini"
+   2. Edit the file to include the line
+      1. xdebug.mode=profile
+   3. Restart apache
+      1. /etc/init.d/apache2 restart
+   4. Set the Debug Browser Extension to "Profile". This may be optional.
+   5. The output is captured at /tmp/cachegrind.out.##.gz  (## refers to the numbers in the filename. One file is created per request)
+   6. Copy the profile data to where PHP Storm can read it (Choose your location)
+      1. cp /tmp/cachegrind.out.##.gz /var/www/html/
+      2. In PHPStorm click on "Tools" choose "Analyze Xdebug Profiler Snapshot..."
+      3. Choose the cachegrind.out file. No need to un-gzip it.
 
 ## FAQ and Other Information
 
