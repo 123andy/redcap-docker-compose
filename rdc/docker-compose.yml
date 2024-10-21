@@ -89,22 +89,23 @@ services:
       - redcap_network
 
   # THIS CONTAINER IS OPTIONAL IF YOU WANT TO HAVE PHPMYADMIN - OTHERWISE COMMENT IT OUT
-  phpmyadmin:
-    container_name: ${DOCKER_PREFIX}_phpmyadmin
-#    image: phpmyadmin/phpmyadmin
-    image: arm64v8/phpmyadmin
-    env_file: .env
-    environment:
-      - UPLOAD_LIMIT=128M
-    depends_on:
-      - db
-    #restart: always
-#    volumes:
-#      - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
-    ports:
-      - 127.0.0.1:${PHPMYADMIN_PORT}:80
-    networks:
-      - redcap_network
+#   phpmyadmin:
+#     container_name: ${DOCKER_PREFIX}_phpmyadmin
+# # CHOOSE ONLY ONE OF THE IMAGE OPTIONS BELOW - USE ARM FOR APPLE SILICON
+# #    image: phpmyadmin/phpmyadmin
+# #    image: arm64v8/phpmyadmin
+#     env_file: .env
+#     environment:
+#       - UPLOAD_LIMIT=128M
+#     depends_on:
+#       - db
+#     #restart: always
+# #    volumes:
+# #      - ${PHPMYADMIN_PHP_OVERRIDES}:/usr/local/etc/php/conf.d/uploads.ini
+#     ports:
+#       - 127.0.0.1:${PHPMYADMIN_PORT}:80
+#     networks:
+#       - redcap_network
 
 volumes:
   mysql-volume:

@@ -60,6 +60,8 @@ See the [detailed documentation](rdc/documentation/README.md) for more informati
 effort so feedback is appreciated.  Please create issues here with any suggestions or make a pull request with improvements.
 
 ## Updates
+* 2024-10-21  Upgraded to php 8.3
+              added [adminer](rdc/documentation/README.md#adminer) as alternate db access tool
 * 2024-10-17  Replaced mailhog with mailpit - a supported variant to handle mail better
 * 2022-10-06  Did some cleanup to allow for M1 (ARM) support and Intel without changes
 * 2022-02-16  Made defaults php 8.1, mysql 8.0, xdebug 3.1.3 and incorporated some pull requests

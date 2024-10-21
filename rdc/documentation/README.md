@@ -14,6 +14,7 @@
     - [Migrating to the new version](#migrating-to-the-new-version)
   - [How do I prevent SMS messages from going out?](#how-do-i-prevent-sms-messages-from-going-out)
   - [Does this work with ARM64 processors, like the M1 or M2 "Apple Silicon" MACs?](#does-this-work-with-arm64-processors-like-the-m1-or-m2-apple-silicon-macs)
+  - [Adminer](#adminer)
   - [How do I stop phpMyAdmin](#how-do-i-stop-phpmyadmin)
   - [Connecting to the database](#connecting-to-the-database)
   - [Local URLS](#local-urls)
@@ -238,12 +239,20 @@ command to look like this:
     image: arm64v8/phpmyadmin
 ```
 
+### Adminer
+Adminer is an alternate solution for phpMyAdmin which hasn't really been supported for many years.  I selected a fork of
+adminer here [https://github.com/adminerevo/adminerevo/](https://github.com/adminerevo/adminerevo/) and placed the folder
+into the /debug/ folder on webroot.  You can access adminer at http://localhost/debug/adminer.php.  If you are using an older
+install of redcap-docker-compose, you may have to copy over the debug folder from /rdc/redcap-overrides/web/webroot/ to your
+local webroot at /www/.
+
 ### How do I stop phpMyAdmin
 If you have another mysql admin tool you'd prefer to use, you can prevent your docker-compose from instantiating the
 phpMyAdmin container.  Either:
 * After startup (e.g. `docker-compose up -d`) you could run `docker-compose stop phpmyadmin`
 * Alternately, you can comment out the phpmyadmin section of the `docker-compose.yml` file with `#` before each line.
   If you don't use it, you might as well turn it off so it isn't running all the time.
+* NOTE that phpMyAdmin is commented out by default since the introduction of adminer.  You will have to edit your docker-compose.yml file to re-enable the phpMyAdmin container
 
 ### Connecting to the database
 There are at least three ways to connect to your database:
