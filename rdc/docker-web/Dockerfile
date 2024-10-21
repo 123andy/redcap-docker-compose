@@ -1,4 +1,5 @@
-FROM php:8.2-apache-buster
+#FROM php:8.2-apache-buster
+FROM php:8.3-apache-bookworm
 
 ## https://hub.docker.com/_/php/tags?page=1&name=apache
 
@@ -16,24 +17,26 @@ RUN apt-get update -qq && \
     libzip-dev \
     zip \
     ghostscript \
-    libmagickwand-dev \
+    libmagickwand-dev
+
 # INSTALL IMAGICK
-    && pecl install imagick \
-    && docker-php-ext-enable imagick \
+# RUN pecl install imagick-3.7.0
+# imagick: Install error "Unterminated preprocessor conditions" in php 8.3
+# https://github.com/Imagick/imagick/issues/640
+RUN curl -fsSL https://github.com/Imagick/imagick/archive/944b67fce68bcb5835999a149f917670555b6fcb.tar.gz | tar xvz -C /tmp \
+    && yes '' | pecl install /tmp/imagick-944b67fce68bcb5835999a149f917670555b6fcb/package.xml \
+    && docker-php-ext-enable imagick
+
+    # Update ImageMagick policy
+RUN sed -i 's/policy\ domain=\"coder\" rights=\"none\" pattern=\"PDF\"/policy domain=\"coder\" rights=\"read\" pattern=\"PDF\"/g' /etc/ImageMagick-6/policy.xml
+
 # INSTALL MYSQLI AND OTHER DOCKER FUN
-    && docker-php-ext-install gd zip mysqli \
+RUN docker-php-ext-install gd zip mysqli \
 # INSTALL XDEBUG
     && pecl install xdebug \
     && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > "/usr/local/etc/php/conf.d/xdebug.ini" \
 ### cleanup
     && rm -r /var/lib/apt/lists/*
-
-# Update ImageMagick policy
-RUN sed -i 's/policy\ domain=\"coder\" rights=\"none\" pattern=\"PDF\"/policy domain=\"coder\" rights=\"read\" pattern=\"PDF\"/g' /etc/ImageMagick-6/policy.xml
-
-# install and configure x-debug 3 when running for first time
-#RUN yes | pecl install xdebug \
-#    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini
 
 # COPY OUR DEFAULT CONTAINER CONFIG
 COPY ./container-config /etc/container-config
