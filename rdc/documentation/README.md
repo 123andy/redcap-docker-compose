@@ -240,11 +240,14 @@ command to look like this:
 ```
 
 ### Adminer
-Adminer is an alternate solution for phpMyAdmin which hasn't really been supported for many years.  I selected a fork of
-adminer here [https://github.com/adminerevo/adminerevo/](https://github.com/adminerevo/adminerevo/) and placed the folder
-into the /debug/ folder on webroot.  You can access adminer at http://localhost/debug/adminer.php.  If you are using an older
-install of redcap-docker-compose, you may have to copy over the debug folder from /rdc/redcap-overrides/web/webroot/ to your
-local webroot at /www/.
+Adminer is an alternate solution for phpMyAdmin since phpMyAdmin is no longer supported and maintained.  I selected a fork of
+adminer here [https://github.com/adminerevo/adminerevo/](https://github.com/adminerevo/adminerevo/) and the setup process copies the file to the /debug/ folder of your local server on setup.
+
+You can access adminer at http://localhost/debug/adminer.php.
+
+The first time you use adminer, you will have to connect.  Server = `db`, Username, Password, and Database are all specified in your `.env` file. 
+
+If you are using an older install of redcap-docker-compose, you may have to copy over the debug folder from /rdc/redcap-overrides/web/webroot/ to your local webroot at /www/.
 
 ### How do I stop phpMyAdmin
 If you have another mysql admin tool you'd prefer to use, you can prevent your docker-compose from instantiating the
