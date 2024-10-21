@@ -39,8 +39,6 @@ services:
   db:
     container_name: ${DOCKER_PREFIX}_db
     build: ./docker-mysql
-#    environment:
-#      user: ${APACHE_RUN_USER_ID}
     env_file: ./.env
     restart: always
     cap_add:
@@ -48,11 +46,10 @@ services:
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
       - ${LOGS_DIR}/mysql:/var/log
-#      - ${MYSQL_OVERRIDES}:/etc/mysql/mysql.conf.d
       - ${MYSQL_OVERRIDES}:/etc/mysql/conf.d
       - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
     ports:
-     - 127.0.0.1:${MYSQL_PORT}:3306
+      - 127.0.0.1:${MYSQL_PORT}:3306
     networks:
       - redcap_network
 
@@ -77,6 +74,7 @@ services:
       - ${LOGS_DIR}/mailpit_data:/data
     depends_on:
       - web
+# No need to expose the mailpit services outside of the docker network
 #    ports:
 #      - 8025:8025
 #      - 1025:1025
@@ -111,8 +109,6 @@ services:
 volumes:
   mysql-volume:
     name: "${DOCKER_PREFIX}_mysql-volume"
-  logs-volume:
-    name: "${DOCKER_PREFIX}_logs-volume"
 
 networks:
   redcap_network:
