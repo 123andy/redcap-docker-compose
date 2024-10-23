@@ -4,5 +4,5 @@ www/*
 logs/*
 rdc/.env
 .vscode*
-
+credentials/*
 
