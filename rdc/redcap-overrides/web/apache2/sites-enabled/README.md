@@ -3,6 +3,9 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [How To](#how-to)
+  - [The Default Setup](#the-default-setup)
+  - [Replacing the default vhost](#replacing-the-default-vhost)
+  - [redcap.conf.example](#redcapconfexample)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
