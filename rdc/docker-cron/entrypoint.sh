@@ -14,6 +14,7 @@ if [ ! -z "$APACHE_RUN_USER_ID" ]; then
     fi
 fi
 
+# Insert crontabs while substituting for webroot_path
 sed -i 's|REDCAP_WEBROOT_PATH|'$REDCAP_WEBROOT_PATH'|g' /var/spool/cron/crontabs/root
 
 #if grep -Fq "cron.php" /var/spool/cron/crontabs/root

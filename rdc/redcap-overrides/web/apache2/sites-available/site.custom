@@ -1,0 +1,6 @@
+# This file will be inserted into the 000-site.conf default virtual host.
+# If you want to customize the vhost.conf you can add those customizations here.
+
+
+# To support the custom setup page
+DirectoryIndex index.php index.html redcap-setup.php

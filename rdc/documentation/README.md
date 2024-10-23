@@ -152,6 +152,74 @@ script merges the overrides into the default folders, so to remove a default you
     MySql have already done so.  You can find the usernames and passwords in the `.env` file.
 
 
+### SSL Setup (optional)
+If you would like to be able to access your localhost docker instance of REDCap via SSL, follow the following steps.
+
+(This is based on an article from https://dockerwebdev.com/tutorials/docker-php-development/)
+
+#### Instructions
+I use [Homebrew](https://brew.sh/) for managing packages on my Mac laptop.  So, these instructions are based on using a Mac and having installed Brew previously.  If this isn't you, there are alternate install [instructions for mkcert](https://github.com/FiloSottile/mkcert#installation) that provide many other methods.
+
+```
+brew install mkcert nss
+mkcert -install
+```
+
+Next, make a locally trusted development certificate
+mkcert localhost 127.0.0.1 ::1 (or add any other names you want to call your local server).  In my case, I use `redcap.local`.
+
+```
+mkcert localhost 127.0.0.1 ::1 redcap.local
+```
+This will yield two new files in your current directory.  Rename and move these files to the docker-compose continer inside the `credentials` folder.
+```
+mv localhost+3.pem /path_to_redcap_docker_compose/credentials/cert.pem
+mv localhost+x-key.pem /path_to_redcap_docker_compose/credentials/cert-key.pem
+```
+
+Turn on the SSL site which is loaded in the `redcap-overrides/web/apache2/sites-available/ssl.conf` by setting
+the `.env` variable `WEB_ENABLE_SSL_SITE=true`
+
+Restart your docker containers with `docker compose down; docker compose up -d`
+
+Try accessing your localhost with https protocol!  If it works, you might need to change your `REDCap base URL` from http to https.
+
+#### Next Steps
+At this point, your local computer can connect to your locally running docker over https without warnings. This is because your local computer 'trusts' the signer which is itself.  However, if your docker container trys to call itself or if the cron container were to try to call the web container with https, it would fail.  This seldom happens, but some EM code calls the server itself and could end up trying to use https.  To enable the docker web container to trust the certs we created on your laptop we have one more optional step.
+
+Find the location of the root certificate used by mkcert on your local computer. This is done with:
+```
+mkcert -CAROOT
+```
+It will give a path like `/Users/you/Library/Application Support/mkcert`.  
+Inside that folder is a file called `rootCA.pem`.  Lets copy that file to the `credentials` folder and *rename* it to `rdc_rootCA.pem`.
+```
+cp /Users/you/Library/Application Support/mkcert/rootCA.pem /path_to_redcap_docker_compose/credentials/rdc_rootCA.pem
+```
+
+There is a script in the `redcap-overrides/web/startup-scripts` that will, if the file `rdc_rootCA.pem` exists, will install it into the server so it is trusted.  
+
+To test of this works, you can ssh into your web container and check.  First, make sure you restart your containers with a `docker-compose down; docker compose up -d;`.
+Here is what it looks like when it isn't working:
+```
+$ docker compose exec web /bin/bash
+root@7aeb61f66236:/var/www/html# cd /tmp
+root@7aeb61f66236:/tmp# wget https://localhost
+--2024-10-23 16:06:02--  https://localhost/
+Resolving localhost (localhost)... ::1, 127.0.0.1
+Connecting to localhost (localhost)|::1|:443... failed: Connection refused.
+Connecting to localhost (localhost)|127.0.0.1|:443... connected.
+ERROR: The certificate of 'localhost' is not trusted.
+ERROR: The certificate of 'localhost' doesn't have a known issuer.
+```
+And, after:
+```
+--2024-10-23 16:47:50--  https://localhost/
+Resolving localhost (localhost)... ::1, 127.0.0.1
+Connecting to localhost (localhost)|::1|:443... failed: Connection refused.
+Connecting to localhost (localhost)|127.0.0.1|:443... connected.
+```
+
 ### X-Debug Configuration (optional)
 X-Debug allows you to insert breakpoints in your php code and evaluate variables from the server in your IDE.  It has a small
 learning curve to pick up but is really helpful in the long run.  I strongly encourage php developers
@@ -245,7 +313,7 @@ adminer here [https://github.com/adminerevo/adminerevo/](https://github.com/admi
 
 You can access adminer at http://localhost/debug/adminer.php.
 
-The first time you use adminer, you will have to connect.  Server = `db`, Username, Password, and Database are all specified in your `.env` file. 
+The first time you use adminer, you will have to connect.  Server = `db` (this is the name inside the redcap-docker network as defined in the `docker-compose.yml` file), Username, Password, and Database are all specified in your `.env` file. 
 
 If you are using an older install of redcap-docker-compose, you may have to copy over the debug folder from /rdc/redcap-overrides/web/webroot/ to your local webroot at /www/.
 
@@ -355,6 +423,7 @@ As of this writing, these ports are defined in .env
 
 ```
 WEB_PORT=80
+WEB_SSL_PORT=443
 MYSQL_PORT=3306
 PHPMYADMIN_PORT=8080
 ```
