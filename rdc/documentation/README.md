@@ -41,22 +41,23 @@
 ## Overview
 This docker-compose will build multiple docker containers as part of a server group to host REDCap on your local computer/server.
 The build consists of:
- * The official PHP-Apache docker image (Currently version 8.1)
+ * The official PHP-Apache docker image (Currently version 8.3)
  * The official MySql docker image (currently version 8.0)
  * Mailpit (for capturing outbound emails from REDCap for your review)
  * A basic alpine-based cron image (for running the REDCap cron and handling log rotation)
  * (optional) The official alpine-based PhpMyAdmin web-based mysql tool for managing the database.
-   * You can comment this out or stop the service after startup (see FAQ)
+   * This service is now commented out by default.  If you wish to use phpMyAdmin you can uncomment the entries from the `docker-compose.yml` file in the `/rdc/` directory
 
 The big advantage of this docker-based method is you can easily upgrade database versions, php versions, and see how
 these changes might affect your projects or custom code.  It also provides a nice mechanism for you and your development
-team to work in identical environments for consistency.
+team to work in identical environments for consistency.  Further, with advanced installations you could run many versions of php or REDCap simultenaously for testing.
 
 ### Docker-Compose Design
 This docker-compose script relies on a number of underlying images which are build or pulled to build your containers
 * docker-cron (built from Dockerfile)
 * docker-web (built from Dockerfile)
 * docker-db (built from Dockerfile as pulled official image)
+* mailpit (built from official image)
 * phpmyadmin image (pulled as official image)
 
 Those images that use Dockerfiles can be modified by tweaking the Dockerfile or scripts in each folder.  You must
@@ -74,15 +75,15 @@ script merges the overrides into the default folders, so to remove a default you
 ## Configuration
 1. Install docker on your machine.
    * Docker now requires that you create a user account.  Register.
-   * [Download the latest version of docker](https://docs.docker.com/get-docker/) desktop for your platform:
+   * [Download the latest version of docker](https://docs.docker.com/get-started/get-docker/) desktop for your platform:
      * For PC, I had to install the latest WSL2 Linux kernel update package and restart but gui walks you through 
      the process.  Also, upon launching VS Code, I installed the WSL extension.
 1. Download a zip of this repository [andy123/redcap-docker-compose](https://github.com/123andy/redcap-docker-compose)
    to your computer.  If you plan on contributing to the project, you may instead want to fork it and then clone your
-   fork so you can push changes and issue a pull request to the main repo.  Otherwise, just use the ZIP option.
-   * A zip file is available here: [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
+   fork so you can push changes and issue a pull request to the main repo.  Otherwise, just use the ZIP option.  You can chose the Master branch of some of the few releases.
+   * A zip file of the latest commit is available here: [zip download](https://github.com/123andy/redcap-docker-compose/archive/master.zip)
    * Unzip this into a good place on your computer (e.g. desktop or documents)
-      * On my Mac, I put it in a folder called 'redcap' under my user directory `~/redcap/`
+      * On my Mac, I put it in a folder called 'redcap' under my user directory `~/REDCap/`
 1. INSTALL A GOOD IDE.  This really makes things easier.  I can recommend:
    * [phpStorm](https://www.jetbrains.com/phpstorm/),
    * [Visual Studio Code](https://code.visualstudio.com/),
@@ -138,17 +139,18 @@ script merges the overrides into the default folders, so to remove a default you
        Then I access the server at http://redcap.local
      * PC Instructions: edit `C:\Windows\System32\drivers\etc\hosts` and make the same change as above.  You will have
        to be an administrator to save the file (or VS Code helps you)
+     * If you want to be able to use SSL on your localhost without errors - there is now a [special section with instructions](#ssl-setup-optional)
 1. You need a copy of the REDCap Installer.
    * If you are a member of the REDCap Consortium Community, you can:
-      1. [Download](https://community.projectredcap.org/page/download.html) the latest full installer as a zip file.
+      1. [Download](https://redcap.vumc.org/community/custom/download.php) the latest full installer as a zip file.
       2. Alternately, if you know your community username and password, there is a built-in setup tool that can complete
       the installation for you.
         * You can find your community username under your community profile (typically something like jane.b.doe)
    * If you do not have an access code for the Community Consortium, you can ask your local site's REDCap administrator
    to provide you with a copy of the latest FULL ZIP installer (provide the instructions above).
       * If your institution has a license you should be able to install a local development version under that license
-      * If you represent your institution, you can request a community account [here](https://community.projectredcap.org/articles/26/getting-started-introduction-learning-the-basics.html)
-   * If you are not affiliated with an institution that has a license with REDCap, you CANNOT access the source code and will be unable to use this tool.  You can contact REDCap to request a license [here](https://project-redcap.org).
+      * If you represent your institution, you can request a community account [here](https://projectredcap.org/resources/community/)
+   * If you are not affiliated with an institution that has a license with REDCap, you CANNOT access the source code and will be unable to use this tool.  You can contact REDCap to request a license [here](https://projectredcap.org/partners/join/).
 1. Configure REDCap
    * At this point, we assume that you have a running set of containers.  Use the REDCap Setup tool to complete your
     installation.  Please note that you DO NOT need to create a new database user as the `.env` and setup scripts for
@@ -200,9 +202,9 @@ Inside that folder is a file called `rootCA.pem`.  Lets copy that file to the `c
 cp /Users/you/Library/Application Support/mkcert/rootCA.pem /path_to_redcap_docker_compose/credentials/rdc_rootCA.pem
 ```
 
-There is a script in the `redcap-overrides/web/startup-scripts` that will, if the file `rdc_rootCA.pem` exists, will install it into the server so it is trusted.  
+There is a script in the `redcap-overrides/web/startup-scripts` that will, if the file `rdc_rootCA.pem` exists, install the crt into the trusted root chain so it will accept localhost calls.  
 
-To test of this works, you can ssh into your web container and check.  First, make sure you restart your containers with a `docker-compose down; docker compose up -d;`.
+To test of this works, you can ssh into your web container and check.  First, make sure you restart your containers with a `docker-compose down; docker compose up -d;`.  Then, goto the `rdc/` directory and connect to the web container as follows below:
 Here is what it looks like when it isn't working:
 ```
 $ docker compose exec web /bin/bash
@@ -256,6 +258,17 @@ to try and learn how to use this tool.
       1. cp /tmp/cachegrind.out.##.gz /var/www/html/
       2. In PHPStorm click on "Tools" choose "Analyze Xdebug Profiler Snapshot..."
       3. Choose the cachegrind.out file. No need to un-gzip it.
+
+
+#### Instructions for Visual Studio Code
+1. After your docker web container is up and running, you should have access to a xdebug information page here: [http://localhost/debug/xdebug_info.php](http://localhost/debug/xdebug_info.php)
+   - Note that the settings for xdebug defalt via the injected override file located here `/rdc/redcap-overrides/web/php/80-xdebug.ini`.  If you want to make changes, you can EITHER edit this file and change the master values, or you can override them using then `.env` XDEBUG environmental variable.  Be sure to run `docker compose down; docker compose up -d` after any changes and check the [xdebug_info]((http://localhost/debug/xdebug_info.php) page afterwards.
+1. In VS Code, install the OFFICIAL 'Php Debug' extension.  (has 12.5M installs as of 10/2024)
+1. For Chrome, install the [Xdebug helper extension](https://chromewebstore.google.com/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc?hl=en).  This will allow you to designate a page/session for debugging by setting a cookie
+1. The redcap-docker-compose repository already contains a .vscode folder with a launch.json which should create a launch open for starting a debug session.  To do this:
+   - Click on the left-side 'Run and Debug' page in VSCODE that was added when you installed PHP Debug
+   - Click on the green play button for 'Listen for Xdebug'
+1. Now, goto your browser, using the new extension, set it to 'debug mode' and then refresh a page and you should see a debug session.   
 
 ## FAQ and Other Information
 
