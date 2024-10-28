@@ -1,3 +1,1 @@
-# This file is inserted into the 000-site.conf default virtual host.
-# If you want to customize the vhost.conf you can customize this file
-# and insert it with the overrides.
+# This is a placeholder for a conf file inserted into the default vhost

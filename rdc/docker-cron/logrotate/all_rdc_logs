@@ -1,0 +1,14 @@
+# Changed to rotate all log files in the /logs-dir based on max size of 1M keeping 4 versions
+# This should prevent the logs from running away in the event of a lot of errors
+/logs-dir/*.log {
+	su cron-www-data root
+    rotate 4
+	create
+	size 1M
+	#minsize 10k
+	dateext
+	#weekly
+	nocompress
+	missingok
+	notifempty
+}

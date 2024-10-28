@@ -45,7 +45,8 @@ services:
       - SYS_NICE  # CAP_SYS_NICE
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
-      - ${LOGS_DIR}/mysql:/var/log
+      # - ${LOGS_DIR}/mysql:/var/log
+      - ${LOGS_DIR}:/var/log
       - ${MYSQL_OVERRIDES}:/etc/mysql/conf.d
       - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
     ports:
