@@ -89,6 +89,8 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
       TZ: ${TZ}
+      #Uncommenting below will enable the file relay config at /logs/mailpit_data/smtp_relay_config.yml
+      #MP_SMTP_RELAY_CONFIG: /data/smtp_relay_config.yml
     networks:
       - redcap_network
 

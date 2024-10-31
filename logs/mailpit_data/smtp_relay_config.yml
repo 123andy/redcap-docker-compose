@@ -1,0 +1,15 @@
+# See https://mailpit.axllent.org/docs/configuration/smtp-relay/ for more details
+# You must also uncomment the environmental variable in the mailpit section of docker-compose.yml
+# For this file to take effect
+
+host:                <hostname-or-ip>            # required
+port:                <port>                      # optional - default 25
+starttls:            <true|false>                # optional - default false
+allow-insecure:      <true|false>                # optional - default false
+auth:                <none|plain|login|cram-md5> # optional - default none
+username:            <username>                  # required for plain, login and cram-md5 auth
+password:            <password>                  # required for plain & login auth
+secret:              <cram-secret>               # required for cram-md5 auth
+return-path:         <bounce-address>            # optional - overrides Return-Path for all released emails
+allowed-recipients:  '@example\.com$'            # optional - limit allowed relay addresses or domains
+blocked-recipients:  '@example2\.com$'           # optional - prevent relating to addresses or domains
