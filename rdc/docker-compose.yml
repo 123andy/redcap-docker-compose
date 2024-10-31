@@ -49,6 +49,8 @@ services:
       - ${LOGS_DIR}:/var/log
       - ${MYSQL_OVERRIDES}:/etc/mysql/conf.d
       - ${MYSQL_SCRIPTS}:/docker-entrypoint-initdb.d/
+    # You can likely comment out this ports section unless you want to directly 
+    #connect to your database from your laptop
     ports:
       - 127.0.0.1:${MYSQL_PORT}:3306
     networks:
