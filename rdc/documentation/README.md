@@ -11,6 +11,8 @@
     - [Next Steps](#next-steps)
   - [X-Debug Configuration (optional)](#x-debug-configuration-optional)
     - [Directions for PHPStorm:](#directions-for-phpstorm)
+    - [Instructions for Visual Studio Code](#instructions-for-visual-studio-code)
+- [Upgrading your REDCap-Docker-Compose localhost installation](#upgrading-your-redcap-docker-compose-localhost-installation)
 - [FAQ and Other Information](#faq-and-other-information)
   - [How do I upgrade to the latest version of redcap-docker-compose?](#how-do-i-upgrade-to-the-latest-version-of-redcap-docker-compose)
     - [A Clean Start](#a-clean-start)
