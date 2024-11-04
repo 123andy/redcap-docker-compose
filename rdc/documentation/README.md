@@ -13,6 +13,11 @@
     - [Directions for PHPStorm:](#directions-for-phpstorm)
     - [Instructions for Visual Studio Code](#instructions-for-visual-studio-code)
 - [Upgrading your REDCap-Docker-Compose localhost installation](#upgrading-your-redcap-docker-compose-localhost-installation)
+  - [Backup your current database](#backup-your-current-database)
+  - [Download and start the new REDCap Docker Compose](#download-and-start-the-new-redcap-docker-compose)
+  - [Import your database backup](#import-your-database-backup)
+  - [Copy over your www directory](#copy-over-your-www-directory)
+  - [Test if all is working!](#test-if-all-is-working)
 - [FAQ and Other Information](#faq-and-other-information)
   - [How do I upgrade to the latest version of redcap-docker-compose?](#how-do-i-upgrade-to-the-latest-version-of-redcap-docker-compose)
     - [A Clean Start](#a-clean-start)
@@ -273,60 +278,62 @@ to try and learn how to use this tool.
 1. Now, goto your browser, using the new extension, set it to 'debug mode' and then refresh a page and you should see a debug session.   
 
 ## Upgrading your REDCap-Docker-Compose localhost installation
-This new section is designed to help you perform an upgrade from an older version of REDCap Docker Compose.  Here are some steps to consider:
+This new section is designed to help you perform an upgrade from an older version of REDCap Docker Compose.  For clarity, I will refer
+to the current folder where your old/existing redcap-docker-compose is located as `~/old_rdc/` so the folder with the `docker-compose.yml`
+would be in `~/old_rdc/rdc/`.
 
-1. Download the latest version of REDCap Docker Compose (aka rdc) and save it to a new working directory.  For example:
-`~/REDCap_2025_01/`
-1. We want to make sure your new docker containers, volumes, and networks are named differently than your existing docker containers.  So, with your new installation, verify that the value for the `DOCKER_PREFIX` variable in the `.env` file is different.  The current version of rdc keeps all resources tagged with this prefix to prevent, for example, accidentally overwriting the database volume of your old setup.
-1. First, lets back-up your current mysql database from the older setup. You can accomplish this using phpmyadmin or with a simple docker command.  For the docker command, begin by going to the `/rdc` folder in your OLD/EXISTING redcap docker compose directory.
+These are step-by-step - please reach out on the community consortium if you are having trouble.
+
+### Backup your current database
+Your current mysql database is stored on a docker volume.  We are going to use the `db` container to generate a `.sql.gz` backup and copy it to your host laptop.  In older versions of rdc, the database container mounted its logs as `~/old_rdc/logs/mysql` or `~old_rdc/logs/`.  If you look there, you should see a `mysql_error.log` or `mysql_slow.log` file.
+1. Make sure your old redcap docker compose is running (e.g. you can access your local redcap).
+1. Backup your current redcap-docker-compose database with the following commands: 
 ```
-$ cd /path/to/old/rdc
+# Goto the folder with the docker-compose.yml file
+$ cd ~/old_rdc/rdc
 
-# STEP 1: Make sure your old rdc containers are running...
-$ docker compose ps
-# This should display a list of your running docker containers.  
-# If they aren't running, execute a `docker compose up -d` first...
-
-# STEP 2: Do a backup.  An example of a valid backup command is below.  Since rdc maps a log directory from the database
-# container to the `logs` directory on your laptop, we will store the backup file there.
-# Older versions of rdc mapped /var/log/mysql (on the db container) to /logs/mysql (on your laptop) while this 
-# version maps /var/log (on the db container) to /logs/ (on your laptop) - so you may need to adjust the final path:
-
-# For newer versions this should work:
+# Depending on how your LOGS_DIR is mounted to the db container, one of the following two commands should work to create a backup:
+# For newer versions where the db container has logs mounted as: ${LOGS_DIR}:/var/log, this should work:
 $ docker compose exec db bash -c 'mysqldump -u root --password=$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE | gzip > /var/log/${DOCKER_PREFIX}_redcap_db_$(date +%Y-%m-%d_%H%M%S).sql.gz'
 
-# Alternately, for older versions of rdc, you might want the destination path like:
+# Alternately, for older versions of rdc, where the logs are mounted as ${LOGS_DIR}/mysql:/var/log or ${LOGS_DIR}/mysql:/var/log/mysql, this might work:
 $ docker compose exec db bash -c 'mysqldump -u root --password=$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE | gzip > /var/log/mysql/${DOCKER_PREFIX}_redcap_db_$(date +%Y-%m-%d_%H%M%S).sql.gz'
+```
+1. Check your `~/old_rdc/logs/...` directory and try to find the new `.sql.gz` backup.  This command might take a while if your database is large.
+1. Shut down your old rdc setup with `~/old_rdc/rdc> docker compose down`
 
-# STEP 3: Verify you have your backup.  Look at your local computer's /logs/ directory (or /logs/mysql/) and see if you
-# can find the database dump.  Great!
+### Download and start the new REDCap Docker Compose
+1. You can pull from the master branch or pick a newer release.  I would default to trying the master branch, but it is up to you.  In most cases, you want to pull the 'zip' version and not clone the repo unless you plan to make pull requests.  Let's then unzip it into a new folder, e.g. `~/REDCap_2025_01/`.  
 
-# STEP 4: Shut down the old version of RDC
-$ docker compose down
-
-# STEP 5: Switch to the newer version of RDC
-$ cd /path/to/latest/redcapdockercompose/rdc
-
-# STEP 6: Make sure the .env has a different value for the DOCKER_PREFIX setting:
+1. Set up the new `.env` file.  Copy `.env-example` to `.env` and set up all the values.
+1. **Make sure the value for the `DOCKER_PREFIX` variable in the new `.env` is different than in your old one.** This will ensure you don't accidentally overwrite a docker volume that might contain data from your previous RDC install.
+```
 $ cat .env | grep "DOCKER_PREFIX"
 DOCKER_PREFIX=rc_v2 (or whatever)
+```
+1. Turn on your new rdc with `docker compose up`.  This should create an empty database and you should be able to access the setup page at `http://localhost`.
 
-# STEP 7: Fire up the new containers
-$ docker compose up -d
+### Import your database backup
+1. Copy the `.sql.gz` backup created from your old instance to the `logs` directory of the new rdc folder (and rename it `redcap_restore.sql.gz`).
+```
+$ cp /path/to/old_rdc/logs/(?mysql)/prefix_redcap_db_2024-xx-xx_xxxxxx.sql.gz /path/to/latest/redcapdockercompose/logs/redcap_restore.sql.gz
+```
+1. Next, lets tell the database container to import the backup:
+```
+~/new_rdc/rdc> $ docker compose exec db bash -c 'zcat /var/log/redcap_restore.sql.gz | mysql -u root --password=$MYSQL_ROOT_PASSWORD ${MYSQL_DATABASE}'
+```
+This might take a while, but when done you should see all your database tables.  You can verify with `http://localhost/debug/adminer.php` and then use `db` as the server name and `root` / `root` as the user/password.
 
-# STEP 8: Copy the backup from the old rdc instance to the new one so it is available for restore.
-# Note that the exact path might be different depending on the version where you made the backup, but it should be
-# somewhere in the old logs folder based on step 2 above..
-$ cp /path/to/old/rdc/logs/mysql/prefix_redcap_db_2024-xx-xx_xxxxxx.sql.gz /path/to/latest/redcapdockercompose/rdc/logs/redcap_restore.sql.gz
-
-# STEP 9: Restore the redcap database with the backup you just made.  Even if you haven't installed REDCap on the new
-# rdc instance, the sql server will create an empty database with the name of `MYSQL_DATABASE` as defined in the .env file
-$ docker compose exec db bash -c 'zcat /var/log/redcap_restore.sql.gz | mysql -u root --password=$MYSQL_ROOT_PASSWORD ${MYSQL_DATABASE}'
-
-# STEP 10: Lastly, you need to copy the web content from your old RDC instance over to the new one
+### Copy over your www directory
+If all worked, your new rdc instance is a copy of your old database, but it is missing the www directory.  So, copy over all the /www/ files from the old install to the new one.
+1. Copy files (via command line or by drag and drop)
+```
 $ cp -r /path/to/old/rdc/www/* /path/to/latest/redcapdockercompose/rdc/www
 ```
+
+### Test if all is working!
 Now, you should be ready to go with the new version.  If you don't like what you get, you can always shut it down (e.g. `docker compose down`) and start up the old one again.  Or, if you want to run both instances simultaneously, you simply need to change the values for the `WEB_PORT` and `WEB_SSL_PORT` and `MYSQL_PORT` in the `.env` files so they do not overlap and you can run both versions at the same time on different ports (but you might need to change your `REDCap base URL` in control center / general configuration)
+
 
 ## FAQ and Other Information
 
