@@ -37,14 +37,14 @@ services:
 
   db:
     container_name: ${DOCKER_PREFIX}_db
-    build: ./docker-mysql
-    image: ${DOCKER_PREFIX}_db
+    image: mysql:8.4-oracle
     env_file: ./.env
     restart: always
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
     volumes:
       - ${MYSQL_DIR}:/var/lib/mysql
+      # MOVED LOGS_DIR out of MYSQL subdir 
       # - ${LOGS_DIR}/mysql:/var/log
       - ${LOGS_DIR}:/var/log
       - ${MYSQL_OVERRIDES}:/etc/mysql/conf.d
