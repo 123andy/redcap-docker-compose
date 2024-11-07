@@ -1,15 +1,12 @@
 <?php
 
-// SCAN YOUR REDCAP TO SEE IF THERE ARE UPDATES TO BE HAD FORM GIT
-
+// SCAN YOUR REDCAP WWW FOLDER TO DO A GIT PULL ON ALL REPOS (e.g. EXTERNAL MODULES)
 
 
 // Find all folders that have a .gitsubrepo folder
 
 $doUpdate = isset($argv[1]) && $argv[1] == "true";
-
-$dirs = scanDir::scan(__DIR__, ".git", true);
-
+$dirs = scanDir::scan(__DIR__, ".git", [], true);
 
 
 // $files = array_slice($files,0,2); // DEBUG TEMP
@@ -21,7 +18,6 @@ $current = array();
 $behind = array();
 $other = array();
 $errors = array();
-
 
 $update = array();
 
@@ -73,11 +69,9 @@ if (!empty($other)) {
     echo "\n============= OTHER ISSUES =============\n";
     foreach ($other as $dir => $detail) {
         // echo json_encode($o) . "\n";
-        echo $dir . "\n";
+        echo $dir . "\n" . preg_replace('/^/m','   | ', preg_replace('/\n+/',"\n", $detail['output'])) . "\n";
     }
 }
-
-
 
 if (!empty($current)) {
     echo "\n============= CURRENT =============\n";
@@ -176,13 +170,13 @@ class scanDir {
     static private $directories, $files, $ext_filter, $recursive, $dir_filter;
 
     // ----------------------------------------------------------------------------------------------
-    // scan(dirpath::string|array, extensions::string|array, recursive::true|false,  skipDirs::array)
+    // scan(dirpath::string|array, extensions::string|array, $ext_filter::array recursive::true|false,  skipDirs::array)
     static public function scan(){
         // Initialize defaults
         self::$recursive = true;
         self::$directories = array();
         self::$files = array();
-        self::$ext_filter = false;
+        self::$ext_filter = array();
         self::$dir_filter = array();
 
         // Check we have minimum parameters
