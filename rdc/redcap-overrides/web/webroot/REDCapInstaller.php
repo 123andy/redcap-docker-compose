@@ -161,6 +161,22 @@ class REDCapInstaller {
                         $q = $this->db_query("UPDATE redcap_config set value = '0' where field_name='autologout_timer'");
                         $this->successes[] = "Set server logout time to never (to reduce headaches for local development)";
                         
+                        // Set up the REDCap Instance Indicator EM
+                        $q = $this->db_query("INSERT INTO redcap_external_modules_downloads VALUES ('redcap_instance_indicator_v1.0.1',1607,now(), null)");
+                        $q = $this->db_query("INSERT INTO redcap_external_modules SET directory_prefix = 'redcap_instance_indicator'");
+                        $insert_id = $this->db_last_insert_id();
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'version', 'string', 'v1.0.1' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'enabled', 'boolean', 'false' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'discoverable-in-project', 'boolean', 'false' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'user-activate-permission', 'boolean', 'false' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'reserved-hide-from-non-admins-in-project-list', 'boolean', 'false' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'indicator_type', 'string', 'dev' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'indicator_position', 'string', 'tl' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'indicator_navbar', 'string', 'below' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'indicator_printable', 'boolean', 'false' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'indicator_custom', 'json-array', '[\"true\"]' )");
+                        $q = $this->db_query("INSERT INTO redcap_external_module_settings VALUES ($insert_id, null, 'indicator_navbar', 'string', 'below' )");
+                        
                         // Direct the user to the remainder of the REDCap install.php
                         $this->successes[] = "Installed $redcap_tables REDCap tables to " . $this->db . " on " . $this->hostname;
                         $nextUrl = $this->redcap_webroot_url . "redcap_v" . $redcap_version . "/ControlCenter/check.php";
@@ -342,6 +358,14 @@ class REDCapInstaller {
     }
 
 
+    /**
+     * Wrapper for getting last insert id
+     * @return int
+     */
+    public function db_last_insert_id() {
+        return mysqli_insert_id($this->db_conn);
+    }
+    
 
     /**
      * Wrapper for running a query
