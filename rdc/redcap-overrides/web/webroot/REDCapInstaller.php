@@ -146,6 +146,21 @@ class REDCapInstaller {
                         $redcap_version = $this->db_query("SELECT value FROM `redcap_config` WHERE field_name='redcap_version'")
                         ->fetch_assoc()['value'];
 
+                        // Set the Login Image
+                        $q = $this->db_query("UPDATE redcap_config set value = '/RDC_LOGO.png' where field_name='login_logo'");
+
+                        // Set the reporting mode to 0 (do not report stats to VUMC)
+                        $q = $this->db_query("UPDATE redcap_config set value = '0' where field_name='auto_report_stats'");
+                        $this->successes[] = "Turn off auto-reporting of statistics (turn back on if you want)";
+                        
+                        // Set server as development server
+                        $q = $this->db_query("UPDATE redcap_config set value = '1' where field_name='is_development_server'");
+                        $this->successes[] = "Set server type as development server";
+                        
+                        // Set autologout to never
+                        $q = $this->db_query("UPDATE redcap_config set value = '0' where field_name='autologout_timer'");
+                        $this->successes[] = "Set server logout time to never (to reduce headaches for local development)";
+                        
                         // Direct the user to the remainder of the REDCap install.php
                         $this->successes[] = "Installed $redcap_tables REDCap tables to " . $this->db . " on " . $this->hostname;
                         $nextUrl = $this->redcap_webroot_url . "redcap_v" . $redcap_version . "/ControlCenter/check.php";
