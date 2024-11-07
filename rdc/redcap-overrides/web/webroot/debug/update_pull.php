@@ -1,16 +1,20 @@
 <?php
-
-// SCAN YOUR REDCAP WWW FOLDER TO DO A GIT PULL ON ALL REPOS (e.g. EXTERNAL MODULES)
-
-
-// Find all folders that have a .gitsubrepo folder
+/**
+ * 
+ * This php file will scan your www directory and all subdirectories for git repositories
+ * and try to update them.  To do a dry-run, from the command line, you execute:
+ * php update_pull.php
+ * 
+ * This will tell you what it detects and what it will want to do.  If you agree,
+ * you can run:
+ * php update_pull.php true
+ * 
+ * and it will actually pull all of the modules specified.
+ *  
+ */
 
 $doUpdate = isset($argv[1]) && $argv[1] == "true";
 $dirs = scanDir::scan(__DIR__, ".git", [], true);
-
-
-// $files = array_slice($files,0,2); // DEBUG TEMP
-// echo print_r($dirs);
 
 // Parse out subrepo information
 $subrepos = array();
@@ -18,7 +22,6 @@ $current = array();
 $behind = array();
 $other = array();
 $errors = array();
-
 $update = array();
 
 foreach ($dirs as $i => $dir) {
@@ -42,21 +45,7 @@ foreach ($dirs as $i => $dir) {
         $other[$dir] = $result;
         $status = "see details";
     }
-
     echo $status . "\n";
-
-
-    // // Open file
-    // $subrepo = $this->parseSubRepoFile($file);
-    // if (empty($subrepo)) continue;
-    //
-    // // Get path relative to repo root and full path
-    // $subrepo['relative_path'] = str_replace($this->repo_path . DIRECTORY_SEPARATOR, "", dirname($file));
-    // $subrepo['full_path'] = $file;
-    // // $subrepo['remote_name'] = basename($subrepo['remote']);
-    //
-    // // Add to list
-    // $subrepos[] = $subrepo;
 }
 
 if (!empty($errors)) {
@@ -95,21 +84,6 @@ if (!empty($behind)) {
     }
 
 }
-
-
-// var_dump($errors);
-// var_dump($current);
-// var_dump($behind);
-// var_dump($other);
-
-
-
-// $this->log($files);
-// $this->log($subrepos);
-// $this->subrepos = $subrepos;
-
-
-
 
 
 /**

@@ -290,6 +290,9 @@ class REDCapInstaller {
             $contents[] = '$password = "' . $this->password . '";';
             $contents[] = '$salt     = "' . $this->salt     . '";';
             $contents[] = '';
+            $contents[] = '// AN OPTIONAL INCLUDE FILE FOR ADDING CUSTOM CLASSES TO ALL OF REDCAP';
+            $contents[] = '// include_once debug/server_settings.php';
+            $contents[] = '';
 
             file_put_contents($dest_path . "database.php", implode("\n\t",$contents));
             return true;
