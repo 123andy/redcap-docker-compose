@@ -42,6 +42,7 @@
   - [How can I REALLY delete everything?](#how-can-i-really-delete-everything)
   - [How can I switch mysql versions?  For example, go from mySql 5.7 to mySql 8.0?](#how-can-i-switch-mysql-versions--for-example-go-from-mysql-57-to-mysql-80)
   - [Scanning External Modules for REPO Submission](#scanning-external-modules-for-repo-submission)
+  - [How do I work with git repositories as External Modules with Visual Studio Code (vsCode)?](#how-do-i-work-with-git-repositories-as-external-modules-with-visual-studio-code-vscode)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -730,3 +731,9 @@ or
 $ docker exec -it 1dc2023b8753 /var/www/html/bin/scan modules-lab/realtime_randomization_v9.9.9
 ```
 where 1dc... is the container ID from the `docker ps` command.
+
+### How do I work with git repositories as External Modules with Visual Studio Code (vsCode)?
+By default, Visual Studio only scans for git repositories in the root directory of your workspace.  So, if you have cloned a git repository for an external module into `www/modules/my_module_v0.0.0` it will NOT appear as a git module in vsCode by default.  This can thankfully be easily fixed.
+1. Open your vsCode settings (command-comma) and search for `git.repositoryScanMaxDepth` - change it from 1 (default) to 3
+1. Restart your vsCode project and it should now detect the git repos for your EMs.
+
