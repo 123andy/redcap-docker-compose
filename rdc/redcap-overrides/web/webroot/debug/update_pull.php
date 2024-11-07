@@ -12,9 +12,27 @@
  * and it will actually pull all of the modules specified.
  *  
  */
+function isCommandLineInterface()
+{
+    return (php_sapi_name() === 'cli');
+}
 
-$doUpdate = isset($argv[1]) && $argv[1] == "true";
-$dirs = scanDir::scan(__DIR__, ".git", [], true);
+
+if (isCommandLineInterface()) {
+    $doUpdate = isset($argv[1]) && $argv[1] == "true";
+} else {
+    echo "<h3>Check Git Repos for Updates</h3>";
+    echo "<p>From the web, this will only show you what needs to be updated (provided the repos are public)</p>";
+    echo "To actually update the repos listed here, from your laptop's command line terminal goto:
+         <code>cd www/debug</code> and then run <code>php update_pull.php true</code></br><pre>";
+}
+
+
+// Because this file is in the /debug folder and we want to scan from the /www folder, I need to move up one level
+$base_dir = dirname(__DIR__, 1); 
+
+// Scan all directories
+$dirs = scanDir::scan($base_dir, ".git", true);
 
 // Parse out subrepo information
 $subrepos = array();
@@ -141,10 +159,10 @@ function syscall ($cmd, $cwd, $useBash = false)
 
 
 class scanDir {
-    static private $directories, $files, $ext_filter, $recursive, $dir_filter;
+    static private $directories, $files, $recursive, $ext_filter, $dir_filter;
 
     // ----------------------------------------------------------------------------------------------
-    // scan(dirpath::string|array, extensions::string|array, $ext_filter::array recursive::true|false,  skipDirs::array)
+    // scan(dirpath::string|array, extensions::string|array, recursive::true|false, $ext_filter::array, skipDirs::array)
     static public function scan(){
         // Initialize defaults
         self::$recursive = true;
