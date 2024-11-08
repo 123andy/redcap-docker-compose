@@ -741,8 +741,8 @@ By default, Visual Studio only scans for git repositories in the root directory 
 ### Any advice about working with repos you've cloned from GIT?
 Funny you should ask!  If I am making my own repo from GIT, I will typically create the repo and pull it into my modules folder with:
 ```sh
-               > cd www/modules
-rdc/www/modules> git clone git@github.com:123andy/my_external_module.git my_external_module_v0.0.0
+           > cd www/modules
+www/modules> git clone git@github.com:123andy/my_external_module.git my_external_module_v0.0.0
 ```
 Note that I use version 0.0.0... This means I'm running off of a git repo and not from a fixed release.  After a while, you might end up with a lot of repos in your
 modules folder.  In order to pull all of them so they are up-to-date with the repo HEAD, I created a script that you can use.  First, you can check to see if you
