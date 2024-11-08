@@ -44,16 +44,16 @@ COPY ./container-config /etc/container-config
 # BY MOUNTING ADDITIONAL FILES INTO /etc/container-config-overwrite FOLDER.  THIS FOLDER
 # IS ALIASED AS THE `WEB_OVERRIDES` ENV VARIABLE IN THE .env FILE
 
-ENV SERVER_NAME localhost
-ENV SERVER_ADMIN root
-ENV SERVER_ALIAS localhost
-ENV APACHE_RUN_HOME /var/www
-ENV APACHE_DOCUMENT_ROOT /var/www/html
-ENV APACHE_ERROR_LOG /dev/stdout
-ENV APACHE_ACCESS_LOG /dev/stdout
+ENV SERVER_NAME=localhost
+ENV SERVER_ADMIN=root
+ENV SERVER_ALIAS=localhost
+ENV APACHE_RUN_HOME=/var/www
+ENV APACHE_DOCUMENT_ROOT=/var/www/html
+ENV APACHE_ERROR_LOG=/dev/stdout
+ENV APACHE_ACCESS_LOG=/dev/stdout
 
 # If you are overriding this container, you might want to remove the default vhost
-ENV REMOVE_DEFAULT_VHOST false
+ENV REMOVE_DEFAULT_VHOST=false
 
 # Copy main startup script
 COPY container_start.sh /etc/container_start.sh
