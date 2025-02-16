@@ -332,7 +332,7 @@ class REDCapInstaller {
      */
     public function getInstallerVersions(){
         try {
-            $result = file_get_contents("https://redcap.vanderbilt.edu/plugins/redcap_consortium/versions.php");
+            $result = file_get_contents("https://redcap.vumc.org/plugins/redcap_consortium/versions.php");
             $results = json_decode($result,true);
             $opt_groups = array();
             foreach ($results as $branch => $versions) {
@@ -415,7 +415,7 @@ class REDCapInstaller {
             list($branch,$version) = explode("--", $_POST['version']);
             if (empty($version)) throw new RuntimeException('Missing required version');
 
-            $url = 'https://redcap.vanderbilt.edu/plugins/redcap_consortium/versions.php';
+            $url = 'https://redcap.vumc.org/plugins/redcap_consortium/versions.php';
             $postdata = http_build_query(array(
                         'username' => $_POST['username'],
                         'password' => $_POST['password'],
