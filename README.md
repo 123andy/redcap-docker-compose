@@ -57,6 +57,7 @@ See the [detailed documentation](rdc/documentation/README.md) for more informati
 effort so feedback is appreciated.  Please create issues here with any suggestions or make a pull request with improvements.
 
 ## Updates
+* 2025-02-18  Added composer and npm/node to web container for facile unit testing
 * 2024-10-23  Added instructions for setting up local SSL environment, cleaned up vhost setups
 * 2024-10-21  Upgraded to php 8.3 and added [adminer](rdc/documentation/README.md#adminer) as alternate db access tool, and commented out phpMyAdmin by default
 * 2024-10-17  Replaced mailhog with mailpit - a supported variant to handle mail better
