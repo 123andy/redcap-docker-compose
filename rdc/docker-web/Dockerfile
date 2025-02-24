@@ -16,6 +16,8 @@ RUN apt-get update -qq && \
     libpng-dev \
     libzip-dev \
     zip \
+    unzip \
+    p7zip-full \
     ghostscript \
     libmagickwand-dev
 
@@ -30,8 +32,9 @@ RUN curl -fsSL https://github.com/Imagick/imagick/archive/944b67fce68bcb5835999a
     # Update ImageMagick policy
 RUN sed -i 's/policy\ domain=\"coder\" rights=\"none\" pattern=\"PDF\"/policy domain=\"coder\" rights=\"read\" pattern=\"PDF\"/g' /etc/ImageMagick-6/policy.xml
 
-# INSTALL MYSQLI AND OTHER DOCKER FUN
-RUN docker-php-ext-install gd zip mysqli \
+# INSTALL MYSQLI AND OTHER DOCKER FUN (added freetype support for Gunther's nedcaptcha)
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd zip mysqli \
 # INSTALL XDEBUG
     && pecl install xdebug \
     && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > "/usr/local/etc/php/conf.d/xdebug.ini" \
